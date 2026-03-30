@@ -83,13 +83,13 @@ const questions = [
     ],
   },
   {
-    label: "How far will you go for the right retreat?",
-    subtext: "56% of Americans traveled 2+ hours for their last wellness retreat (Skift Research 2024). The right place is worth the journey.",
+    label: "Where would you like to retreat?",
+    subtext: "Global wellness tourism reached $817B in 2024 (GWI). The best retreats are found on every continent — the question is where you want yours.",
     options: [
-      { value: "usa_canada", icon: "🇺🇸", title: "Close to Home", desc: "USA or Canada. Under a 4-hour flight." },
-      { value: "mexico", icon: "🇲🇽", title: "Open to Mexico", desc: "A short flight for a big transformation." },
-      { value: "europe", icon: "🇪🇺", title: "Anywhere in Europe", desc: "The right retreat is worth crossing the Atlantic." },
-      { value: "anywhere", icon: "🌍", title: "Anywhere on Earth", desc: "Asia, Iceland, wherever the best experience lives." },
+      { value: "usa_canada", icon: "🌎", title: "North America", desc: "USA, Canada, or Mexico — world-class retreats close to home." },
+      { value: "europe", icon: "🌍", title: "Europe", desc: "Swiss clinics, Italian thermal springs, Nordic healing." },
+      { value: "asia", icon: "🌏", title: "Asia & Indian Ocean", desc: "Bali, Thailand, India, Maldives — ancient traditions, modern luxury." },
+      { value: "anywhere", icon: "✈️", title: "Surprise Me", desc: "Show me the best match regardless of location." },
     ],
   },
   {
@@ -130,9 +130,9 @@ function matchRetreats(answers: QuizAnswer[], retreats: RetreatData[]): MatchedR
 
   // Region filter
   const allowedRegions: string[] = [];
-  if (travel === "usa_canada") allowedRegions.push("USA", "Canada");
-  else if (travel === "mexico") allowedRegions.push("USA", "Canada", "Mexico");
-  else if (travel === "europe") allowedRegions.push("USA", "Canada", "Mexico", "Europe");
+  if (travel === "usa_canada") allowedRegions.push("USA", "Canada", "Mexico");
+  else if (travel === "europe") allowedRegions.push("Europe");
+  else if (travel === "asia") allowedRegions.push("Asia");
   // "anywhere" = no filter
 
   // Budget filter
