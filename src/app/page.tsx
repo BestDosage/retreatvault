@@ -96,20 +96,20 @@ export default async function HomePage() {
                     Find your<br />perfect retreat
                   </h2>
                   <p className="mt-5 max-w-md text-[14px] leading-relaxed text-dark-200/80">
-                    Answer 5 questions about your goals, budget, and preferred
-                    destination. We&rsquo;ll match you with the highest-scoring
-                    retreats in our vault.
+                    Answer 7 research-backed questions about your wellness goals,
+                    intensity preferences, and budget. Our algorithm analyzes 120+
+                    retreats across 15 categories to find your perfect match.
                   </p>
                 </div>
                 <div className="text-center lg:text-right">
-                  <a href="/retreats" className="btn-luxury !px-10 !py-5 !text-[11px]">
+                  <a href="/quiz" className="btn-luxury !px-10 !py-5 !text-[11px]">
                     Take the Quiz
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                   </a>
                   <p className="mt-4 text-[11px] text-dark-400">
-                    Free &middot; 60 seconds &middot; No spam
+                    Free &middot; 90 seconds &middot; 7 questions
                   </p>
                 </div>
               </div>
