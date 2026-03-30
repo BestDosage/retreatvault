@@ -21,10 +21,6 @@ import {
   deriveSeasonalData, deriveScoreHistory, derive72HourEffect,
 } from "@/lib/retreat-intelligence";
 
-export async function generateStaticParams() {
-  const retreats = await getAllRetreats();
-  return retreats.map((r) => ({ slug: r.slug }));
-}
 
 export default async function RetreatPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

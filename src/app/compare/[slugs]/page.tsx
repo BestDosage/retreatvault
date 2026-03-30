@@ -8,16 +8,6 @@ import TierBadge from "@/components/TierBadge";
 import CompareScoreBars from "@/components/CompareScoreBars";
 import type { Metadata } from "next";
 
-export async function generateStaticParams() {
-  const retreats = await getAllRetreats();
-  const params: { slugs: string }[] = [];
-  for (let i = 0; i < retreats.length; i++) {
-    for (let j = i + 1; j < retreats.length; j++) {
-      params.push({ slugs: `${retreats[i].slug}-vs-${retreats[j].slug}` });
-    }
-  }
-  return params;
-}
 
 export async function generateMetadata({ params }: { params: Promise<{ slugs: string }> }): Promise<Metadata> {
   const { slugs } = await params;
