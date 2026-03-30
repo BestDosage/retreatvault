@@ -83,8 +83,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <div className="md:col-span-2">
                 <h4 className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Company</h4>
                 <div className="mt-6 flex flex-col gap-3">
-                  <a href="/about" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Methodology</a>
-                  <a href="/about" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Contact</a>
+                  <a href="/methodology" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Methodology</a>
+                  <a href="/contact" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Contact</a>
                 </div>
               </div>
             </div>
