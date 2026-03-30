@@ -30,7 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
             {/* Links */}
             <div className="flex items-center gap-8">
-              <a href="/retreats" className="text-[11px] font-medium uppercase tracking-[0.2em] text-dark-300 transition-colors duration-500 hover:text-white">
+              <a href="/retreats" className="hidden text-[11px] font-medium uppercase tracking-[0.2em] text-dark-300 transition-colors duration-500 hover:text-white sm:block">
                 Directory
               </a>
               <a href="/retreats?region=USA" className="hidden text-[11px] font-medium uppercase tracking-[0.2em] text-dark-400 transition-colors duration-500 hover:text-white md:block">
