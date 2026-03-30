@@ -84,11 +84,16 @@ export function RoiCalculator({ data }: { data: RoiData }) {
   const retreatTotal = data.retreatCostPerDay * days;
   const separateTotal = data.totalSeparateCost * days;
   const savings = separateTotal - retreatTotal;
+  const includedServices = data.comparisons.filter((c) => c.included);
+  const notIncluded = data.comparisons.filter((c) => !c.included);
 
   return (
     <div className="rounded-3xl border border-gold-400/[0.08] bg-gradient-to-br from-white/[0.025] to-white/[0.01] p-6 sm:p-8">
       <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Value Analysis</p>
-      <h3 className="mt-2 font-serif text-xl font-light text-white">Retreat ROI Calculator</h3>
+      <h3 className="mt-2 font-serif text-xl font-light text-white">Is This Retreat Worth It?</h3>
+      <p className="mt-2 text-[12px] leading-relaxed text-dark-400">
+        This retreat bundles multiple wellness services into one price. Here&rsquo;s what it would cost to book the same services individually at home — personal trainer, nutritionist, spa, meals, and accommodation — compared to the all-in retreat price.
+      </p>
 
       {/* Day selector */}
       <div className="mt-5 flex items-center gap-3">
@@ -110,36 +115,64 @@ export function RoiCalculator({ data }: { data: RoiData }) {
 
       {/* Comparison */}
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        <div className="rounded-xl bg-white/[0.03] p-5">
-          <div className="text-[9px] uppercase tracking-wider text-dark-500">Retreat Cost</div>
+        <div className="rounded-xl border border-gold-400/20 bg-gold-400/[0.04] p-5">
+          <div className="text-[9px] uppercase tracking-wider text-gold-500">All-In Retreat Price</div>
           <div className="mt-1 font-serif text-3xl font-light text-gold-300">${retreatTotal.toLocaleString()}</div>
-          <div className="text-[10px] text-dark-500">${data.retreatCostPerDay.toLocaleString()}/day &times; {days} days</div>
+          <div className="text-[10px] text-dark-400">${data.retreatCostPerDay.toLocaleString()}/day &times; {days} days</div>
+          <div className="mt-2 text-[10px] text-dark-500">Everything below, included.</div>
         </div>
         <div className="rounded-xl bg-white/[0.03] p-5">
-          <div className="text-[9px] uppercase tracking-wider text-dark-500">Same Services Separately</div>
-          <div className="mt-1 font-serif text-3xl font-light text-dark-200">${separateTotal.toLocaleString()}</div>
-          <div className="text-[10px] text-dark-500">${data.totalSeparateCost.toLocaleString()}/day &times; {days} days</div>
+          <div className="text-[9px] uppercase tracking-wider text-dark-500">Booking Each Service at Home</div>
+          <div className="mt-1 font-serif text-3xl font-light text-dark-200 line-through decoration-red-400/40">${separateTotal.toLocaleString()}</div>
+          <div className="text-[10px] text-dark-400">${data.totalSeparateCost.toLocaleString()}/day &times; {days} days</div>
+          <div className="mt-2 text-[10px] text-dark-500">Hiring each professional separately.</div>
         </div>
       </div>
 
       {savings > 0 && (
-        <div className="mt-4 rounded-xl border border-gold-400/10 bg-gold-400/[0.04] px-5 py-3 text-center">
-          <span className="text-[12px] font-semibold text-gold-300">
-            You save ${savings.toLocaleString()} ({data.savingsPercent}%) vs booking separately
-          </span>
+        <div className="mt-4 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06] px-5 py-4 text-center">
+          <div className="text-[14px] font-semibold text-emerald-400">
+            You save ${savings.toLocaleString()}
+          </div>
+          <div className="mt-0.5 text-[11px] text-emerald-400/70">
+            That&rsquo;s {data.savingsPercent}% less than booking the same services individually
+          </div>
         </div>
       )}
 
-      {/* Service breakdown */}
-      <div className="mt-5 space-y-1.5">
-        {data.comparisons.map((c) => (
-          <div key={c.service} className="flex items-center justify-between text-[11px]">
-            <span className={c.included ? "text-dark-300" : "text-dark-600 line-through"}>{c.service}</span>
-            <span className={c.included ? "text-gold-400" : "text-dark-600"}>
-              {c.included ? `$${c.dailyCost}/day` : "Not included"}
-            </span>
+      {/* What's included breakdown */}
+      <div className="mt-6">
+        <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-dark-500">What&rsquo;s bundled in your retreat price</p>
+        <div className="mt-3 space-y-2">
+          {includedServices.map((c) => (
+            <div key={c.service} className="flex items-center justify-between rounded-lg bg-white/[0.02] px-4 py-2.5">
+              <div className="flex items-center gap-2">
+                <svg className="h-3.5 w-3.5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                <span className="text-[12px] text-dark-200">{c.service}</span>
+              </div>
+              <span className="text-[11px] text-dark-500">
+                would cost <span className="text-gold-400">${c.dailyCost}/day</span> at home
+              </span>
+            </div>
+          ))}
+        </div>
+        {notIncluded.length > 0 && (
+          <div className="mt-3 space-y-2">
+            {notIncluded.map((c) => (
+              <div key={c.service} className="flex items-center justify-between rounded-lg px-4 py-2.5 opacity-40">
+                <div className="flex items-center gap-2">
+                  <svg className="h-3.5 w-3.5 text-dark-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <span className="text-[12px] text-dark-500">{c.service}</span>
+                </div>
+                <span className="text-[11px] text-dark-600">Not included</span>
+              </div>
+            ))}
           </div>
-        ))}
+        )}
       </div>
     </div>
   );
