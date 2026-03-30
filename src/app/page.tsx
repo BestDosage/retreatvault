@@ -96,8 +96,8 @@ export default async function HomePage() {
                     Find your<br />perfect retreat
                   </h2>
                   <p className="mt-5 max-w-md text-[14px] leading-relaxed text-dark-200/80">
-                    Answer 7 research-backed questions about your wellness goals,
-                    intensity preferences, and budget. Our algorithm analyzes 120+
+                    Answer 8 research-backed questions about your wellness goals,
+                    travel style, and budget. Our algorithm analyzes 120+
                     retreats across 15 categories to find your perfect match.
                   </p>
                 </div>
@@ -109,7 +109,7 @@ export default async function HomePage() {
                     </svg>
                   </a>
                   <p className="mt-4 text-[11px] text-dark-400">
-                    Free &middot; 90 seconds &middot; 7 questions
+                    Free &middot; 2 minutes &middot; 8 questions
                   </p>
                 </div>
               </div>

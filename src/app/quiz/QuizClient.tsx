@@ -21,6 +21,7 @@ interface RetreatData {
   price_min_per_night: number;
   price_max_per_night: number;
   minimum_stay_nights: number;
+  max_guests: number;
   specialty_tags: string[];
   program_types: string[];
   scores: Record<string, number>;
@@ -62,6 +63,16 @@ const questions = [
       { value: "challenged", icon: "🔥", title: "Deeply Challenged", desc: "Hard workouts, early mornings, structured discipline." },
       { value: "restored", icon: "🧘", title: "Deeply Restored", desc: "Slow, quiet, nurturing. Let the retreat do the work." },
       { value: "balanced", icon: "⚡", title: "Perfectly Balanced", desc: "Push when it's time. Rest when it's time." },
+    ],
+  },
+  {
+    label: "Who are you traveling with?",
+    subtext: "GWI reports solo wellness travel grew 46% since 2022. But the right companion — or intentional solitude — shapes the entire experience.",
+    options: [
+      { value: "solo", icon: "🧘", title: "Solo", desc: "This journey is mine alone. Deep personal work." },
+      { value: "partner", icon: "💑", title: "With a Partner", desc: "Shared transformation. Couples-focused programming." },
+      { value: "friends", icon: "👯", title: "With Friends", desc: "Group energy, shared adventures, social wellness." },
+      { value: "flexible", icon: "🤷", title: "Flexible", desc: "I'm open — just show me the best retreats." },
     ],
   },
   {
@@ -122,11 +133,12 @@ function matchRetreats(answers: QuizAnswer[], retreats: RetreatData[]): MatchedR
   const answerMap = new Map(answers.map((a) => [a.questionIndex, a.value]));
   const goal = answerMap.get(0) || "";
   const intensity = answerMap.get(1) || "";
-  const guidance = answerMap.get(2) || "";
-  const detox = answerMap.get(3) || "";
-  const travel = answerMap.get(4) || "";
-  const stay = answerMap.get(5) || "";
-  const budget = answerMap.get(6) || "";
+  const travelStyle = answerMap.get(2) || "";
+  const guidance = answerMap.get(3) || "";
+  const detox = answerMap.get(4) || "";
+  const travel = answerMap.get(5) || "";
+  const stay = answerMap.get(6) || "";
+  const budget = answerMap.get(7) || "";
 
   // Region filter
   const allowedRegions: string[] = [];
@@ -209,6 +221,27 @@ function matchRetreats(answers: QuizAnswer[], retreats: RetreatData[]): MatchedR
           reasons.push("Fully enforced digital detox");
         }
         score += r.scores.mindfulness * 0.5;
+      }
+
+      // Travel style matching
+      if (travelStyle === "solo") {
+        if (tags.includes("solo") || tags.includes("silence") || tags.includes("meditation") || tags.includes("ashram")) {
+          score += 8;
+          reasons.push("Ideal for solo wellness seekers");
+        }
+        if (r.scores.personalization >= 8.5) score += 3;
+      } else if (travelStyle === "partner") {
+        if (tags.includes("couples") || tags.includes("romantic") || tags.includes("luxury")) {
+          score += 8;
+          reasons.push("Designed for couples experiences");
+        }
+        if (r.scores.amenities >= 9) score += 3;
+      } else if (travelStyle === "friends") {
+        if (tags.includes("adventure") || tags.includes("fitness") || tags.includes("group") || r.max_guests >= 100) {
+          score += 8;
+          reasons.push("Great for group & friend getaways");
+        }
+        if (r.scores.activities >= 8.5) score += 3;
       }
 
       // Q5: Travel — already filtered
@@ -295,15 +328,15 @@ export default function QuizClient({ retreats }: { retreats: RetreatData[] }) {
     setSelected(null);
     setDirection(1);
 
-    if (step < 6) {
+    if (step < 7) {
       setStep(step + 1);
     } else {
       // Show loading then results
-      setStep(7);
+      setStep(8);
       setTimeout(() => {
         const matched = matchRetreats(updated, retreats);
         setResults(matched);
-        setStep(8);
+        setStep(9);
       }, 2200);
     }
   }, [selected, currentAnswer, step, answers, retreats]);
@@ -314,10 +347,10 @@ export default function QuizClient({ retreats }: { retreats: RetreatData[] }) {
     setStep(Math.max(0, step - 1));
   }, [step]);
 
-  const progress = step <= 6 ? ((step + 1) / 7) * 100 : 100;
+  const progress = step <= 7 ? ((step + 1) / 8) * 100 : 100;
 
   // ═══ LOADING STATE ═══
-  if (step === 7) {
+  if (step === 8) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-dark-950 px-6">
         <motion.div
@@ -334,7 +367,7 @@ export default function QuizClient({ retreats }: { retreats: RetreatData[] }) {
   }
 
   // ═══ RESULTS ═══
-  if (step === 8) {
+  if (step === 9) {
     return (
       <div className="min-h-screen bg-dark-950 px-4 pb-20 pt-28 sm:px-10">
         <div className="mx-auto max-w-4xl">
@@ -506,7 +539,7 @@ export default function QuizClient({ retreats }: { retreats: RetreatData[] }) {
             Back
           </button>
           <span className="text-[11px] font-medium tracking-wider text-gold-400">
-            {step + 1} of 7
+            {step + 1} of 8
           </span>
           <a href="/" className="text-[11px] uppercase tracking-wider text-dark-500 hover:text-dark-300">
             Exit
@@ -587,7 +620,7 @@ export default function QuizClient({ retreats }: { retreats: RetreatData[] }) {
               activeValue ? "opacity-100" : "opacity-30 cursor-not-allowed"
             }`}
           >
-            {step === 6 ? "See My Matches" : "Continue"}
+            {step === 7 ? "See My Matches" : "Continue"}
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>

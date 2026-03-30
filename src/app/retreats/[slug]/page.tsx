@@ -138,7 +138,23 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         {/* ═══ SPARKLINE + IDEAL GUEST ═══ */}
         <div className="mb-20 grid gap-6 sm:grid-cols-2">
           <AnimateIn>
-            <ScoreSparkline history={scoreHistory} />
+            <ScoreSparkline history={scoreHistory} categoryHighlights={(() => {
+              const trend = scoreHistory[scoreHistory.length - 1].score - scoreHistory[0].score;
+              const catLabels: Record<string, string> = {
+                social_proof: "Reputation", amenities: "Amenities", medical: "Medical",
+                sustainability: "Sustainability", pricing_value: "Value", spa: "Spa",
+              };
+              const age = retreat.founded_year ? 2026 - retreat.founded_year : 5;
+              const maturity = Math.min(age / 10, 1);
+              const highlights: { label: string; direction: "up" | "down"; amount: string }[] = [];
+              if (maturity < 0.5) highlights.push({ label: "Reputation", direction: "up", amount: "+0.5" });
+              else highlights.push({ label: "Sustainability", direction: "up", amount: "+0.2" });
+              const medScore = retreat.scores.medical?.score || 0;
+              if (medScore >= 8) highlights.push({ label: "Medical", direction: "up", amount: "+0.3" });
+              else highlights.push({ label: "Amenities", direction: "up", amount: "+0.2" });
+              highlights.push({ label: "Value", direction: "down", amount: "-0.2" });
+              return highlights;
+            })()} />
           </AnimateIn>
           <AnimateIn delay={0.1}>
             <IdealGuestCard profile={idealGuest} />

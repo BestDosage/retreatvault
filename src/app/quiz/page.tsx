@@ -21,6 +21,7 @@ export default async function QuizPage() {
     price_min_per_night: r.price_min_per_night,
     price_max_per_night: r.price_max_per_night,
     minimum_stay_nights: r.minimum_stay_nights,
+    max_guests: r.max_guests,
     specialty_tags: r.specialty_tags,
     program_types: r.program_types,
     scores: {

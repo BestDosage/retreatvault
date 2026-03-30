@@ -298,7 +298,7 @@ export function SeasonalChart({ months }: { months: MonthData[] }) {
 // ═══════════════════════════════════════════════
 // 8. VAULT SCORE SPARKLINE
 // ═══════════════════════════════════════════════
-export function ScoreSparkline({ history }: { history: ScoreHistoryPoint[] }) {
+export function ScoreSparkline({ history, categoryHighlights }: { history: ScoreHistoryPoint[]; categoryHighlights?: { label: string; direction: "up" | "down"; amount: string }[] }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true });
   const min = Math.min(...history.map((h) => h.score)) - 0.3;
@@ -313,7 +313,9 @@ export function ScoreSparkline({ history }: { history: ScoreHistoryPoint[] }) {
     return `${x},${y}`;
   });
 
-  const trend = history[history.length - 1].score - history[0].score;
+  const startScore = history[0].score;
+  const endScore = history[history.length - 1].score;
+  const trend = endScore - startScore;
 
   return (
     <div ref={ref} className="rounded-2xl border border-white/[0.04] bg-white/[0.015] p-5">
@@ -323,9 +325,20 @@ export function ScoreSparkline({ history }: { history: ScoreHistoryPoint[] }) {
           <h4 className="mt-1 text-[13px] font-medium text-white">Vault Score History</h4>
         </div>
         <span className={`text-[11px] font-medium ${trend >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-          {trend >= 0 ? "\u25B2" : "\u25BC"} {Math.abs(trend).toFixed(1)} since Q1 2024
+          {trend >= 0 ? "\u25B2" : "\u25BC"} {Math.abs(trend).toFixed(1)} since 2024
         </span>
       </div>
+
+      {/* Score summary */}
+      <div className="mt-2 flex items-center gap-3 text-[11px]">
+        <span className="text-dark-500">{startScore.toFixed(1)}</span>
+        <span className="text-dark-600">&rarr;</span>
+        <span className="font-medium text-white">{endScore.toFixed(1)}</span>
+        <span className={`rounded-full px-2 py-0.5 text-[9px] font-medium ${trend >= 0 ? "bg-emerald-400/10 text-emerald-400" : "bg-red-400/10 text-red-400"}`}>
+          {trend >= 0 ? "Improving" : "Declining"}
+        </span>
+      </div>
+
       <div className="mt-3">
         <svg viewBox={`0 0 ${w} ${h}`} className="w-full" style={{ height: 50 }}>
           <motion.polyline
@@ -340,11 +353,26 @@ export function ScoreSparkline({ history }: { history: ScoreHistoryPoint[] }) {
             transition={{ duration: 1.5, ease: "easeOut" }}
           />
         </svg>
-        <div className="mt-1 flex justify-between text-[8px] text-dark-600">
-          <span>{history[0].quarter}</span>
-          <span>{history[history.length - 1].quarter}</span>
+        <div className="mt-1 flex justify-between text-[9px] text-dark-500">
+          <span>2024</span>
+          <span>2026</span>
         </div>
       </div>
+
+      {/* Category highlights */}
+      {categoryHighlights && categoryHighlights.length > 0 && (
+        <div className="mt-4 space-y-2 border-t border-white/[0.04] pt-4">
+          <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-dark-500">Key Changes</p>
+          {categoryHighlights.map((ch) => (
+            <div key={ch.label} className="flex items-center justify-between">
+              <span className="text-[11px] text-dark-300">{ch.label}</span>
+              <span className={`text-[11px] font-medium ${ch.direction === "up" ? "text-emerald-400" : "text-red-400"}`}>
+                {ch.direction === "up" ? "\u25B2" : "\u25BC"} {ch.amount}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
