@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { notFound } from "next/navigation";
 import { getAllRetreats, getRetreatBySlug, getRetreatAwards, getRetreatVideos } from "@/lib/data";
 import { CATEGORY_LABELS, SCORE_WEIGHTS, RetreatScores } from "@/lib/types";

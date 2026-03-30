@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getAllRetreats } from "@/lib/data";
 import { CATEGORY_LABELS, SCORE_WEIGHTS, RetreatScores, WellnessRetreat } from "@/lib/types";
 import AnimateIn, { StaggerContainer, StaggerItem } from "@/components/AnimateIn";

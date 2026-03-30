@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getAllRetreats, getRegions } from "@/lib/data";
 import AnimateIn, { StaggerContainer, StaggerItem, Counter, TextReveal, Marquee } from "@/components/AnimateIn";
 import TierBadge from "@/components/TierBadge";

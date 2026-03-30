@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Suspense } from "react";
 import { getAllRetreats } from "@/lib/data";
 import RetreatCard from "@/components/RetreatCard";
