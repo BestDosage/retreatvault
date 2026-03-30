@@ -1,5 +1,13 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Compare Wellness Retreats Side-by-Side — Scores & Pricing",
+  description:
+    "Compare up to 3 wellness retreats across 15 scored categories including nutrition, spa, medical, sleep & fitness. See which retreat wins on the metrics that matter to you.",
+};
+
 import { getAllRetreats } from "@/lib/data";
 import { CATEGORY_LABELS, SCORE_WEIGHTS, RetreatScores, WellnessRetreat } from "@/lib/types";
 import AnimateIn from "@/components/AnimateIn";

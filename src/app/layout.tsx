@@ -6,9 +6,12 @@ import CompareBar from "@/components/CompareBar";
 import PressStrip from "@/components/PressStrip";
 
 export const metadata: Metadata = {
-  title: "RetreatVault \u2014 The World\u2019s Finest Wellness Retreats, Rigorously Rated",
+  title: {
+    default: "RetreatVault | Wellness Retreat Reviews & Ratings 2026",
+    template: "%s | RetreatVault",
+  },
   description:
-    "Science-backed scoring across 15 categories. The definitive guide to the world\u2019s most transformative wellness retreats.",
+    "Compare 120+ wellness retreats rated across 15 categories. Unbiased scores for spa resorts, medical clinics, yoga retreats & detox centers worldwide. Find your perfect retreat.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -1,5 +1,13 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Wellness Retreat Quiz — Find Your Perfect Match in 2 Minutes",
+  description:
+    "Answer 8 research-backed questions and our algorithm matches you to the best wellness retreat from 120+ rated properties. Based on PubMed research & clinical data. Free, instant results.",
+};
+
 import { getAllRetreats } from "@/lib/data";
 import QuizClient from "./QuizClient";
 

@@ -1,5 +1,13 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "How We Score Retreats — 15 Categories, Zero Bias | Methodology",
+  description:
+    "Our scoring methodology explained: 15 weighted categories, triangulated data sources, first-hand visits, and peer-reviewed research. Built by an analytical chemist. No paid placements.",
+};
+
 import AnimateIn, { StaggerContainer, StaggerItem } from "@/components/AnimateIn";
 
 const scoringCategories = [

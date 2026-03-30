@@ -1,5 +1,13 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Wellness Retreat Directory — 120+ Retreats Rated & Compared",
+  description:
+    "Browse every wellness retreat in our vault. Filter by region, price, and specialty. Each retreat scored 0-10 across nutrition, fitness, spa, medical, sleep & 11 more categories.",
+};
+
 import { Suspense } from "react";
 import { getAllRetreats } from "@/lib/data";
 import RetreatCard from "@/components/RetreatCard";

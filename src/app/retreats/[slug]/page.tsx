@@ -1,7 +1,31 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getAllRetreats, getRetreatBySlug, getRetreatAwards, getRetreatVideos } from "@/lib/data";
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const retreat = await getRetreatBySlug(slug);
+  if (!retreat) return { title: "Retreat Not Found" };
+
+  const topScores = Object.entries(retreat.scores)
+    .sort(([, a], [, b]) => (b as any).score - (a as any).score)
+    .slice(0, 3)
+    .map(([k]) => {
+      const labels: Record<string, string> = {
+        nutrition: "Nutrition", fitness: "Fitness", mindfulness: "Mindfulness",
+        spa: "Spa", sleep: "Sleep", medical: "Medical", personalization: "Personalization",
+        amenities: "Amenities", pricing_value: "Value", activities: "Activities",
+      };
+      return labels[k] || k;
+    });
+
+  return {
+    title: `${retreat.name} Review — Rated ${retreat.wrd_score}/10 (${retreat.score_tier === "elite" ? "Elite" : retreat.score_tier === "exceptional" ? "Exceptional" : "Recommended"})`,
+    description: `${retreat.name} in ${retreat.city} scored ${retreat.wrd_score}/10. ${retreat.subtitle}. Top categories: ${topScores.join(", ")}. From $${retreat.price_min_per_night}/night. Read the full data-driven review.`,
+  };
+}
 import { CATEGORY_LABELS, SCORE_WEIGHTS, RetreatScores } from "@/lib/types";
 import TierBadge from "@/components/TierBadge";
 import WrdScore from "@/components/WrdScore";

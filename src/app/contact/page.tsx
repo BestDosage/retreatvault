@@ -1,5 +1,13 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Contact RetreatVault — Submit a Retreat or Partner With Us",
+  description:
+    "Get in touch with the RetreatVault team. Submit a wellness retreat for review, ask about our scoring methodology, or explore partnership opportunities. Operated by BestDosage LLC.",
+};
+
 import AnimateIn from "@/components/AnimateIn";
 
 export default function ContactPage() {

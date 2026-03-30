@@ -1,5 +1,13 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Best Wellness Retreats 2026 — Rated & Ranked | RetreatVault",
+  description:
+    "Discover the world's top-rated wellness retreats scored across 15 data-driven categories. Compare luxury spas, medical clinics, yoga ashrams & detox centers. No paid placements.",
+};
+
 import { getAllRetreats, getRegions } from "@/lib/data";
 import AnimateIn, { StaggerContainer, StaggerItem, Counter, TextReveal, Marquee } from "@/components/AnimateIn";
 import TierBadge from "@/components/TierBadge";
