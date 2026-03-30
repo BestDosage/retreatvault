@@ -430,7 +430,7 @@ export default function QuizClient({ retreats }: { retreats: RetreatData[] }) {
             <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-8 text-center">
               <p className="text-[9px] font-semibold uppercase tracking-[0.4em] text-gold-500">Save Your Results</p>
               <h3 className="mt-3 font-serif text-xl font-light text-white">
-                Save your matches + receive our full 2025 Vault Report
+                Save your matches + receive our full 2026 Vault Report
               </h3>
               <form
                 onSubmit={(e) => {
