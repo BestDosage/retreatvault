@@ -18,9 +18,7 @@ export default async function HomePage() {
           1. HERO
           ══════════════════════════════════════════════════ */}
       <section className="relative flex h-screen min-h-[750px] flex-col items-center justify-center overflow-hidden">
-        {topRetreat?.hero_image_url?.startsWith("http") && (
-          <img src={topRetreat.hero_image_url} alt="" className="absolute inset-0 h-full w-full scale-105 object-cover" />
-        )}
+        <img src="https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=1920&h=1080&fit=crop&q=80" alt="" className="absolute inset-0 h-full w-full scale-105 object-cover" />
         <div className="absolute inset-0 bg-dark-950/75" />
         <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/20 to-dark-950/60" />
         <div className="absolute bottom-0 left-0 right-0 h-56 bg-gradient-to-t from-dark-950 to-transparent" />
