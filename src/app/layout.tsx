@@ -26,7 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-5 sm:px-10 lg:px-16">
             {/* Logo */}
             <a href="/" className="group flex items-center">
-              <img src="/logo-transparent.png" alt="RetreatVault" className="h-10 w-auto" />
+              <img src="/logo-transparent.png" alt="RetreatVault" className="h-28 w-auto" />
             </a>
 
             {/* Links */}
@@ -64,7 +64,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="line-gold" />
             <div className="grid gap-16 py-20 md:grid-cols-12">
               <div className="md:col-span-5">
-                <img src="/logo-transparent.png" alt="RetreatVault" className="h-12 w-auto" />
+                <img src="/logo-transparent.png" alt="RetreatVault" className="h-36 w-auto" />
                 <p className="mt-6 max-w-sm text-[13px] leading-relaxed text-dark-400">
                   The world&rsquo;s most rigorous wellness retreat rating system.
                   15 weighted categories. Zero bias. Built by an analytical chemist
