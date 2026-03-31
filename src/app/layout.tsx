@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <nav className="fixed top-0 z-50 w-full">
           <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-5 sm:px-10 lg:px-16">
             {/* Logo */}
-            <a href="/" className="group flex items-center">
+            <a href="/" className="group flex items-center -my-8">
               <img src="/logo-transparent.png" alt="RetreatVault" className="h-28 w-auto" />
             </a>
 
