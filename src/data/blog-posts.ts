@@ -159,7 +159,7 @@ I know. You've been fantasizing about a beach somewhere. Cocktails. No emails. A
 
 You come back. And within 72 hours, the cortisol is right back where it was.
 
-A 2022 study from Radboud University (PMID: 35426466) tracked cortisol levels in vacationers versus retreat participants over 10 weeks. The vacation group? Cortisol normalized within 3 days of returning home. The retreat group maintained lower cortisol for 6-8 weeks post-retreat.
+A 2022 study from Radboud University ([PMID: 35426466](https://pubmed.ncbi.nlm.nih.gov/35426466/)) tracked cortisol levels in vacationers versus retreat participants over 10 weeks. The vacation group? Cortisol normalized within 3 days of returning home. The retreat group maintained lower cortisol for 6-8 weeks post-retreat.
 
 The difference isn't the destination. It's the protocol.
 
@@ -167,7 +167,7 @@ The difference isn't the destination. It's the protocol.
 
 Burnout isn't "being tired." It's a measurable physiological state.
 
-Your hypothalamic-pituitary-adrenal (HPA) axis — the system that regulates your stress response — gets stuck in overdrive. Cortisol stays elevated. Inflammation markers (IL-6, TNF-alpha, CRP) rise. Your prefrontal cortex — the part of your brain responsible for decision-making and emotional regulation — literally shrinks under chronic stress. A 2019 meta-analysis (PMID: 30879399) confirmed this with brain imaging across 15 studies.
+Your hypothalamic-pituitary-adrenal (HPA) axis — the system that regulates your stress response — gets stuck in overdrive. Cortisol stays elevated. Inflammation markers (IL-6, TNF-alpha, CRP) rise. Your prefrontal cortex — the part of your brain responsible for decision-making and emotional regulation — literally shrinks under chronic stress. A 2019 meta-analysis ([PMID: 30879399](https://pubmed.ncbi.nlm.nih.gov/30879399/)) confirmed this with brain imaging across 15 studies.
 
 This isn't something you fix with a mojito and a sunset.
 
@@ -191,10 +191,10 @@ If a retreat doesn't measure anything, they can't improve anything. That's not a
 
 The modalities that have the strongest evidence for HPA axis recovery:
 
-- **Breathwork** — Specifically slow-paced, extended exhale techniques. A 2023 Stanford study (PMID: 36630953) found 5 minutes of cyclic sighing outperformed mindfulness meditation for mood improvement and physiological calming.
+- **Breathwork** — Specifically slow-paced, extended exhale techniques. A 2023 Stanford study ([PMID: 36630953](https://pubmed.ncbi.nlm.nih.gov/36630953/)) found 5 minutes of cyclic sighing outperformed mindfulness meditation for mood improvement and physiological calming.
 - **Yoga Nidra / Non-Sleep Deep Rest (NSDR)** — Andrew Huberman has popularized this, but the research backs it up. NSDR protocols reduce cortisol and increase dopamine baseline (Kamakhya Kumar, 2014).
 - **Cold exposure** — Deliberate cold water immersion activates the parasympathetic nervous system. The key is controlled, progressive exposure — not jumping into an ice bath on day one.
-- **Nature immersion** — Japanese "forest bathing" research (PMID: 31001682) shows measurable cortisol reduction after just 20 minutes in a forest environment.
+- **Nature immersion** — Japanese "forest bathing" research ([PMID: 31001682](https://pubmed.ncbi.nlm.nih.gov/31001682/)) shows measurable cortisol reduction after just 20 minutes in a forest environment.
 
 ### 3. Sleep Architecture Support
 
@@ -208,7 +208,7 @@ Look for retreats that:
 
 ### 4. Minimum 5-Night Stay
 
-This is non-negotiable for burnout. Three days isn't enough. Your nervous system needs at least 4-5 days to begin downregulating in a meaningful way. A 2019 study on wellness retreat outcomes (PMID: 31412272) found that benefits scaled significantly with stays of 6+ nights versus shorter programs.
+This is non-negotiable for burnout. Three days isn't enough. Your nervous system needs at least 4-5 days to begin downregulating in a meaningful way. A 2019 study on wellness retreat outcomes ([PMID: 31412272](https://pubmed.ncbi.nlm.nih.gov/31412272/)) found that benefits scaled significantly with stays of 6+ nights versus shorter programs.
 
 ### 5. Structured But Not Rigid
 
