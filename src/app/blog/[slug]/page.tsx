@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { blogPosts } from "@/data/blog-posts";
+import { getAllRetreats } from "@/lib/data";
 import BlogPostClient from "./BlogPostClient";
+
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -28,5 +31,22 @@ export default async function BlogPostPage({
 
   const otherPosts = blogPosts.filter((p) => p.slug !== slug).slice(0, 2);
 
-  return <BlogPostClient post={post} relatedPosts={otherPosts} />;
+  // Fetch retreat data for inline images
+  const allRetreats = await getAllRetreats();
+  const retreatImageMap: Record<string, { name: string; image: string; slug: string }> = {};
+  for (const r of allRetreats) {
+    retreatImageMap[r.slug] = {
+      name: r.name,
+      image: r.hero_image_url,
+      slug: r.slug,
+    };
+  }
+
+  return (
+    <BlogPostClient
+      post={post}
+      relatedPosts={otherPosts}
+      retreatImages={retreatImageMap}
+    />
+  );
 }

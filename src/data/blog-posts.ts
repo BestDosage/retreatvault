@@ -10,13 +10,13 @@ export const blogPosts: BlogPost[] = [
     published_date: "2026-04-02",
     updated_date: "2026-04-02",
     read_time_minutes: 12,
-    hero_image_url: "/images/blog/retreat-cost-breakdown.jpg",
-    hero_image_alt: "Sunrise over a minimalist wellness retreat pool overlooking mountains",
+    hero_image_url: "{{retreat:amangiri}}",
+    hero_image_alt: "Amangiri resort pool with desert canyon views",
     category: "budget",
     category_label: "Budget & Value",
     tags: ["pricing", "budget", "value", "first-time"],
     meta_description: "Real wellness retreat costs broken down by tier — from $89/night budget retreats to $2,000/night medical spas. What's included, what's hidden, and how to calculate actual value.",
-    related_retreat_slugs: [],
+    related_retreat_slugs: ["kripalu-center", "miraval-arizona", "sha-wellness-clinic", "clinique-la-prairie", "canyon-ranch-tucson", "civana-wellness-resort"],
     content: `Nobody tells you the real number.
 
 You Google "wellness retreat" and the first thing you see is a $4,200 Bali package next to a $189 yoga weekend in Upstate New York. Both call themselves "transformative." Both have gorgeous photos of someone meditating at sunrise. And you're sitting there thinking — what am I actually paying for?
@@ -31,6 +31,8 @@ Here's the honest answer.
 
 These are your yoga ashrams, meditation centers, and community-style retreats. Shared rooms. Vegetarian buffets. One or two group classes a day. Think Kripalu in Massachusetts or a donation-based Vipassana center.
 
+{{retreat:kripalu-center}}
+
 **What you get:** Structure, silence, and a break from your routine. The programming is group-based and the accommodation is basic. No private plunge pools. No IV drips.
 
 **What you don't get:** Personalization. Medical oversight. Luxury amenities. Private anything.
@@ -40,6 +42,8 @@ These are your yoga ashrams, meditation centers, and community-style retreats. S
 ### Tier 2: Mid-Range — $200 to $600/night
 
 This is where most quality retreats live. Private rooms. Curated meal plans (not just a buffet). Small group classes with actual certified instructors. Some one-on-one sessions included. Think Miraval in Arizona or Civana in Scottsdale.
+
+{{retreat:miraval-arizona}}
 
 **What you get:** A real program. Decent food. Some level of personalization. Usually a spa with treatments available (often at extra cost). Fitness facilities that go beyond a yoga mat on a deck.
 
@@ -51,6 +55,8 @@ This is where most quality retreats live. Private rooms. Curated meal plans (not
 
 Now we're talking all-inclusive programs with medical professionals on staff. Think SHA Wellness Clinic, Canyon Ranch, or Kamalaya in Thailand. These places have nutritionists, doctors, and therapists building a custom program around your bloodwork.
 
+{{retreat:sha-wellness-clinic}}
+
 **What you get:** Medical-grade assessments. Personalized protocols. World-class facilities. Chef-prepared meals designed for your body. Private sessions with specialists. The full monty.
 
 **What you don't get:** A casual experience. These programs expect your commitment. Minimum stays are usually 5-7 nights. You're not here to lounge by the pool (though you can).
@@ -60,6 +66,8 @@ Now we're talking all-inclusive programs with medical professionals on staff. Th
 ### Tier 4: Ultra-Luxury — $1,500 to $5,000+/night
 
 The Aman resorts. The Clinique La Prairie. Palazzo Fiuggi. This tier combines 5-star hospitality with cutting-edge medical technology — think genomic testing, cryotherapy, hyperbaric chambers, and longevity protocols that would make a biohacker weep.
+
+{{retreat:clinique-la-prairie}}
 
 **What you get:** Everything. Plus things you didn't know existed. Some of these places have on-site labs that rival hospitals.
 
@@ -86,6 +94,8 @@ A $500/night retreat can easily become $800/night once you add what you actually
 
 ## How to Calculate the Real Value
 
+{{retreat:canyon-ranch-tucson}}
+
 I think about retreat value the same way I think about any investment — what's the cost per meaningful outcome?
 
 **The formula I use:**
@@ -107,6 +117,8 @@ A good mid-range retreat that includes 2-3 of these daily? That $400/night start
 **$1,000 total:** A 3-day weekend retreat within driving distance. Skip the flights. Focus on one modality — yoga, meditation, or digital detox. Shared room. Pack your own supplements.
 
 **$3,000 total:** A 5-night mid-range retreat. Private room. Look for places that include meals and a few treatments. Shoulder season (October or April) for better rates.
+
+{{retreat:civana-wellness-resort}}
 
 **$7,000 total:** A 7-night premium retreat with medical intake. This is where real transformation starts. You'll get bloodwork, a custom program, and enough time for your nervous system to actually downregulate.
 
@@ -134,13 +146,13 @@ I'm Chad. Your chemist.`,
     published_date: "2026-04-02",
     updated_date: "2026-04-02",
     read_time_minutes: 14,
-    hero_image_url: "/images/blog/burnout-recovery-retreat.jpg",
-    hero_image_alt: "Person sitting alone on a dock overlooking a misty lake at dawn",
+    hero_image_url: "{{retreat:kamalaya-koh-samui}}",
+    hero_image_alt: "Kamalaya Koh Samui retreat nestled in tropical hillside",
     category: "condition",
     category_label: "Condition-Based",
     tags: ["burnout", "recovery", "mental-health", "stress", "nervous-system"],
     meta_description: "The best wellness retreats for burnout recovery — rated by an analytical chemist across 15 categories. Not spa vacations. Real clinical programs that help your nervous system heal.",
-    related_retreat_slugs: [],
+    related_retreat_slugs: ["kamalaya-koh-samui", "sha-wellness-clinic", "canyon-ranch-tucson", "the-ranch-malibu", "como-shambhala-estate", "miraval-austin", "lefay-resort-lago-di-garda", "fivelements-retreat-bali"],
     content: `I'm going to say something that might sting: if you're burned out, a vacation won't fix you.
 
 I know. You've been fantasizing about a beach somewhere. Cocktails. No emails. And look — I'm not against beaches. I dive the ocean every chance I get. But here's the problem with the "I just need a vacation" approach to burnout:
@@ -210,41 +222,65 @@ You're burned out. The last thing you need is a boot camp schedule that creates 
 These aren't random picks from a listicle. Every retreat below is scored in our database across 15 weighted categories. I'm highlighting the ones that specifically excel in the categories that matter for burnout: **Sleep & Recovery, Mindfulness, Medical, Personalization, and Nutrition.**
 
 ### 1. Kamalaya Koh Samui — Thailand
+
+{{retreat:kamalaya-koh-samui}}
+
 **Why it works for burnout:** Their "Embracing Change" and "Stress & Burnout" programs are built specifically for this. Naturopathic doctors on staff. TCM practitioners. Sleep architecture protocols. And the location — a former monk's cave on the southern coast of Koh Samui — isn't just pretty. It's genuinely quiet.
 
 **Best for:** Mid-career professionals who want clinical-grade programming in a warm climate.
 
 ### 2. SHA Wellness Clinic — Spain
+
+{{retreat:sha-wellness-clinic}}
+
 **Why it works for burnout:** Medical-grade assessment on arrival. Cognitive health unit. Stress management protocols backed by functional medicine testing. This isn't a spa — it's closer to a European medical center that happens to have ocean views.
 
 **Best for:** People who want data. Blood panels, cortisol mapping, sleep analysis — SHA measures everything.
 
 ### 3. Canyon Ranch — Tucson, Arizona
+
+{{retreat:canyon-ranch-tucson}}
+
 **Why it works for burnout:** Integrative health team includes physicians, behavioral health therapists, and exercise physiologists. Their "Life Management" program is explicitly designed for chronic stress recovery. Plus, the Sonoran Desert environment has been shown to support circadian rhythm realignment.
 
 **Best for:** Americans who don't want to fly international. Especially those who respond well to dry heat and desert landscape.
 
 ### 4. The Ranch Malibu — California
+
+{{retreat:the-ranch-malibu}}
+
 **Why it works for burnout:** Radical simplicity. No phones. No choices. You hike. You do yoga. You eat clean plant-based meals. You sleep. The structure itself is the medicine — it removes every decision from your plate.
 
 **Best for:** Type-A personalities who need someone to physically take the controls away from them.
 
 ### 5. COMO Shambhala Estate — Bali
+
+{{retreat:como-shambhala-estate}}
+
 **Why it works for burnout:** Ayurvedic and TCM practitioners. Hydrotherapy circuits. Jungle setting with rice terraces. Their "Cleanse" program includes colonics, nutritional therapy, and daily bodywork — but it's the pacing that makes it work for burnout. Nothing feels rushed.
 
 **Best for:** People who want Eastern medicine modalities in a luxury environment.
 
 ### 6. Miraval Austin — Texas
+
+{{retreat:miraval-austin}}
+
 **Why it works for burnout:** Their "Mindfulness & Resilience" programming is strong. Equine therapy. Challenge courses (controlled stress exposure — this is actually therapeutic). And the all-inclusive pricing means no decision fatigue about add-ons.
 
 **Best for:** People who need both restoration and active engagement. Sitting still makes you anxious? Miraval gets that.
 
 ### 7. Lefay Resort & SPA — Lake Garda, Italy
+
+{{retreat:lefay-resort-lago-di-garda}}
+
 **Why it works for burnout:** Their "Burnout & Energy Recovery" program includes Traditional Chinese Medicine, osteopathy, and a phytotherapy protocol. The lakeside setting is genuinely calming. And the Italian food philosophy — seasonal, local, unfussy — is restorative on its own.
 
 **Best for:** Europeans or anyone who responds to Mediterranean culture as medicine.
 
 ### 8. Fivelements — Bali
+
+{{retreat:fivelements-retreat-bali}}
+
 **Why it works for burnout:** Plant-based Balinese healing. Sacred arts. Deeply intentional programming that slows you down without feeling woo-woo. Their water purification ceremonies sound out there, but the science of ritual and intentional transitions supports nervous system regulation.
 
 **Best for:** People who are open to spiritual modalities alongside clinical ones.
@@ -275,13 +311,13 @@ I'm Chad. Your chemist.`,
     published_date: "2026-04-02",
     updated_date: "2026-04-02",
     read_time_minutes: 11,
-    hero_image_url: "/images/blog/retreat-red-flags.jpg",
-    hero_image_alt: "Close-up of a hand holding a supplement capsule against a blurred tropical backdrop",
+    hero_image_url: "{{retreat:six-senses-douro-valley}}",
+    hero_image_alt: "Six Senses Douro Valley overlooking the river and vineyards",
     category: "trust",
     category_label: "Trust & Validation",
     tags: ["scams", "red-flags", "trust", "first-time", "research"],
     meta_description: "An analytical chemist's honest guide to spotting wellness retreat scams and red flags. What to look for, what to avoid, and how to verify claims before you book.",
-    related_retreat_slugs: [],
+    related_retreat_slugs: ["sha-wellness-clinic", "canyon-ranch-tucson", "kamalaya-koh-samui", "six-senses-douro-valley", "euphoria-retreat", "ananda-in-the-himalayas"],
     content: `Let me tell you about the time I almost got fooled.
 
 Three years ago I was researching a retreat in Southeast Asia for a client. Stunning website. "Detoxification at the cellular level." "Reset your metabolism in 7 days." "Proprietary blend of ancient herbs and modern science."
@@ -326,6 +362,8 @@ I'm not saying non-licensed practitioners can't be helpful. A skilled yoga teach
 
 ### Red Flag #3: Pricing Opacity
 
+{{retreat:euphoria-retreat}}
+
 You should never have to guess what something costs.
 
 If a retreat's website says "Contact us for pricing," that's not necessarily a scam — but it's a yellow flag. Good retreats are transparent about their rates because they're confident in their value.
@@ -361,6 +399,8 @@ This is counterintuitive. You'd think a perfect rating is good. But a retreat wi
 
 Look, I respect traditional medicine systems. Ayurveda has 5,000 years of history. Traditional Chinese Medicine has produced genuine pharmaceutical breakthroughs (artemisinin won a Nobel Prize).
 
+{{retreat:ananda-in-the-himalayas}}
+
 But when a retreat slaps "ancient" in front of everything — "ancient detox ritual," "ancient healing ceremony," "ancient breathing technique" — without any specificity about what tradition, what lineage, what training the facilitators have... they're using "ancient" as a marketing word, not a credential.
 
 **The test:** Ask them to explain the specific tradition and their facilitators' training in it. A retreat rooted in genuine Ayurvedic practice will happily tell you their practitioners studied at a specific institution for a specific number of years. A retreat that's cosplaying as traditional will get vague fast.
@@ -374,6 +414,8 @@ Now the good news. Here's what we see consistently in the retreats that score hi
 They tell you exactly what they do and why. Their website doesn't just show pretty photos — it explains their approach, names their practitioners, and describes what a typical day looks like in enough detail that you could explain it to someone else.
 
 ### Green Flag #2: Credentialed Staff (Listed by Name)
+
+{{retreat:sha-wellness-clinic}}
 
 The best retreats are proud of their people. You'll find bios with real credentials, real training histories, and often photos and specialties for each practitioner. They want you to know who's going to work with you.
 
@@ -397,6 +439,8 @@ You don't need a retreat to have published a Nature paper. But willingness to me
 A retreat that's confident in its product has a fair cancellation policy. If a retreat requires full non-refundable payment months in advance with no flexibility? They know some people will regret the purchase. That's not a good sign.
 
 ## How We Handle This at RetreatVault
+
+{{retreat:canyon-ranch-tucson}}
 
 This is exactly why we built the scoring system. Every retreat in our database is rated across 15 weighted categories — not by how pretty their Instagram is, but by measurable criteria:
 

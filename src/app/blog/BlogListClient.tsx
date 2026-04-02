@@ -11,7 +11,21 @@ const categoryColors: Record<string, string> = {
   science: "text-violet-400",
 };
 
-export default function BlogListClient({ posts }: { posts: BlogPost[] }) {
+type RetreatImageMap = Record<string, { name: string; image: string }>;
+
+function resolveHeroImage(post: BlogPost, retreatImages: RetreatImageMap): string | null {
+  const match = post.hero_image_url.match(/\{\{retreat:(.+?)\}\}/);
+  if (match) return retreatImages[match[1]]?.image || null;
+  return post.hero_image_url;
+}
+
+export default function BlogListClient({
+  posts,
+  retreatImages,
+}: {
+  posts: BlogPost[];
+  retreatImages: RetreatImageMap;
+}) {
   return (
     <div className="min-h-screen pt-28">
       <div className="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-16">
@@ -38,57 +52,68 @@ export default function BlogListClient({ posts }: { posts: BlogPost[] }) {
 
         {/* Posts Grid */}
         <StaggerContainer className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 pb-24">
-          {posts.map((post) => (
-            <StaggerItem key={post.slug}>
-              <a
-                href={`/blog/${post.slug}`}
-                className="group block overflow-hidden rounded-lg border border-white/[0.04] bg-dark-900 transition-all duration-500 hover:border-gold-700/30 hover:bg-dark-800"
-              >
-                {/* Image placeholder */}
-                <div className="aspect-[16/9] overflow-hidden bg-dark-800">
-                  <div className="flex h-full items-center justify-center">
-                    <span className="text-[10px] uppercase tracking-[0.3em] text-dark-500">
-                      {post.category_label}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-6">
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`text-[9px] font-semibold uppercase tracking-[0.3em] ${categoryColors[post.category] || "text-gold-500"}`}
-                    >
-                      {post.category_label}
-                    </span>
-                    <span className="text-[10px] text-dark-500">
-                      {post.read_time_minutes} min read
-                    </span>
+          {posts.map((post) => {
+            const heroImage = resolveHeroImage(post, retreatImages);
+            return (
+              <StaggerItem key={post.slug}>
+                <a
+                  href={`/blog/${post.slug}`}
+                  className="group block overflow-hidden rounded-lg border border-white/[0.04] bg-dark-900 transition-all duration-500 hover:border-gold-700/30 hover:bg-dark-800"
+                >
+                  {/* Image */}
+                  <div className="aspect-[16/9] overflow-hidden bg-dark-800">
+                    {heroImage ? (
+                      <img
+                        src={heroImage}
+                        alt={post.hero_image_alt}
+                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center">
+                        <span className="text-[10px] uppercase tracking-[0.3em] text-dark-500">
+                          {post.category_label}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
-                  <h2 className="mt-3 font-serif text-xl font-light leading-snug text-white transition-colors duration-500 group-hover:text-gold-400">
-                    {post.title}
-                  </h2>
+                  {/* Content */}
+                  <div className="p-6">
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`text-[9px] font-semibold uppercase tracking-[0.3em] ${categoryColors[post.category] || "text-gold-500"}`}
+                      >
+                        {post.category_label}
+                      </span>
+                      <span className="text-[10px] text-dark-500">
+                        {post.read_time_minutes} min read
+                      </span>
+                    </div>
 
-                  <p className="mt-3 text-[13px] leading-relaxed text-dark-400 line-clamp-3">
-                    {post.subtitle}
-                  </p>
+                    <h2 className="mt-3 font-serif text-xl font-light leading-snug text-white transition-colors duration-500 group-hover:text-gold-400">
+                      {post.title}
+                    </h2>
 
-                  <div className="mt-6 flex items-center justify-between">
-                    <span className="text-[11px] text-dark-500">
-                      {post.author}
-                    </span>
-                    <span className="text-[10px] text-dark-500">
-                      {new Date(post.published_date).toLocaleDateString(
-                        "en-US",
-                        { month: "short", day: "numeric", year: "numeric" }
-                      )}
-                    </span>
+                    <p className="mt-3 text-[13px] leading-relaxed text-dark-400 line-clamp-3">
+                      {post.subtitle}
+                    </p>
+
+                    <div className="mt-6 flex items-center justify-between">
+                      <span className="text-[11px] text-dark-500">{post.author}</span>
+                      <span className="text-[10px] text-dark-500">
+                        {new Date(post.published_date).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </a>
-            </StaggerItem>
-          ))}
+                </a>
+              </StaggerItem>
+            );
+          })}
         </StaggerContainer>
       </div>
     </div>

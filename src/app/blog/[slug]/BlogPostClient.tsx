@@ -11,7 +11,48 @@ const categoryColors: Record<string, string> = {
   science: "text-violet-400",
 };
 
-function renderContent(content: string) {
+type RetreatImageMap = Record<string, { name: string; image: string; slug: string }>;
+
+function resolveRetreatImage(ref: string, retreatImages: RetreatImageMap): string | null {
+  const match = ref.match(/\{\{retreat:(.+?)\}\}/);
+  if (!match) return null;
+  const slug = match[1];
+  return retreatImages[slug]?.image || null;
+}
+
+function RetreatImage({
+  slug,
+  retreatImages,
+}: {
+  slug: string;
+  retreatImages: RetreatImageMap;
+}) {
+  const retreat = retreatImages[slug];
+  if (!retreat?.image) return null;
+
+  return (
+    <figure className="my-8 overflow-hidden rounded-xl">
+      <a href={`/retreats/${retreat.slug}`} className="group block">
+        <div className="aspect-[21/9] overflow-hidden rounded-xl">
+          <img
+            src={retreat.image}
+            alt={retreat.name}
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            loading="lazy"
+          />
+        </div>
+        <figcaption className="mt-2 flex items-center justify-between">
+          <span className="text-[11px] text-dark-400">{retreat.name}</span>
+          <span className="text-[10px] text-gold-600 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            View full rating &rarr;
+          </span>
+        </figcaption>
+      </a>
+    </figure>
+  );
+}
+
+function renderContent(content: string, retreatImages: RetreatImageMap) {
   const lines = content.split("\n");
   const elements: React.ReactNode[] = [];
   let i = 0;
@@ -21,6 +62,20 @@ function renderContent(content: string) {
 
     // Empty line
     if (line.trim() === "") {
+      i++;
+      continue;
+    }
+
+    // Retreat image embed
+    const retreatMatch = line.trim().match(/^\{\{retreat:(.+?)\}\}$/);
+    if (retreatMatch) {
+      elements.push(
+        <RetreatImage
+          key={`retreat-${i}`}
+          slug={retreatMatch[1]}
+          retreatImages={retreatImages}
+        />
+      );
       i++;
       continue;
     }
@@ -61,10 +116,7 @@ function renderContent(content: string) {
         i++;
       }
       elements.push(
-        <ul
-          key={`ul-${i}`}
-          className="my-4 ml-4 flex flex-col gap-2"
-        >
+        <ul key={`ul-${i}`} className="my-4 ml-4 flex flex-col gap-2">
           {items.map((item, idx) => (
             <li
               key={idx}
@@ -86,18 +138,10 @@ function renderContent(content: string) {
         i++;
       }
       elements.push(
-        <ol
-          key={`ol-${i}`}
-          className="my-4 ml-4 flex flex-col gap-2"
-        >
+        <ol key={`ol-${i}`} className="my-4 ml-4 flex flex-col gap-2">
           {items.map((item, idx) => (
-            <li
-              key={idx}
-              className="text-[15px] leading-relaxed text-dark-200"
-            >
-              <span className="mr-3 font-semibold text-gold-500">
-                {idx + 1}.
-              </span>
+            <li key={idx} className="text-[15px] leading-relaxed text-dark-200">
+              <span className="mr-3 font-semibold text-gold-500">{idx + 1}.</span>
               <InlineMarkdown text={item} />
             </li>
           ))}
@@ -108,10 +152,7 @@ function renderContent(content: string) {
 
     // Regular paragraph
     elements.push(
-      <p
-        key={i}
-        className="my-4 text-[15px] leading-[1.85] text-dark-200"
-      >
+      <p key={i} className="my-4 text-[15px] leading-[1.85] text-dark-200">
         <InlineMarkdown text={line} />
       </p>
     );
@@ -122,25 +163,17 @@ function renderContent(content: string) {
 }
 
 function InlineMarkdown({ text }: { text: string }) {
-  // Process bold, italic, links, and inline code
   const parts: React.ReactNode[] = [];
   let remaining = text;
   let key = 0;
 
   while (remaining.length > 0) {
-    // Bold
     const boldMatch = remaining.match(/\*\*(.+?)\*\*/);
-    // Link
     const linkMatch = remaining.match(/\[(.+?)\]\((.+?)\)/);
 
-    // Find earliest match
     const matches = [
-      boldMatch
-        ? { type: "bold", index: remaining.indexOf(boldMatch[0]), match: boldMatch }
-        : null,
-      linkMatch
-        ? { type: "link", index: remaining.indexOf(linkMatch[0]), match: linkMatch }
-        : null,
+      boldMatch ? { type: "bold", index: remaining.indexOf(boldMatch[0]), match: boldMatch } : null,
+      linkMatch ? { type: "link", index: remaining.indexOf(linkMatch[0]), match: linkMatch } : null,
     ]
       .filter(Boolean)
       .sort((a, b) => a!.index - b!.index);
@@ -152,11 +185,8 @@ function InlineMarkdown({ text }: { text: string }) {
 
     const first = matches[0]!;
 
-    // Add text before match
     if (first.index > 0) {
-      parts.push(
-        <span key={key++}>{remaining.slice(0, first.index)}</span>
-      );
+      parts.push(<span key={key++}>{remaining.slice(0, first.index)}</span>);
     }
 
     if (first.type === "bold") {
@@ -186,14 +216,22 @@ function InlineMarkdown({ text }: { text: string }) {
 export default function BlogPostClient({
   post,
   relatedPosts,
+  retreatImages,
 }: {
   post: BlogPost;
   relatedPosts: BlogPost[];
+  retreatImages: RetreatImageMap;
 }) {
-  const publishedDate = new Date(post.published_date).toLocaleDateString(
-    "en-US",
-    { month: "long", day: "numeric", year: "numeric" }
-  );
+  const publishedDate = new Date(post.published_date).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  // Resolve hero image from retreat reference
+  const heroUrl = resolveRetreatImage(post.hero_image_url, retreatImages) || post.hero_image_url;
+  const heroRetreatSlug = post.hero_image_url.match(/\{\{retreat:(.+?)\}\}/)?.[1];
+  const heroRetreatName = heroRetreatSlug ? retreatImages[heroRetreatSlug]?.name : null;
 
   return (
     <div className="min-h-screen pt-28">
@@ -201,16 +239,11 @@ export default function BlogPostClient({
         {/* Breadcrumb */}
         <AnimateIn>
           <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.3em]">
-            <a
-              href="/blog"
-              className="text-dark-400 transition-colors duration-300 hover:text-gold-400"
-            >
+            <a href="/blog" className="text-dark-400 transition-colors duration-300 hover:text-gold-400">
               Journal
             </a>
             <span className="text-dark-600">/</span>
-            <span
-              className={categoryColors[post.category] || "text-gold-500"}
-            >
+            <span className={categoryColors[post.category] || "text-gold-500"}>
               {post.category_label}
             </span>
           </div>
@@ -234,34 +267,51 @@ export default function BlogPostClient({
           <div className="mt-8 flex flex-wrap items-center gap-6">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full border border-gold-700/30 bg-dark-800">
-                <span className="text-[11px] font-semibold text-gold-400">
-                  CW
-                </span>
+                <span className="text-[11px] font-semibold text-gold-400">CW</span>
               </div>
               <div>
-                <p className="text-[13px] font-medium text-white">
-                  {post.author}
-                </p>
-                <p className="text-[11px] text-dark-400">
-                  {post.author_title}
-                </p>
+                <p className="text-[13px] font-medium text-white">{post.author}</p>
+                <p className="text-[11px] text-dark-400">{post.author_title}</p>
               </div>
             </div>
             <div className="h-4 w-px bg-dark-700" />
             <span className="text-[12px] text-dark-400">{publishedDate}</span>
             <div className="h-4 w-px bg-dark-700" />
-            <span className="text-[12px] text-dark-400">
-              {post.read_time_minutes} min read
-            </span>
+            <span className="text-[12px] text-dark-400">{post.read_time_minutes} min read</span>
           </div>
         </AnimateIn>
+
+        {/* Hero Image */}
+        {heroUrl && (
+          <AnimateIn delay={0.25}>
+            <figure className="mt-10 overflow-hidden rounded-xl">
+              <div className="aspect-[21/9] overflow-hidden rounded-xl">
+                <img
+                  src={heroUrl}
+                  alt={post.hero_image_alt}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              {heroRetreatName && (
+                <figcaption className="mt-2">
+                  <a
+                    href={`/retreats/${heroRetreatSlug}`}
+                    className="text-[11px] text-dark-500 transition-colors duration-300 hover:text-gold-400"
+                  >
+                    {heroRetreatName}
+                  </a>
+                </figcaption>
+              )}
+            </figure>
+          </AnimateIn>
+        )}
 
         <div className="line-gold mt-10" />
 
         {/* Article Body */}
-        <AnimateIn delay={0.25}>
+        <AnimateIn delay={0.3}>
           <article className="mx-auto max-w-3xl pb-20 pt-8">
-            {renderContent(post.content)}
+            {renderContent(post.content, retreatImages)}
           </article>
         </AnimateIn>
 
@@ -283,9 +333,7 @@ export default function BlogPostClient({
         {/* Related Posts */}
         {relatedPosts.length > 0 && (
           <div className="mx-auto max-w-3xl pb-24">
-            <h3 className="font-serif text-2xl font-light text-white">
-              Keep Reading
-            </h3>
+            <h3 className="font-serif text-2xl font-light text-white">Keep Reading</h3>
             <div className="mt-6 grid gap-6 sm:grid-cols-2">
               {relatedPosts.map((rp) => (
                 <a
@@ -301,9 +349,7 @@ export default function BlogPostClient({
                   <h4 className="mt-2 font-serif text-lg font-light text-white transition-colors duration-500 group-hover:text-gold-400">
                     {rp.title}
                   </h4>
-                  <p className="mt-2 text-[12px] text-dark-400">
-                    {rp.read_time_minutes} min read
-                  </p>
+                  <p className="mt-2 text-[12px] text-dark-400">{rp.read_time_minutes} min read</p>
                 </a>
               ))}
             </div>

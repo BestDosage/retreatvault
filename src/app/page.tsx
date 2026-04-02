@@ -351,11 +351,15 @@ export default async function HomePage() {
                         href={`/retreats?region=${region.name}`}
                         className="group relative flex items-center gap-6 overflow-hidden rounded-2xl border border-white/[0.04] bg-white/[0.015] p-6 transition-all duration-700 hover:border-gold-400/15 hover:bg-white/[0.03] sm:p-8"
                       >
-                        {topImage?.startsWith("http") && (
-                          <div className="hidden h-20 w-20 shrink-0 overflow-hidden rounded-xl sm:block">
+                        <div className="hidden h-20 w-20 shrink-0 overflow-hidden rounded-xl sm:block">
+                          {topImage ? (
                             <img src={topImage} alt="" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
-                          </div>
-                        )}
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center bg-dark-800">
+                              <span className="text-[9px] uppercase tracking-[0.2em] text-dark-500">{region.name.slice(0, 2)}</span>
+                            </div>
+                          )}
+                        </div>
                         <div className="flex-1">
                           <h3 className="font-serif text-2xl font-light text-white transition-colors duration-500 group-hover:text-gold-300">
                             {region.name}
