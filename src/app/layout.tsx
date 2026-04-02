@@ -43,6 +43,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <a href="/retreats?region=Asia" className="hidden text-[11px] font-medium uppercase tracking-[0.2em] text-dark-400 transition-colors duration-500 hover:text-white lg:block">
                 Asia
               </a>
+              <a href="/blog" className="hidden text-[11px] font-medium uppercase tracking-[0.2em] text-dark-400 transition-colors duration-500 hover:text-white lg:block">
+                Journal
+              </a>
               <a href="/retreats" className="btn-luxury !py-2.5 !px-6 !text-[9px]">
                 Explore
               </a>
@@ -85,6 +88,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <h4 className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Company</h4>
                 <div className="mt-6 flex flex-col gap-3">
                   <a href="/methodology" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Methodology</a>
+                  <a href="/blog" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Journal</a>
                   <a href="/contact" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Contact</a>
                 </div>
               </div>

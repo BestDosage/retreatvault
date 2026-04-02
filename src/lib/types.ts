@@ -1,3 +1,22 @@
+export interface BlogPost {
+  slug: string;
+  title: string;
+  subtitle: string;
+  author: string;
+  author_title: string;
+  published_date: string;
+  updated_date: string;
+  read_time_minutes: number;
+  hero_image_url: string;
+  hero_image_alt: string;
+  category: "trust" | "budget" | "condition" | "decision" | "science";
+  category_label: string;
+  tags: string[];
+  meta_description: string;
+  content: string;
+  related_retreat_slugs: string[];
+}
+
 export interface CategoryScore {
   score: number;
   sub_scores: Record<string, number>;
