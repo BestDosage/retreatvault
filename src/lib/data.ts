@@ -1,8 +1,15 @@
 import { supabase } from "@/lib/supabase";
 import { WellnessRetreat, RetreatScores, getScoreTier } from "@/lib/types";
 
+// Fix broken hero images — keyed by slug
+const IMAGE_OVERRIDES: Record<string, string> = {
+  "grail-springs": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1400&h=800&fit=crop&q=80",
+  "echo-valley-ranch": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1400&h=800&fit=crop&q=80",
+};
+
 // Transform a Supabase row into our WellnessRetreat type
 function mapRow(row: any): WellnessRetreat {
+  const slug = row.slug as string;
   return {
     id: row.id,
     slug: row.slug,
@@ -26,7 +33,7 @@ function mapRow(row: any): WellnessRetreat {
     price_max_per_night: row.price_max_per_night || 0,
     pricing_model: row.pricing_model || "bed_and_breakfast",
     minimum_stay_nights: row.minimum_stay_nights || 1,
-    hero_image_url: row.hero_image_url || "",
+    hero_image_url: IMAGE_OVERRIDES[slug] || row.hero_image_url || "",
     gallery_images: row.gallery_images || [],
     youtube_videos: [],
     instagram_handle: row.instagram_handle || "",
