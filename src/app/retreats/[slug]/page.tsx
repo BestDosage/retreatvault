@@ -1,8 +1,11 @@
-export const dynamic = "force-dynamic";
-
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getAllRetreats, getRetreatBySlug, getRetreatAwards, getRetreatVideos } from "@/lib/data";
+
+export async function generateStaticParams() {
+  const retreats = await getAllRetreats();
+  return retreats.map((r) => ({ slug: r.slug }));
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;

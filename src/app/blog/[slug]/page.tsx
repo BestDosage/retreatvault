@@ -4,7 +4,9 @@ import { blogPosts } from "@/data/blog-posts";
 import { getAllRetreats } from "@/lib/data";
 import BlogPostClient from "./BlogPostClient";
 
-export const dynamic = "force-dynamic";
+export async function generateStaticParams() {
+  return blogPosts.map((post) => ({ slug: post.slug }));
+}
 
 export async function generateMetadata({
   params,
