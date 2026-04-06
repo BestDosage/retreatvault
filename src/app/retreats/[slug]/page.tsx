@@ -27,6 +27,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${retreat.name} Review — Rated ${retreat.wrd_score}/10 (${retreat.score_tier === "elite" ? "Elite" : retreat.score_tier === "exceptional" ? "Exceptional" : "Recommended"})`,
     description: `${retreat.name} in ${retreat.city} scored ${retreat.wrd_score}/10. ${retreat.subtitle}. Top categories: ${topScores.join(", ")}. From $${retreat.price_min_per_night}/night. Read the full data-driven review.`,
+    alternates: { canonical: `/retreats/${slug}` },
+    openGraph: {
+      title: `${retreat.name} — ${retreat.wrd_score}/10 Vault Score`,
+      description: `${retreat.subtitle}. Top categories: ${topScores.join(", ")}.`,
+      images: retreat.hero_image_url ? [{ url: retreat.hero_image_url }] : [],
+    },
   };
 }
 import { CATEGORY_LABELS, SCORE_WEIGHTS, RetreatScores } from "@/lib/types";
@@ -34,7 +40,8 @@ import TierBadge from "@/components/TierBadge";
 import WrdScore from "@/components/WrdScore";
 import ScoreBar from "@/components/ScoreBar";
 import AnimateIn, { StaggerContainer, StaggerItem } from "@/components/AnimateIn";
-import RadarChart from "@/components/RadarChart";
+import dynamic from "next/dynamic";
+const RadarChart = dynamic(() => import("@/components/RadarChart"), { ssr: false });
 import VaultVsGuest from "@/components/VaultVsGuest";
 import { BestForChips } from "@/components/BestForTags";
 import {
@@ -75,8 +82,23 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
   const hasImage = retreat.hero_image_url?.startsWith("http");
   const galleryImages = (retreat.gallery_images || []).filter((img: string) => img?.startsWith("http"));
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.retreatvault.com" },
+      { "@type": "ListItem", position: 2, name: "Directory", item: "https://www.retreatvault.com/retreats" },
+      { "@type": "ListItem", position: 3, name: retreat.region, item: `https://www.retreatvault.com/retreats?region=${retreat.region}` },
+      { "@type": "ListItem", position: 4, name: retreat.name },
+    ],
+  };
+
   return (
     <div className="min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* ════════════════ HERO ════════════════ */}
       <section className="relative h-[70vh] min-h-[500px] overflow-hidden">
         {hasImage && (

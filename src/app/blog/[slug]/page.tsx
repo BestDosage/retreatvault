@@ -19,6 +19,7 @@ export async function generateMetadata({
   return {
     title: post.title,
     description: post.meta_description,
+    alternates: { canonical: `/blog/${slug}` },
   };
 }
 
@@ -44,11 +45,27 @@ export default async function BlogPostPage({
     };
   }
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.retreatvault.com" },
+      { "@type": "ListItem", position: 2, name: "Journal", item: "https://www.retreatvault.com/blog" },
+      { "@type": "ListItem", position: 3, name: post.title },
+    ],
+  };
+
   return (
-    <BlogPostClient
-      post={post}
-      relatedPosts={otherPosts}
-      retreatImages={retreatImageMap}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <BlogPostClient
+        post={post}
+        relatedPosts={otherPosts}
+        retreatImages={retreatImageMap}
+      />
+    </>
   );
 }

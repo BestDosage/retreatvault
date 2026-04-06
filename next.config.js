@@ -4,7 +4,11 @@ const nextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "**" },
     ],
+    formats: ["image/avif", "image/webp"],
   },
+  compress: true,
+  poweredByHeader: false,
+  productionBrowserSourceMaps: false,
 };
 
 module.exports = nextConfig;

@@ -18,8 +18,28 @@ export default async function HomePage() {
   const regions = await getRegions();
   const topRetreat = retreats[0];
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "RetreatVault",
+    url: "https://www.retreatvault.com",
+    logo: "https://www.retreatvault.com/logo.png",
+    description:
+      "The world's most rigorous wellness retreat rating system. 15 weighted categories. Zero bias.",
+    sameAs: [],
+    parentOrganization: {
+      "@type": "Organization",
+      name: "BestDosage LLC",
+      url: "https://bestdosage.com",
+    },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* ══════════════════════════════════════════════════
           1. HERO
           ══════════════════════════════════════════════════ */}
@@ -41,13 +61,13 @@ export default async function HomePage() {
             </div>
           </AnimateIn>
 
-          <div className="mb-8">
+          <h1 className="mb-8">
             <TextReveal
               text="The World's Most Exclusive Wellness Retreats, Ranked."
               className="font-serif text-[clamp(2rem,5.2vw,4.5rem)] font-light leading-[1.08] text-white"
               delay={0.5}
             />
-          </div>
+          </h1>
 
           <AnimateIn delay={1.3} duration={1}>
             <p className="mx-auto mb-14 max-w-lg text-[14px] font-light leading-[1.8] text-dark-200/80">

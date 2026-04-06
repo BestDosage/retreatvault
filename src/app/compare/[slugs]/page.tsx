@@ -18,6 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slugs: st
   return {
     title: `${a.name} vs ${b.name} \u2014 RetreatVault Comparison 2026`,
     description: `Head-to-head comparison of ${a.name} and ${b.name} across 15 wellness categories. Vault Scores: ${a.wrd_score.toFixed(1)} vs ${b.wrd_score.toFixed(1)}.`,
+    alternates: { canonical: `/compare/${slugs}` },
   };
 }
 
@@ -39,8 +40,22 @@ export default async function HeadToHeadPage({ params }: { params: Promise<{ slu
   const winsA = categories.filter((c) => (a.scores[c]?.score || 0) > (b.scores[c]?.score || 0)).length;
   const winsB = categories.filter((c) => (b.scores[c]?.score || 0) > (a.scores[c]?.score || 0)).length;
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.retreatvault.com" },
+      { "@type": "ListItem", position: 2, name: "Compare", item: "https://www.retreatvault.com/compare" },
+      { "@type": "ListItem", position: 3, name: `${a.name} vs ${b.name}` },
+    ],
+  };
+
   return (
     <div className="min-h-screen pt-28 pb-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <div className="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-16">
         <AnimateIn>
           <p className="text-[9px] font-semibold uppercase tracking-[0.4em] text-gold-500">Head to Head</p>

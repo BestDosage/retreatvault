@@ -12,11 +12,41 @@ export const metadata: Metadata = {
   },
   description:
     "Compare 120+ wellness retreats rated across 15 categories. Unbiased scores for spa resorts, medical clinics, yoga retreats & detox centers worldwide. Find your perfect retreat.",
+  metadataBase: new URL("https://www.retreatvault.com"),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: "RetreatVault",
+    images: [
+      {
+        url: "/logo.png",
+        width: 1200,
+        height: 630,
+        alt: "RetreatVault — Wellness Retreat Reviews & Ratings",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/logo.png"],
+  },
+  other: {
+    "theme-color": "#050505",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+      </head>
       <body>
         <SmoothScroll />
         <CompareProvider>
