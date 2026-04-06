@@ -36,7 +36,29 @@ export default async function RetreatsPage({ searchParams }: { searchParams: Pro
   const filtered = filterAndSort(all, params.region || null, params.tier || null, params.sort || null);
   const regionLabel = params.region && params.region !== "All" ? params.region : null;
 
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Wellness Retreat Directory",
+    description:
+      "Browse 120+ wellness retreats scored across 15 categories. Filter by region, price, and specialty on RetreatVault.",
+    url: "https://www.retreatvault.com/retreats",
+    numberOfItems: filtered.length,
+    itemListOrder: "https://schema.org/ItemListOrderDescending",
+    itemListElement: filtered.slice(0, 10).map((retreat, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: retreat.name,
+      url: `https://www.retreatvault.com/retreats/${retreat.id}`,
+    })),
+  };
+
   return (
+    <>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
+    />
     <div className="min-h-screen pt-28">
       <div className="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-16">
         {/* Header */}
@@ -84,5 +106,6 @@ export default async function RetreatsPage({ searchParams }: { searchParams: Pro
         <div className="pb-20" />
       </div>
     </div>
+    </>
   );
 }

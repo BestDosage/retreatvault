@@ -1,0 +1,19 @@
+# RetreatVault
+> The world's most rigorous wellness retreat rating system — 15 weighted categories, zero bias.
+
+## About
+RetreatVault independently scores and ranks 120+ wellness retreats worldwide across 15 weighted categories including nutrition, fitness, medical, spa, sleep, and sustainability. Built by an analytical chemist with no paid placements or affiliate bias. Retreats span luxury resorts, medical spas, yoga ashrams, detox centers, and integrative clinics across five global regions.
+
+## Key Pages
+- https://www.retreatvault.com/: Homepage with featured retreats and region explorer
+- https://www.retreatvault.com/retreats: Full retreat directory with filtering by region, tier, and price
+- https://www.retreatvault.com/methodology: Detailed scoring methodology — 15 categories explained
+- https://www.retreatvault.com/quiz: Personalized retreat matching quiz (8 questions)
+- https://www.retreatvault.com/compare: Side-by-side retreat comparison tool
+- https://www.retreatvault.com/blog: Wellness travel guides and research
+- https://www.retreatvault.com/contact: Contact and inquiries
+
+## Data
+- 120+ wellness retreats scored across 5 global regions
+- Scoring methodology: 15 weighted categories, 0-10 composite Vault Score, tier badges (Elite, Exceptional, Highly Recommended)
+- Updated: Quarterly

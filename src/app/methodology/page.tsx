@@ -36,7 +36,59 @@ const dataSources = [
 ];
 
 export default function MethodologyPage() {
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "How does RetreatVault score wellness retreats?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Every retreat is scored 0-10 across 15 weighted categories including Nutrition & Food Quality, Fitness & Movement, Medical & Clinical, Spa & Relaxation, Sleep & Recovery, and 10 more. The final Vault Score is a weighted average calibrated by peer-reviewed research on what drives wellness outcomes. The system was designed by an analytical chemist.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Can retreats pay for a higher score on RetreatVault?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "No. RetreatVault does not accept paid placements, affiliate commissions, or sponsored content. Every score is independently calculated using the same weighted methodology across all retreats. There is zero pay-to-play.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "What types of retreats are listed on RetreatVault?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "RetreatVault covers luxury wellness resorts, medical spas, yoga ashrams, detox centers, fitness boot camps, meditation retreats, Ayurvedic centers, and integrative health clinics across five global regions.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "How do I find the best retreat for my goals?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Take the free RetreatVault quiz — 8 research-backed questions about your wellness goals, travel style, and budget. Our algorithm analyzes 120+ retreats across 15 categories to find your ideal match. You can also filter the directory by region, tier, and price.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "How often are retreat scores updated?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "All retreat scores are re-evaluated quarterly. Changes in staff, menus, programs, facilities, and guest reviews are incorporated into updated scores. The Vault Score History chart on each retreat page shows how ratings have changed over time.",
+        },
+      },
+    ],
+  };
+
   return (
+    <>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+    />
     <div className="min-h-screen pt-28 pb-20">
       <div className="mx-auto max-w-4xl px-6 sm:px-10">
         {/* Hero */}
@@ -173,5 +225,6 @@ export default function MethodologyPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

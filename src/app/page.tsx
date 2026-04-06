@@ -34,11 +34,39 @@ export default async function HomePage() {
     },
   };
 
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "RetreatVault",
+    url: "https://www.retreatvault.com",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: "https://www.retreatvault.com/retreats?q={search_term_string}",
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
+  const speakableJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: "RetreatVault — The World's Most Exclusive Wellness Retreats, Ranked",
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["h1", ".hero-description"],
+    },
+    url: "https://www.retreatvault.com",
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([jsonLd, websiteJsonLd, speakableJsonLd]),
+        }}
       />
       {/* ══════════════════════════════════════════════════
           1. HERO
