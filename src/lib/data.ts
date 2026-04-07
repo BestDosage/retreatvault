@@ -58,18 +58,29 @@ function mapRow(row: any): WellnessRetreat {
 }
 
 export async function getAllRetreats(): Promise<WellnessRetreat[]> {
-  const { data, error } = await supabase
-    .from("retreats")
-    .select("*")
-    .neq("slug", "test")
-    .gt("wrd_score", 0)
-    .order("wrd_score", { ascending: false });
+  // Supabase defaults to 1000 rows per query — paginate to get all retreats
+  const PAGE_SIZE = 1000;
+  const all: any[] = [];
+  let from = 0;
+  while (true) {
+    const { data, error } = await supabase
+      .from("retreats")
+      .select("*")
+      .neq("slug", "test")
+      .gt("wrd_score", 0)
+      .order("wrd_score", { ascending: false })
+      .range(from, from + PAGE_SIZE - 1);
 
-  if (error) {
-    console.error("Supabase getAllRetreats error:", error.message);
-    return [];
+    if (error) {
+      console.error("Supabase getAllRetreats error:", error.message);
+      return all.map(mapRow);
+    }
+    if (!data || data.length === 0) break;
+    all.push(...data);
+    if (data.length < PAGE_SIZE) break;
+    from += PAGE_SIZE;
   }
-  return (data || []).map(mapRow);
+  return all.map(mapRow);
 }
 
 export async function getRetreatBySlug(slug: string): Promise<WellnessRetreat | undefined> {
