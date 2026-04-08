@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { supabase } from "@/lib/supabase";
 import { WellnessRetreat, RetreatScores, getScoreTier } from "@/lib/types";
 
@@ -106,12 +107,26 @@ async function _fetchAllRetreats(): Promise<WellnessRetreat[]> {
   return mapped;
 }
 
+// Wrap the in-memory loader with Next's persistent unstable_cache so the
+// data survives across serverless lambda invocations (the module-scope
+// cache only helps within a single warm instance).
+const _cachedFetchAllRetreats = unstable_cache(
+  async () => {
+    return _fetchAllRetreats();
+  },
+  ["all-retreats-v1"],
+  { revalidate: 3600, tags: ["retreats"] }
+);
+
 export async function getAllRetreats(): Promise<WellnessRetreat[]> {
   if (_retreatsCache) return _retreatsCache;
-  // Share a single in-flight promise across all concurrent callers
-  if (!_retreatsPromise) {
-    _retreatsPromise = _fetchAllRetreats();
-  }
+  if (_retreatsPromise) return _retreatsPromise;
+
+  _retreatsPromise = _cachedFetchAllRetreats().then((data) => {
+    _retreatsCache = data;
+    _retreatsBySlugCache = new Map(data.map((r) => [r.slug, r]));
+    return data;
+  });
   return _retreatsPromise;
 }
 
