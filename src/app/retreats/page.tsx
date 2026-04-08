@@ -34,11 +34,32 @@ function filterAndSort(retreats: WellnessRetreat[], region: string | null, tier:
   return f;
 }
 
-export default async function RetreatsPage({ searchParams }: { searchParams: Promise<{ region?: string; tier?: string; sort?: string }> }) {
+const PAGE_SIZE = 60;
+
+export default async function RetreatsPage({ searchParams }: { searchParams: Promise<{ region?: string; tier?: string; sort?: string; page?: string }> }) {
   const params = await searchParams;
   const all = await getAllRetreats();
   const filtered = filterAndSort(all, params.region || null, params.tier || null, params.sort || null);
   const regionLabel = params.region && params.region !== "All" ? params.region : null;
+
+  // Pagination
+  const currentPage = Math.max(1, parseInt(params.page || "1", 10) || 1);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const pageStart = (safePage - 1) * PAGE_SIZE;
+  const paginated = filtered.slice(pageStart, pageStart + PAGE_SIZE);
+
+  // Build query string preserving filters
+  const baseQuery = new URLSearchParams();
+  if (params.region) baseQuery.set("region", params.region);
+  if (params.tier) baseQuery.set("tier", params.tier);
+  if (params.sort) baseQuery.set("sort", params.sort);
+  const buildPageUrl = (p: number) => {
+    const q = new URLSearchParams(baseQuery);
+    if (p > 1) q.set("page", String(p));
+    const qs = q.toString();
+    return `/retreats${qs ? `?${qs}` : ""}`;
+  };
 
   const itemListSchema = {
     "@context": "https://schema.org",
@@ -98,13 +119,31 @@ export default async function RetreatsPage({ searchParams }: { searchParams: Pro
             </a>
           </div>
         ) : (
-          <StaggerContainer className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" staggerDelay={0.08}>
-            {filtered.map((retreat) => (
-              <StaggerItem key={retreat.id}>
-                <RetreatCard retreat={retreat} />
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
+          <>
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {paginated.map((retreat) => (
+                <RetreatCard key={retreat.id} retreat={retreat} />
+              ))}
+            </div>
+
+            {totalPages > 1 && (
+              <nav className="mt-16 flex items-center justify-center gap-2 text-[11px] uppercase tracking-wider text-dark-400">
+                {safePage > 1 && (
+                  <a href={buildPageUrl(safePage - 1)} className="rounded border border-dark-700 px-4 py-2 hover:border-gold-500 hover:text-gold-300">
+                    ← Prev
+                  </a>
+                )}
+                <span className="px-4 py-2">
+                  Page {safePage} of {totalPages}
+                </span>
+                {safePage < totalPages && (
+                  <a href={buildPageUrl(safePage + 1)} className="rounded border border-dark-700 px-4 py-2 hover:border-gold-500 hover:text-gold-300">
+                    Next →
+                  </a>
+                )}
+              </nav>
+            )}
+          </>
         )}
 
         <div className="pb-20" />
