@@ -2,22 +2,32 @@
 
 import { WellnessRetreat, RetreatScores } from "@/lib/types";
 
-// Derive "Best For" tags from scoring data
-export function deriveBestForTags(retreat: WellnessRetreat): string[] {
+// Returns EVERY Best For tag a retreat qualifies for. Used by the directory
+// filter — must NOT slice here, otherwise retreats whose matching tag is
+// later in the derivation order (e.g. Spa, Meditation) get dropped from the
+// filter result and the tag appears to return zero matches.
+export function deriveAllBestForTags(retreat: WellnessRetreat): string[] {
   const tags: string[] = [];
   const s = retreat.scores;
+  if (!s) return tags;
 
-  if (s.mindfulness?.score >= 8.5 || s.sleep?.score >= 8.5) tags.push("Best for Burnout");
-  if (s.amenities?.score >= 8.5 && retreat.price_max_per_night >= 1500) tags.push("Best for Couples");
-  if (s.medical?.score >= 8.0 || s.sleep?.score >= 8.5) tags.push("Best for Longevity");
-  if ((s.medical?.score >= 9.0 || s.personalization?.score >= 9.0) && s.fitness?.score >= 7.5) tags.push("Best for Biohackers");
-  if (s.personalization?.score >= 7.5 && s.pricing_value?.score >= 7.5 && s.travel_access?.score >= 7.0) tags.push("Best First Retreat");
-  if (s.fitness?.score >= 9.0) tags.push("Best for Fitness");
-  if (s.nutrition?.score >= 9.0) tags.push("Best for Nutrition");
-  if (s.spa?.score >= 9.0) tags.push("Best for Spa");
-  if (s.mindfulness?.score >= 9.0) tags.push("Best for Meditation");
+  if ((s.mindfulness?.score ?? 0) >= 8.5 || (s.sleep?.score ?? 0) >= 8.5) tags.push("Best for Burnout");
+  if ((s.amenities?.score ?? 0) >= 8.5 && (retreat.price_max_per_night ?? 0) >= 1500) tags.push("Best for Couples");
+  if ((s.medical?.score ?? 0) >= 8.0 || (s.sleep?.score ?? 0) >= 8.5) tags.push("Best for Longevity");
+  if (((s.medical?.score ?? 0) >= 9.0 || (s.personalization?.score ?? 0) >= 9.0) && (s.fitness?.score ?? 0) >= 7.5) tags.push("Best for Biohackers");
+  if ((s.personalization?.score ?? 0) >= 7.5 && (s.pricing_value?.score ?? 0) >= 7.5 && (s.travel_access?.score ?? 0) >= 7.0) tags.push("Best First Retreat");
+  if ((s.fitness?.score ?? 0) >= 9.0) tags.push("Best for Fitness");
+  if ((s.nutrition?.score ?? 0) >= 9.0) tags.push("Best for Nutrition");
+  if ((s.spa?.score ?? 0) >= 9.0) tags.push("Best for Spa");
+  if ((s.mindfulness?.score ?? 0) >= 9.0) tags.push("Best for Meditation");
 
-  return tags.slice(0, 4); // max 4 tags per retreat
+  return tags;
+}
+
+// Display version — capped at 4 to avoid visual clutter on cards.
+// Always use deriveAllBestForTags() for filtering logic.
+export function deriveBestForTags(retreat: WellnessRetreat): string[] {
+  return deriveAllBestForTags(retreat).slice(0, 4);
 }
 
 export function BestForChips({
