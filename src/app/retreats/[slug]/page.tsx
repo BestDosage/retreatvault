@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getAllRetreats, getRetreatBySlug, getRetreatAwards, getRetreatVideos } from "@/lib/data";
 
@@ -106,7 +107,16 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
       {/* ════════════════ HERO ════════════════ */}
       <section className="relative h-[70vh] min-h-[500px] overflow-hidden">
         {hasImage && (
-          <img src={retreat.hero_image_url} alt={retreat.name} className="absolute inset-0 h-full w-full object-cover" />
+          <Image
+            src={retreat.hero_image_url as string}
+            alt={retreat.name}
+            fill
+            priority
+            fetchPriority="high"
+            sizes="100vw"
+            quality={70}
+            className="object-cover"
+          />
         )}
         <div className="absolute inset-0 bg-dark-950/50" />
         <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/30 to-dark-950/20" />
@@ -307,7 +317,15 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
             <div className="mt-8 grid gap-3 sm:grid-cols-3">
               {galleryImages.map((img: string, i: number) => (
                 <div key={i} className="group/g relative aspect-[4/3] overflow-hidden rounded-2xl">
-                  <img src={img} alt={`${retreat.name} ${i + 1}`} className="h-full w-full object-cover transition-transform duration-[1s] group-hover/g:scale-110" loading="lazy" />
+                  <Image
+                    src={img}
+                    alt={`${retreat.name} ${i + 1}`}
+                    fill
+                    loading="lazy"
+                    sizes="(max-width: 640px) 100vw, 33vw"
+                    quality={65}
+                    className="object-cover transition-transform duration-[1s] group-hover/g:scale-110"
+                  />
                   <div className="absolute inset-0 bg-dark-950/10 transition-opacity duration-500 group-hover/g:opacity-0" />
                 </div>
               ))}
@@ -396,7 +414,17 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         {/* ═══ CTA ═══ */}
         <AnimateIn className="mb-24">
           <div className="relative overflow-hidden rounded-3xl border border-white/[0.04]">
-            {hasImage && <img src={retreat.hero_image_url} alt="" className="absolute inset-0 h-full w-full object-cover" />}
+            {hasImage && (
+              <Image
+                src={retreat.hero_image_url as string}
+                alt=""
+                fill
+                loading="lazy"
+                sizes="100vw"
+                quality={65}
+                className="object-cover"
+              />
+            )}
             <div className="absolute inset-0 bg-dark-950/80 backdrop-blur-sm" />
             <div className="relative px-10 py-20 text-center sm:px-16 sm:py-28">
               <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-gold-400">Begin Your Journey</p>
