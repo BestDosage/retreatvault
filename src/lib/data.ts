@@ -280,10 +280,14 @@ export async function queryRetreatsForDirectory(
   const { region, tag, budget, page, pageSize } = args;
   const offset = Math.max(0, (page - 1) * pageSize);
 
+  // Build filter chain. `count: "planned"` uses the PostgreSQL planner
+  // estimate instead of a full COUNT(*) scan — orders of magnitude faster
+  // on 9,400+ rows and avoids the statement-timeout failure mode that was
+  // silently returning 0 results on prod.
   const buildBase = () => {
     let q: any = supabase
       .from("retreats")
-      .select("*", { count: "exact" })
+      .select("*", { count: "planned" })
       .neq("slug", "test")
       .gt("wrd_score", 0);
     if (region && region !== "All") q = q.eq("region", region);
@@ -292,20 +296,30 @@ export async function queryRetreatsForDirectory(
     return q;
   };
 
-  const { data, error, count } = await buildBase()
-    .order("wrd_score", { ascending: false })
-    .order("slug", { ascending: true })
-    .range(offset, offset + pageSize - 1);
+  try {
+    const { data, error, count } = await buildBase()
+      .order("wrd_score", { ascending: false })
+      .order("slug", { ascending: true })
+      .range(offset, offset + pageSize - 1);
 
-  if (error) {
-    console.error("queryRetreatsForDirectory error:", error.message);
+    if (error) {
+      console.error("[queryRetreatsForDirectory] supabase error:", error.message, error);
+      return { retreats: [], total: 0 };
+    }
+
+    const rowCount = data?.length || 0;
+    console.log(
+      `[queryRetreatsForDirectory] ok region=${region} tag=${tag} budget=${budget} page=${page} rows=${rowCount} count=${count}`
+    );
+
+    return {
+      retreats: (data || []).map(mapRow),
+      total: count || rowCount,
+    };
+  } catch (e: any) {
+    console.error("[queryRetreatsForDirectory] threw:", e?.message || e);
     return { retreats: [], total: 0 };
   }
-
-  return {
-    retreats: (data || []).map(mapRow),
-    total: count || 0,
-  };
 }
 
 export async function getRetreatsByRegion(region: string): Promise<WellnessRetreat[]> {
