@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Compare Wellness Retreats Side-by-Side — Scores & Pricing",
   description:

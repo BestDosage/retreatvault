@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 
+// Cache the homepage as static — refresh once per hour
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Best Wellness Retreats 2026 — Rated & Ranked | RetreatVault",
   description:

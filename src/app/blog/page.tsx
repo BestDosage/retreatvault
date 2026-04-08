@@ -3,6 +3,8 @@ import { blogPosts } from "@/data/blog-posts";
 import { getAllRetreats } from "@/lib/data";
 import BlogListClient from "./BlogListClient";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Wellness Retreat Insights — Evidence-Based Guides & Analysis",
   description:

@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 
+// Refresh once per hour — filter UI uses client-side searchParams so the
+// underlying data fetch can be cached safely
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Wellness Retreat Directory — 120+ Retreats Rated & Compared",
   description:
