@@ -66,63 +66,44 @@ let _retreatsBySlugCache: Map<string, WellnessRetreat> = new Map();
 let _retreatsPromise: Promise<WellnessRetreat[]> | null = null;
 
 async function _fetchAllRetreats(): Promise<WellnessRetreat[]> {
-  // Supabase defaults to 1000 rows per query — paginate to get all retreats
-  const PAGE_SIZE = 1000;
-  const all: any[] = [];
-  let from = 0;
-  let attempts = 0;
-  while (true) {
-    const { data, error } = await supabase
-      .from("retreats")
-      .select("*")
-      .neq("slug", "test")
-      .gt("wrd_score", 0)
-      .order("wrd_score", { ascending: false })
-      // Stable secondary sort by unique `slug` column — without this,
-      // pagination with ~32 distinct wrd_scores across 9,400 rows is
-      // non-deterministic (Postgres returns ties in arbitrary order),
-      // so rows get skipped or duplicated across paginated batches.
-      // That was the root cause of /retreats/[slug] 404s: missing slugs
-      // never made it into the in-memory cache built from paginated results.
-      .order("slug", { ascending: true })
-      .range(from, from + PAGE_SIZE - 1);
+  // Single-query bulk fetch, enabled by the composite index
+  // `retreats_wrd_slug_idx ON retreats (wrd_score DESC, slug ASC)
+  //  WHERE wrd_score > 0 AND slug <> 'test'` (applied via Supabase
+  // migration). Before the index existed, a `SELECT *` with this ORDER BY
+  // fell back to a full sort on disk, and paginating with .range() did an
+  // index walk from offset 0 on EVERY batch — roughly 1s/batch × 10 batches
+  // = 10s+ which hit the Supabase anon statement timeout on cold lambdas.
+  //
+  // Now a single query returns all ~9,409 rows via the index in ~500ms,
+  // and the client pulls them down in one round trip. No pagination loop,
+  // no retry-until-timeout, no empty-cache-poisoning.
+  //
+  // .range(0, 49999) explicitly asks PostgREST for up to 50k rows; without
+  // an explicit range header PostgREST caps responses at its configured
+  // db-max-rows (1000 on default Supabase). The table has ~9.4k rows today;
+  // 50k leaves room to grow ~5x before this needs to become a real
+  // keyset-paginated loop.
+  const { data, error } = await supabase
+    .from("retreats")
+    .select("*")
+    .neq("slug", "test")
+    .gt("wrd_score", 0)
+    .order("wrd_score", { ascending: false })
+    .order("slug", { ascending: true })
+    .range(0, 49999);
 
-    if (error) {
-      // Retry up to 3 times on transient errors (timeouts, network)
-      attempts += 1;
-      console.error(`Supabase getAllRetreats error (attempt ${attempts}):`, error.message);
-      if (attempts >= 3) {
-        // Previously this returned whatever partial rows had been fetched so
-        // far, which meant an early-failing fetch would populate the module
-        // cache AND unstable_cache with an empty/truncated array — then every
-        // subsequent request for the next hour served that empty cache. Throw
-        // instead so neither cache layer stores the bad result and the next
-        // request gets a clean retry.
-        throw new Error(`Supabase getAllRetreats failed after 3 attempts: ${error.message}`);
-      }
-      // brief backoff
-      await new Promise((r) => setTimeout(r, 500 * attempts));
-      continue;
-    }
-    if (!data || data.length === 0) break;
-    all.push(...data);
-    // Only break when we get an empty page. Don't early-terminate on
-    // `data.length < PAGE_SIZE` — PostgREST can return fewer rows than
-    // requested for reasons other than "end of table" (server-side
-    // row limits, statement timeouts on large scans, etc.), which was
-    // causing the bulk fetch to silently truncate below 9,409 rows
-    // and leave most slugs out of _retreatsBySlugCache → 404s.
-    from += data.length;
-    attempts = 0; // reset on success
+  if (error) {
+    console.error("Supabase getAllRetreats error:", error.message);
+    // Throw — unstable_cache does not cache thrown errors, so a transient
+    // failure won't poison the cache for the next hour.
+    throw new Error(`Supabase getAllRetreats failed: ${error.message}`);
   }
 
-  const mapped = all.map(mapRow);
-  // Never populate the module-scope caches with an empty result. An empty
-  // array from a bad fetch would be indistinguishable from "fully loaded"
-  // and would lock the lambda into serving 0 rows until a cold restart.
-  if (mapped.length === 0) {
+  if (!data || data.length === 0) {
     throw new Error("Supabase getAllRetreats returned 0 rows — refusing to cache empty result");
   }
+
+  const mapped = data.map(mapRow);
   _retreatsCache = mapped;
   _retreatsBySlugCache = new Map(mapped.map((r) => [r.slug, r]));
   return mapped;
