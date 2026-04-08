@@ -1,7 +1,7 @@
 "use client";
 
+import Image from "next/image";
 import { WellnessRetreat } from "@/lib/types";
-import { motion } from "framer-motion";
 import TierBadge from "./TierBadge";
 import AddToCompareButton from "./AddToCompareButton";
 import { BestForChips } from "./BestForTags";
@@ -20,20 +20,21 @@ export default function RetreatCard({ retreat }: { retreat: WellnessRetreat }) {
   };
 
   return (
-    <motion.div
-      className="group block cursor-pointer"
-      onClick={() => window.location.href = `/retreats/${retreat.slug}`}
-      whileHover={{ y: -6 }}
-      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+    <div
+      className="group block cursor-pointer transition-transform duration-500 ease-out hover:-translate-y-1.5"
+      onClick={() => (window.location.href = `/retreats/${retreat.slug}`)}
     >
       {/* Image */}
       <div className="relative aspect-[4/5] overflow-hidden rounded-2xl">
         {retreat.hero_image_url?.startsWith("http") ? (
-          <img
+          <Image
             src={retreat.hero_image_url}
             alt={retreat.name}
-            className="h-full w-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.05]"
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            quality={65}
             loading="lazy"
+            className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.05]"
           />
         ) : (
           <div className="h-full w-full bg-dark-800" />
@@ -103,6 +104,6 @@ export default function RetreatCard({ retreat }: { retreat: WellnessRetreat }) {
           <AddToCompareButton retreat={{ id: retreat.id, slug: retreat.slug, name: retreat.name, hero_image_url: retreat.hero_image_url, wrd_score: retreat.wrd_score }} />
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
