@@ -2,19 +2,13 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getAllRetreats, getRetreatBySlug, getRetreatAwards, getRetreatVideos } from "@/lib/data";
 
-// ISR config: pre-build top 500 retreats by WRD score; the rest render on-demand
-// on first visit and stay cached for 24h. All 9,289 are still fully indexable.
-export const dynamicParams = true;
-export const revalidate = 86400; // 24 hours
+// On Vercel Pro: pre-build all 9,289 retreats at build time.
+// The module-scope cache in src/lib/data.ts keeps this fast (single Supabase fetch).
+export const revalidate = 86400; // refresh stale pages once a day
 
 export async function generateStaticParams() {
   const retreats = await getAllRetreats();
-  // Pre-build only the top 500 by score to keep build under Vercel's 45-min limit.
-  // The remaining ~8,789 will be rendered on first request and cached.
-  return retreats
-    .slice() // already sorted by wrd_score desc from getAllRetreats
-    .slice(0, 500)
-    .map((r) => ({ slug: r.slug }));
+  return retreats.map((r) => ({ slug: r.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
