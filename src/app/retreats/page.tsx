@@ -11,79 +11,30 @@ export const metadata: Metadata = {
 };
 
 import { Suspense } from "react";
-import { getAllRetreats } from "@/lib/data";
+import { queryRetreatsForDirectory } from "@/lib/data";
 import RetreatCard from "@/components/RetreatCard";
 import RetreatFilters from "@/components/RetreatFilters";
 import AnimateIn, { StaggerContainer, StaggerItem } from "@/components/AnimateIn";
-import { WellnessRetreat } from "@/lib/types";
-import { deriveAllBestForTags } from "@/components/BestForTags";
-
-// Budget bands match the values exposed in RetreatFilters.tsx.
-// Applied directly to price_max_per_night — no score/profile derivation,
-// which means these filters can't crash on retreats with missing data.
-function matchesBudget(r: WellnessRetreat, budget: string): boolean {
-  const price = r.price_max_per_night || 0;
-  switch (budget) {
-    case "accessible": return price > 0 && price < 500;
-    case "mid":        return price >= 500 && price < 1500;
-    case "premium":    return price >= 1500 && price < 3000;
-    case "ultra":      return price >= 3000;
-    default:           return true;
-  }
-}
-
-interface FilterArgs {
-  region: string | null;
-  tag: string | null;
-  budget: string | null;
-}
-
-function filterAndSort(retreats: WellnessRetreat[], args: FilterArgs): WellnessRetreat[] {
-  const { region, tag, budget } = args;
-  let f = [...retreats];
-
-  if (region && region !== "All") f = f.filter((r) => r.region === region);
-
-  if (tag && tag !== "all") {
-    // Use the UNSLICED derivation here — deriveBestForTags() caps display at
-    // 4 tags per retreat, which would silently drop retreats whose matching
-    // tag is later in the derivation order (Spa, Meditation).
-    f = f.filter((r) => {
-      try {
-        return deriveAllBestForTags(r).includes(tag);
-      } catch {
-        return false;
-      }
-    });
-  }
-
-  if (budget && budget !== "all") {
-    f = f.filter((r) => matchesBudget(r, budget));
-  }
-
-  // Always sort by Vault Score descending — no user-facing sort control.
-  f.sort((a, b) => b.wrd_score - a.wrd_score);
-  return f;
-}
 
 const PAGE_SIZE = 60;
 
 export default async function RetreatsPage({ searchParams }: { searchParams: Promise<{ region?: string; tag?: string; budget?: string; page?: string }> }) {
   const params = await searchParams;
-  const all = await getAllRetreats();
-  const filtered = filterAndSort(all, {
+  const currentPage = Math.max(1, parseInt(params.page || "1", 10) || 1);
+
+  // Query Supabase directly for the 60 rows we need, filters applied
+  // server-side. No more bulk-loading 9,409 rows into lambda memory.
+  const { retreats: paginated, total } = await queryRetreatsForDirectory({
     region: params.region || null,
     tag: params.tag || null,
     budget: params.budget || null,
+    page: currentPage,
+    pageSize: PAGE_SIZE,
   });
-  const regionLabel = params.region && params.region !== "All" ? params.region : null;
 
-  // Pagination
-  const currentPage = Math.max(1, parseInt(params.page || "1", 10) || 1);
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const regionLabel = params.region && params.region !== "All" ? params.region : null;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const safePage = Math.min(currentPage, totalPages);
-  const pageStart = (safePage - 1) * PAGE_SIZE;
-  const paginated = filtered.slice(pageStart, pageStart + PAGE_SIZE);
 
   // Build query string preserving filters
   const baseQuery = new URLSearchParams();
@@ -102,11 +53,11 @@ export default async function RetreatsPage({ searchParams }: { searchParams: Pro
     "@type": "ItemList",
     name: "Wellness Retreat Directory",
     description:
-      "Browse 120+ wellness retreats scored across 15 categories. Filter by region, price, and specialty on RetreatVault.",
+      "Browse 9,400+ wellness retreats scored across 15 categories. Filter by region, price, and specialty on RetreatVault.",
     url: "https://www.retreatvault.com/retreats",
-    numberOfItems: filtered.length,
+    numberOfItems: total,
     itemListOrder: "https://schema.org/ItemListOrderDescending",
-    itemListElement: filtered.slice(0, 10).map((retreat, index) => ({
+    itemListElement: paginated.slice(0, 10).map((retreat, index) => ({
       "@type": "ListItem",
       position: index + 1,
       name: retreat.name,
@@ -137,7 +88,7 @@ export default async function RetreatsPage({ searchParams }: { searchParams: Pro
         </AnimateIn>
         <AnimateIn delay={0.15}>
           <p className="mt-4 text-[13px] text-dark-400">
-            {filtered.length} retreat{filtered.length !== 1 ? "s" : ""} independently scored and ranked
+            {total.toLocaleString()} retreat{total !== 1 ? "s" : ""} independently scored and ranked
           </p>
         </AnimateIn>
 
@@ -147,7 +98,7 @@ export default async function RetreatsPage({ searchParams }: { searchParams: Pro
           </Suspense>
         </div>
 
-        {filtered.length === 0 ? (
+        {paginated.length === 0 ? (
           <div className="py-40 text-center">
             <p className="font-serif text-2xl text-dark-400">No retreats match your criteria</p>
             <a href="/retreats" className="mt-6 inline-block text-[11px] uppercase tracking-wider text-gold-400 hover:text-gold-300">
