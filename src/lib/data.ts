@@ -92,10 +92,13 @@ async function _fetchAllRetreats(): Promise<WellnessRetreat[]> {
       attempts += 1;
       console.error(`Supabase getAllRetreats error (attempt ${attempts}):`, error.message);
       if (attempts >= 3) {
-        const partial = all.map(mapRow);
-        _retreatsCache = partial;
-        _retreatsBySlugCache = new Map(partial.map((r) => [r.slug, r]));
-        return partial;
+        // Previously this returned whatever partial rows had been fetched so
+        // far, which meant an early-failing fetch would populate the module
+        // cache AND unstable_cache with an empty/truncated array — then every
+        // subsequent request for the next hour served that empty cache. Throw
+        // instead so neither cache layer stores the bad result and the next
+        // request gets a clean retry.
+        throw new Error(`Supabase getAllRetreats failed after 3 attempts: ${error.message}`);
       }
       // brief backoff
       await new Promise((r) => setTimeout(r, 500 * attempts));
@@ -114,6 +117,12 @@ async function _fetchAllRetreats(): Promise<WellnessRetreat[]> {
   }
 
   const mapped = all.map(mapRow);
+  // Never populate the module-scope caches with an empty result. An empty
+  // array from a bad fetch would be indistinguishable from "fully loaded"
+  // and would lock the lambda into serving 0 rows until a cold restart.
+  if (mapped.length === 0) {
+    throw new Error("Supabase getAllRetreats returned 0 rows — refusing to cache empty result");
+  }
   _retreatsCache = mapped;
   _retreatsBySlugCache = new Map(mapped.map((r) => [r.slug, r]));
   return mapped;
@@ -121,24 +130,48 @@ async function _fetchAllRetreats(): Promise<WellnessRetreat[]> {
 
 // Wrap the in-memory loader with Next's persistent unstable_cache so the
 // data survives across serverless lambda invocations (the module-scope
-// cache only helps within a single warm instance).
+// cache only helps within a single warm instance). Thrown errors are NOT
+// cached by unstable_cache, so a transient fetch failure won't poison the
+// cache for the next hour.
 const _cachedFetchAllRetreats = unstable_cache(
   async () => {
-    return _fetchAllRetreats();
+    const result = await _fetchAllRetreats();
+    // Belt-and-suspenders: also refuse to cache empty here. _fetchAllRetreats
+    // already throws on 0 rows, but if a future refactor ever returns [],
+    // this guard prevents a stuck empty cache from reappearing.
+    if (!result || result.length === 0) {
+      throw new Error("all-retreats fetch returned empty — refusing to cache");
+    }
+    return result;
   },
-  ["all-retreats-v3"],
+  ["all-retreats-v4"],
   { revalidate: 3600, tags: ["retreats"] }
 );
 
 export async function getAllRetreats(): Promise<WellnessRetreat[]> {
-  if (_retreatsCache) return _retreatsCache;
+  if (_retreatsCache && _retreatsCache.length > 0) return _retreatsCache;
   if (_retreatsPromise) return _retreatsPromise;
 
-  _retreatsPromise = _cachedFetchAllRetreats().then((data) => {
-    _retreatsCache = data;
-    _retreatsBySlugCache = new Map(data.map((r) => [r.slug, r]));
-    return data;
-  });
+  _retreatsPromise = _cachedFetchAllRetreats()
+    .then((data) => {
+      // Never populate module caches with an empty result — same reasoning
+      // as inside _fetchAllRetreats. If this happens, clear the promise so
+      // the next call retries instead of returning stale empty forever.
+      if (!data || data.length === 0) {
+        _retreatsPromise = null;
+        return [];
+      }
+      _retreatsCache = data;
+      _retreatsBySlugCache = new Map(data.map((r) => [r.slug, r]));
+      return data;
+    })
+    .catch((err) => {
+      // Make sure a failed fetch doesn't leave the promise stuck — the next
+      // request will retry fresh instead of awaiting a rejected promise.
+      console.error("getAllRetreats fetch failed:", err);
+      _retreatsPromise = null;
+      return [];
+    });
   return _retreatsPromise;
 }
 
