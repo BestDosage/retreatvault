@@ -1,9 +1,27 @@
 import type { Metadata } from "next";
+import { Inter, Cormorant_Garamond } from "next/font/google";
+import Image from "next/image";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import CompareProvider from "@/components/CompareProvider";
 import CompareBar from "@/components/CompareBar";
 import PressStrip from "@/components/PressStrip";
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-inter",
+  adjustFontFallback: true,
+});
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "700"],
+  display: "swap",
+  variable: "--font-cormorant",
+  adjustFontFallback: true,
+});
 
 export const metadata: Metadata = {
   title: {
@@ -37,15 +55,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${cormorant.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="" />
       </head>
       <body>
         <SmoothScroll />
@@ -56,7 +68,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-5 sm:px-10 lg:px-16">
             {/* Logo */}
             <a href="/" className="group flex items-center -my-8">
-              <img src="/logo-transparent.png" alt="RetreatVault" className="h-28 w-auto" />
+              <Image
+                src="/logo-transparent.png"
+                alt="RetreatVault"
+                width={224}
+                height={112}
+                priority
+                className="h-28 w-auto"
+              />
             </a>
 
             {/* Links */}
@@ -97,7 +116,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="line-gold" />
             <div className="grid gap-16 py-20 md:grid-cols-12">
               <div className="md:col-span-5">
-                <img src="/logo-transparent.png" alt="RetreatVault" className="h-36 w-auto" />
+                <Image
+                  src="/logo-transparent.png"
+                  alt="RetreatVault"
+                  width={288}
+                  height={144}
+                  loading="lazy"
+                  className="h-36 w-auto"
+                />
                 <p className="mt-6 max-w-sm text-[13px] leading-relaxed text-dark-400">
                   The world&rsquo;s most rigorous wellness retreat rating system.
                   15 weighted categories. Zero bias. Built by an analytical chemist
