@@ -7,6 +7,13 @@ import { getAllRetreats, getRetreatBySlug, getRetreatAwards, getRetreatVideos } 
 // The module-scope cache in src/lib/data.ts keeps this fast (single Supabase fetch).
 export const revalidate = 86400; // refresh stale pages once a day
 
+// Explicitly allow on-demand rendering for any slug not returned by
+// generateStaticParams at build time (e.g. slugs added after the build,
+// or slugs missed due to a truncated bulk fetch). getRetreatBySlug has a
+// direct-Supabase fallback so on-demand renders can still find the data
+// even when it wasn't in the prebuilt cache.
+export const dynamicParams = true;
+
 export async function generateStaticParams() {
   const retreats = await getAllRetreats();
   return retreats.map((r) => ({ slug: r.slug }));

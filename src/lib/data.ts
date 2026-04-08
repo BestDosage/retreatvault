@@ -103,8 +103,13 @@ async function _fetchAllRetreats(): Promise<WellnessRetreat[]> {
     }
     if (!data || data.length === 0) break;
     all.push(...data);
-    if (data.length < PAGE_SIZE) break;
-    from += PAGE_SIZE;
+    // Only break when we get an empty page. Don't early-terminate on
+    // `data.length < PAGE_SIZE` — PostgREST can return fewer rows than
+    // requested for reasons other than "end of table" (server-side
+    // row limits, statement timeouts on large scans, etc.), which was
+    // causing the bulk fetch to silently truncate below 9,409 rows
+    // and leave most slugs out of _retreatsBySlugCache → 404s.
+    from += data.length;
     attempts = 0; // reset on success
   }
 
@@ -121,7 +126,7 @@ const _cachedFetchAllRetreats = unstable_cache(
   async () => {
     return _fetchAllRetreats();
   },
-  ["all-retreats-v2"],
+  ["all-retreats-v3"],
   { revalidate: 3600, tags: ["retreats"] }
 );
 
@@ -139,7 +144,32 @@ export async function getAllRetreats(): Promise<WellnessRetreat[]> {
 
 export async function getRetreatBySlug(slug: string): Promise<WellnessRetreat | undefined> {
   if (!_retreatsCache) await getAllRetreats();
-  return _retreatsBySlugCache.get(slug);
+  const cached = _retreatsBySlugCache.get(slug);
+  if (cached) return cached;
+
+  // Safety net: if the bulk fetch truncated or the cache is stale, fall back
+  // to a direct Supabase query by slug so detail pages never 404 on valid data.
+  // This is cheap — slug is indexed — and only runs on cache misses.
+  try {
+    const { data, error } = await supabase
+      .from("retreats")
+      .select("*")
+      .eq("slug", slug)
+      .gt("wrd_score", 0)
+      .maybeSingle();
+    if (error) {
+      console.error(`getRetreatBySlug direct-fetch error for "${slug}":`, error.message);
+      return undefined;
+    }
+    if (!data) return undefined;
+    const mapped = mapRow(data);
+    // Warm the cache so subsequent hits in this lambda don't re-query.
+    _retreatsBySlugCache.set(slug, mapped);
+    return mapped;
+  } catch (e) {
+    console.error(`getRetreatBySlug direct-fetch threw for "${slug}":`, e);
+    return undefined;
+  }
 }
 
 export async function getRetreatsByRegion(region: string): Promise<WellnessRetreat[]> {
