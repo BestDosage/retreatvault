@@ -16,14 +16,41 @@ import RetreatCard from "@/components/RetreatCard";
 import RetreatFilters from "@/components/RetreatFilters";
 import AnimateIn, { StaggerContainer, StaggerItem } from "@/components/AnimateIn";
 import { WellnessRetreat } from "@/lib/types";
+import { deriveBestForTags } from "@/components/BestForTags";
+import { deriveIdealGuestProfile } from "@/lib/retreat-intelligence";
 
-function filterAndSort(retreats: WellnessRetreat[], region: string | null, tier: string | null, sort: string | null): WellnessRetreat[] {
+interface FilterArgs {
+  region: string | null;
+  tag: string | null;
+  goal: string | null;
+  experience: string | null;
+  travel: string | null;
+  budget: string | null;
+  sort: string | null;
+}
+
+function filterAndSort(retreats: WellnessRetreat[], args: FilterArgs): WellnessRetreat[] {
+  const { region, tag, goal, experience, travel, budget, sort } = args;
   let f = [...retreats];
+
   if (region && region !== "All") f = f.filter((r) => r.region === region);
-  if (tier && tier !== "all") {
-    const min: Record<string, number> = { elite: 9.0, exceptional: 8.0, highly_recommended: 7.0 };
-    f = f.filter((r) => r.wrd_score >= (min[tier] || 0));
+
+  if (tag && tag !== "all") {
+    f = f.filter((r) => deriveBestForTags(r).includes(tag));
   }
+
+  // Ideal-guest filters: derive once per retreat, not once per filter, for speed.
+  if ((goal && goal !== "all") || (experience && experience !== "all") || (travel && travel !== "all") || (budget && budget !== "all")) {
+    f = f.filter((r) => {
+      const p = deriveIdealGuestProfile(r);
+      if (goal && goal !== "all" && p.primaryGoal !== goal) return false;
+      if (experience && experience !== "all" && p.experienceLevel !== experience) return false;
+      if (travel && travel !== "all" && p.travelStyle !== travel) return false;
+      if (budget && budget !== "all" && p.budgetTier !== budget) return false;
+      return true;
+    });
+  }
+
   switch (sort) {
     case "score_asc": f.sort((a, b) => a.wrd_score - b.wrd_score); break;
     case "price_asc": f.sort((a, b) => a.price_min_per_night - b.price_min_per_night); break;
@@ -36,10 +63,18 @@ function filterAndSort(retreats: WellnessRetreat[], region: string | null, tier:
 
 const PAGE_SIZE = 60;
 
-export default async function RetreatsPage({ searchParams }: { searchParams: Promise<{ region?: string; tier?: string; sort?: string; page?: string }> }) {
+export default async function RetreatsPage({ searchParams }: { searchParams: Promise<{ region?: string; tag?: string; goal?: string; experience?: string; travel?: string; budget?: string; sort?: string; page?: string }> }) {
   const params = await searchParams;
   const all = await getAllRetreats();
-  const filtered = filterAndSort(all, params.region || null, params.tier || null, params.sort || null);
+  const filtered = filterAndSort(all, {
+    region: params.region || null,
+    tag: params.tag || null,
+    goal: params.goal || null,
+    experience: params.experience || null,
+    travel: params.travel || null,
+    budget: params.budget || null,
+    sort: params.sort || null,
+  });
   const regionLabel = params.region && params.region !== "All" ? params.region : null;
 
   // Pagination
@@ -52,7 +87,11 @@ export default async function RetreatsPage({ searchParams }: { searchParams: Pro
   // Build query string preserving filters
   const baseQuery = new URLSearchParams();
   if (params.region) baseQuery.set("region", params.region);
-  if (params.tier) baseQuery.set("tier", params.tier);
+  if (params.tag) baseQuery.set("tag", params.tag);
+  if (params.goal) baseQuery.set("goal", params.goal);
+  if (params.experience) baseQuery.set("experience", params.experience);
+  if (params.travel) baseQuery.set("travel", params.travel);
+  if (params.budget) baseQuery.set("budget", params.budget);
   if (params.sort) baseQuery.set("sort", params.sort);
   const buildPageUrl = (p: number) => {
     const q = new URLSearchParams(baseQuery);
