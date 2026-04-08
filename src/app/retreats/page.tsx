@@ -16,7 +16,7 @@ import RetreatCard from "@/components/RetreatCard";
 import RetreatFilters from "@/components/RetreatFilters";
 import AnimateIn, { StaggerContainer, StaggerItem } from "@/components/AnimateIn";
 import { WellnessRetreat } from "@/lib/types";
-import { deriveBestForTags } from "@/components/BestForTags";
+import { deriveAllBestForTags } from "@/components/BestForTags";
 
 // Budget bands match the values exposed in RetreatFilters.tsx.
 // Applied directly to price_max_per_night — no score/profile derivation,
@@ -36,21 +36,21 @@ interface FilterArgs {
   region: string | null;
   tag: string | null;
   budget: string | null;
-  sort: string | null;
 }
 
 function filterAndSort(retreats: WellnessRetreat[], args: FilterArgs): WellnessRetreat[] {
-  const { region, tag, budget, sort } = args;
+  const { region, tag, budget } = args;
   let f = [...retreats];
 
   if (region && region !== "All") f = f.filter((r) => r.region === region);
 
   if (tag && tag !== "all") {
-    // deriveBestForTags uses optional chaining on scores, so it's safe even
-    // when a retreat has missing category scores — it just returns fewer tags.
+    // Use the UNSLICED derivation here — deriveBestForTags() caps display at
+    // 4 tags per retreat, which would silently drop retreats whose matching
+    // tag is later in the derivation order (Spa, Meditation).
     f = f.filter((r) => {
       try {
-        return deriveBestForTags(r).includes(tag);
+        return deriveAllBestForTags(r).includes(tag);
       } catch {
         return false;
       }
@@ -61,26 +61,20 @@ function filterAndSort(retreats: WellnessRetreat[], args: FilterArgs): WellnessR
     f = f.filter((r) => matchesBudget(r, budget));
   }
 
-  switch (sort) {
-    case "score_asc": f.sort((a, b) => a.wrd_score - b.wrd_score); break;
-    case "price_asc": f.sort((a, b) => a.price_min_per_night - b.price_min_per_night); break;
-    case "price_desc": f.sort((a, b) => b.price_max_per_night - a.price_max_per_night); break;
-    case "rating_desc": f.sort((a, b) => b.google_rating - a.google_rating); break;
-    default: f.sort((a, b) => b.wrd_score - a.wrd_score);
-  }
+  // Always sort by Vault Score descending — no user-facing sort control.
+  f.sort((a, b) => b.wrd_score - a.wrd_score);
   return f;
 }
 
 const PAGE_SIZE = 60;
 
-export default async function RetreatsPage({ searchParams }: { searchParams: Promise<{ region?: string; tag?: string; budget?: string; sort?: string; page?: string }> }) {
+export default async function RetreatsPage({ searchParams }: { searchParams: Promise<{ region?: string; tag?: string; budget?: string; page?: string }> }) {
   const params = await searchParams;
   const all = await getAllRetreats();
   const filtered = filterAndSort(all, {
     region: params.region || null,
     tag: params.tag || null,
     budget: params.budget || null,
-    sort: params.sort || null,
   });
   const regionLabel = params.region && params.region !== "All" ? params.region : null;
 
@@ -96,7 +90,6 @@ export default async function RetreatsPage({ searchParams }: { searchParams: Pro
   if (params.region) baseQuery.set("region", params.region);
   if (params.tag) baseQuery.set("tag", params.tag);
   if (params.budget) baseQuery.set("budget", params.budget);
-  if (params.sort) baseQuery.set("sort", params.sort);
   const buildPageUrl = (p: number) => {
     const q = new URLSearchParams(baseQuery);
     if (p > 1) q.set("page", String(p));

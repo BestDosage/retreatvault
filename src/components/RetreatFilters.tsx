@@ -29,14 +29,6 @@ const BUDGET_TIERS = [
   { value: "ultra", label: "Ultra-Premium ($3,000+)" },
 ];
 
-const SORT_OPTIONS = [
-  { value: "score_desc", label: "Highest Vault Score" },
-  { value: "score_asc", label: "Lowest Vault Score" },
-  { value: "price_asc", label: "Lowest Price" },
-  { value: "price_desc", label: "Highest Price" },
-  { value: "rating_desc", label: "Highest Rating" },
-];
-
 const selectClass =
   "rounded-full border border-white/[0.06] bg-transparent px-5 py-2.5 text-[10px] uppercase tracking-wider text-dark-300 focus:border-gold-500/30 focus:outline-none";
 
@@ -46,19 +38,19 @@ export default function RetreatFilters() {
   const activeRegion = searchParams.get("region") || "All";
   const activeBestFor = searchParams.get("tag") || "all";
   const activeBudget = searchParams.get("budget") || "all";
-  const activeSort = searchParams.get("sort") || "score_desc";
 
   const updateParams = useCallback(
     (key: string, value: string) => {
       const params = new URLSearchParams(searchParams.toString());
-      if (value === "All" || value === "all" || value === "score_desc") params.delete(key);
+      if (value === "All" || value === "all") params.delete(key);
       else params.set(key, value);
-      // Strip any stale params from the old filter set so their presence in
-      // a bookmarked URL can't retrigger the removed code paths.
+      // Strip any stale params from removed filters so old bookmarks can't
+      // retrigger deleted code paths.
       params.delete("tier");
       params.delete("goal");
       params.delete("experience");
       params.delete("travel");
+      params.delete("sort");
       // Reset pagination when a filter changes
       params.delete("page");
       router.push(`/retreats${params.toString() ? `?${params.toString()}` : ""}`);
@@ -85,7 +77,7 @@ export default function RetreatFilters() {
         ))}
       </div>
 
-      {/* Filter dropdowns — just Best For + Budget + Sort */}
+      {/* Filter dropdowns — Best For + Budget only */}
       <div className="flex flex-wrap gap-3">
         <select aria-label="Best For" value={activeBestFor} onChange={(e) => updateParams("tag", e.target.value)} className={selectClass}>
           {BEST_FOR.map((t) => (
@@ -96,12 +88,6 @@ export default function RetreatFilters() {
         <select aria-label="Budget Tier" value={activeBudget} onChange={(e) => updateParams("budget", e.target.value)} className={selectClass}>
           {BUDGET_TIERS.map((b) => (
             <option key={b.value} value={b.value} className="bg-dark-900">{b.label}</option>
-          ))}
-        </select>
-
-        <select aria-label="Sort" value={activeSort} onChange={(e) => updateParams("sort", e.target.value)} className={selectClass}>
-          {SORT_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value} className="bg-dark-900">{o.label}</option>
           ))}
         </select>
       </div>

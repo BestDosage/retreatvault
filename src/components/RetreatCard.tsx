@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { WellnessRetreat } from "@/lib/types";
+import { getRetreatImage } from "@/lib/retreat-images";
 import TierBadge from "./TierBadge";
 import AddToCompareButton from "./AddToCompareButton";
 import { BestForChips } from "./BestForTags";
@@ -26,19 +27,15 @@ export default function RetreatCard({ retreat }: { retreat: WellnessRetreat }) {
     >
       {/* Image */}
       <div className="relative aspect-[4/5] overflow-hidden rounded-2xl">
-        {retreat.hero_image_url?.startsWith("http") ? (
-          <Image
-            src={retreat.hero_image_url}
-            alt={retreat.name}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            quality={65}
-            loading="lazy"
-            className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.05]"
-          />
-        ) : (
-          <div className="h-full w-full bg-dark-800" />
-        )}
+        <Image
+          src={getRetreatImage(retreat)}
+          alt={retreat.name}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          quality={65}
+          loading="lazy"
+          className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.05]"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-dark-950/90 via-dark-950/20 to-transparent" />
         <div className="absolute inset-0 bg-dark-950/5 transition-opacity duration-700 group-hover:bg-dark-950/0" />
 
