@@ -4,12 +4,55 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
 const REGIONS = ["All", "USA", "Europe", "Canada", "Mexico", "Asia"];
-const TIERS = [
-  { value: "all", label: "All Tiers" },
-  { value: "elite", label: "Elite (9.0+)" },
-  { value: "exceptional", label: "Exceptional (8.0+)" },
-  { value: "highly_recommended", label: "Highly Recommended (7.0+)" },
+
+// Best For tags — must mirror deriveBestForTags() in BestForTags.tsx
+const BEST_FOR = [
+  { value: "all", label: "Best For — All" },
+  { value: "Best for Burnout", label: "Burnout Recovery" },
+  { value: "Best for Longevity", label: "Longevity" },
+  { value: "Best for Biohackers", label: "Biohackers" },
+  { value: "Best for Couples", label: "Couples" },
+  { value: "Best First Retreat", label: "First Retreat" },
+  { value: "Best for Fitness", label: "Fitness" },
+  { value: "Best for Nutrition", label: "Nutrition" },
+  { value: "Best for Spa", label: "Spa" },
+  { value: "Best for Meditation", label: "Meditation" },
 ];
+
+// Mirrors deriveIdealGuestProfile() in lib/retreat-intelligence.ts
+const PRIMARY_GOALS = [
+  { value: "all", label: "Any Goal" },
+  { value: "Medical Wellness & Longevity", label: "Medical & Longevity" },
+  { value: "Fitness Transformation", label: "Fitness Transformation" },
+  { value: "Spiritual & Mindfulness", label: "Spiritual & Mindfulness" },
+  { value: "Luxury Spa & Pampering", label: "Luxury Spa" },
+  { value: "Burnout Recovery", label: "Burnout Recovery" },
+  { value: "Relaxation & Renewal", label: "Relaxation & Renewal" },
+];
+
+const EXPERIENCE_LEVELS = [
+  { value: "all", label: "Any Experience" },
+  { value: "First Retreat", label: "First Retreat" },
+  { value: "Any Level", label: "Any Level" },
+  { value: "Seasoned Retreater", label: "Seasoned Retreater" },
+];
+
+const TRAVEL_STYLES = [
+  { value: "all", label: "Any Travel Style" },
+  { value: "Solo Seekers", label: "Solo Seekers" },
+  { value: "Couples", label: "Couples" },
+  { value: "Solo or Couples", label: "Solo or Couples" },
+  { value: "Groups & Couples", label: "Groups & Couples" },
+];
+
+const BUDGET_TIERS = [
+  { value: "all", label: "Any Budget" },
+  { value: "Accessible Luxury", label: "Accessible Luxury (<$500)" },
+  { value: "Mid-Range", label: "Mid-Range ($500–$1,500)" },
+  { value: "Premium", label: "Premium ($1,500–$3,000)" },
+  { value: "Ultra-Premium", label: "Ultra-Premium ($3,000+)" },
+];
+
 const SORT_OPTIONS = [
   { value: "score_desc", label: "Highest Vault Score" },
   { value: "score_asc", label: "Lowest Vault Score" },
@@ -18,11 +61,18 @@ const SORT_OPTIONS = [
   { value: "rating_desc", label: "Highest Rating" },
 ];
 
+const selectClass =
+  "rounded-full border border-white/[0.06] bg-transparent px-5 py-2.5 text-[10px] uppercase tracking-wider text-dark-300 focus:border-gold-500/30 focus:outline-none";
+
 export default function RetreatFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const activeRegion = searchParams.get("region") || "All";
-  const activeTier = searchParams.get("tier") || "all";
+  const activeBestFor = searchParams.get("tag") || "all";
+  const activeGoal = searchParams.get("goal") || "all";
+  const activeExperience = searchParams.get("experience") || "all";
+  const activeTravel = searchParams.get("travel") || "all";
+  const activeBudget = searchParams.get("budget") || "all";
   const activeSort = searchParams.get("sort") || "score_desc";
 
   const updateParams = useCallback(
@@ -30,6 +80,8 @@ export default function RetreatFilters() {
       const params = new URLSearchParams(searchParams.toString());
       if (value === "All" || value === "all" || value === "score_desc") params.delete(key);
       else params.set(key, value);
+      // Always reset pagination when a filter changes
+      params.delete("page");
       router.push(`/retreats${params.toString() ? `?${params.toString()}` : ""}`);
     },
     [router, searchParams]
@@ -54,21 +106,42 @@ export default function RetreatFilters() {
         ))}
       </div>
 
-      {/* Dropdowns */}
+      {/* Filter dropdowns */}
       <div className="flex flex-wrap gap-3">
-        <select
-          value={activeTier}
-          onChange={(e) => updateParams("tier", e.target.value)}
-          className="rounded-full border border-white/[0.06] bg-transparent px-5 py-2.5 text-[10px] uppercase tracking-wider text-dark-300 focus:border-gold-500/30 focus:outline-none"
-        >
-          {TIERS.map((t) => <option key={t.value} value={t.value} className="bg-dark-900">{t.label}</option>)}
+        <select aria-label="Best For" value={activeBestFor} onChange={(e) => updateParams("tag", e.target.value)} className={selectClass}>
+          {BEST_FOR.map((t) => (
+            <option key={t.value} value={t.value} className="bg-dark-900">{t.label}</option>
+          ))}
         </select>
-        <select
-          value={activeSort}
-          onChange={(e) => updateParams("sort", e.target.value)}
-          className="rounded-full border border-white/[0.06] bg-transparent px-5 py-2.5 text-[10px] uppercase tracking-wider text-dark-300 focus:border-gold-500/30 focus:outline-none"
-        >
-          {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value} className="bg-dark-900">{o.label}</option>)}
+
+        <select aria-label="Primary Goal" value={activeGoal} onChange={(e) => updateParams("goal", e.target.value)} className={selectClass}>
+          {PRIMARY_GOALS.map((g) => (
+            <option key={g.value} value={g.value} className="bg-dark-900">{g.label}</option>
+          ))}
+        </select>
+
+        <select aria-label="Experience Level" value={activeExperience} onChange={(e) => updateParams("experience", e.target.value)} className={selectClass}>
+          {EXPERIENCE_LEVELS.map((x) => (
+            <option key={x.value} value={x.value} className="bg-dark-900">{x.label}</option>
+          ))}
+        </select>
+
+        <select aria-label="Travel Style" value={activeTravel} onChange={(e) => updateParams("travel", e.target.value)} className={selectClass}>
+          {TRAVEL_STYLES.map((x) => (
+            <option key={x.value} value={x.value} className="bg-dark-900">{x.label}</option>
+          ))}
+        </select>
+
+        <select aria-label="Budget Tier" value={activeBudget} onChange={(e) => updateParams("budget", e.target.value)} className={selectClass}>
+          {BUDGET_TIERS.map((b) => (
+            <option key={b.value} value={b.value} className="bg-dark-900">{b.label}</option>
+          ))}
+        </select>
+
+        <select aria-label="Sort" value={activeSort} onChange={(e) => updateParams("sort", e.target.value)} className={selectClass}>
+          {SORT_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value} className="bg-dark-900">{o.label}</option>
+          ))}
         </select>
       </div>
     </div>

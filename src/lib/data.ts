@@ -78,6 +78,13 @@ async function _fetchAllRetreats(): Promise<WellnessRetreat[]> {
       .neq("slug", "test")
       .gt("wrd_score", 0)
       .order("wrd_score", { ascending: false })
+      // Stable secondary sort by unique `slug` column — without this,
+      // pagination with ~32 distinct wrd_scores across 9,400 rows is
+      // non-deterministic (Postgres returns ties in arbitrary order),
+      // so rows get skipped or duplicated across paginated batches.
+      // That was the root cause of /retreats/[slug] 404s: missing slugs
+      // never made it into the in-memory cache built from paginated results.
+      .order("slug", { ascending: true })
       .range(from, from + PAGE_SIZE - 1);
 
     if (error) {
@@ -114,7 +121,7 @@ const _cachedFetchAllRetreats = unstable_cache(
   async () => {
     return _fetchAllRetreats();
   },
-  ["all-retreats-v1"],
+  ["all-retreats-v2"],
   { revalidate: 3600, tags: ["retreats"] }
 );
 
