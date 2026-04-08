@@ -186,6 +186,128 @@ export async function getRetreatBySlug(slug: string): Promise<WellnessRetreat | 
   }
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+// Server-side directory query
+// ═══════════════════════════════════════════════════════════════════════
+//
+// The directory page /retreats used to load all 9,409 retreats into lambda
+// memory via getAllRetreats(), filter them in JS, and slice to 60. That
+// works for small datasets but at 9k+ rows it's brittle and slow.
+//
+// This function queries Supabase directly with filters + LIMIT + OFFSET so
+// we only ever pull the 60 rows we actually need to render. Fast, cheap,
+// and independent of the bulk-fetch code path.
+
+export type BestForTag =
+  | "Best for Burnout"
+  | "Best for Couples"
+  | "Best for Longevity"
+  | "Best for Biohackers"
+  | "Best First Retreat"
+  | "Best for Fitness"
+  | "Best for Nutrition"
+  | "Best for Spa"
+  | "Best for Meditation";
+
+export interface DirectoryQueryArgs {
+  region?: string | null;
+  tag?: string | null;
+  budget?: string | null;
+  page: number;
+  pageSize: number;
+}
+
+export interface DirectoryQueryResult {
+  retreats: WellnessRetreat[];
+  total: number;
+}
+
+/**
+ * Translate a "Best For" tag into a Supabase query builder that narrows to
+ * rows matching that tag's score threshold. Mirrors deriveAllBestForTags()
+ * in src/components/BestForTags.tsx — keep them in sync.
+ */
+function applyBestForFilter(query: any, tag: string) {
+  switch (tag) {
+    case "Best for Burnout":
+      return query.or("scores->mindfulness->>score.gte.8.5,scores->sleep->>score.gte.8.5");
+    case "Best for Couples":
+      return query
+        .gte("scores->amenities->>score", "8.5")
+        .gte("price_max_per_night", 1500);
+    case "Best for Longevity":
+      return query.or("scores->medical->>score.gte.8.0,scores->sleep->>score.gte.8.5");
+    case "Best for Biohackers":
+      return query
+        .or("scores->medical->>score.gte.9.0,scores->personalization->>score.gte.9.0")
+        .gte("scores->fitness->>score", "7.5");
+    case "Best First Retreat":
+      return query
+        .gte("scores->personalization->>score", "7.5")
+        .gte("scores->pricing_value->>score", "7.5")
+        .gte("scores->travel_access->>score", "7.0");
+    case "Best for Fitness":
+      return query.gte("scores->fitness->>score", "9.0");
+    case "Best for Nutrition":
+      return query.gte("scores->nutrition->>score", "9.0");
+    case "Best for Spa":
+      return query.gte("scores->spa->>score", "9.0");
+    case "Best for Meditation":
+      return query.gte("scores->mindfulness->>score", "9.0");
+    default:
+      return query;
+  }
+}
+
+function applyBudgetFilter(query: any, budget: string) {
+  switch (budget) {
+    case "accessible":
+      return query.gt("price_max_per_night", 0).lt("price_max_per_night", 500);
+    case "mid":
+      return query.gte("price_max_per_night", 500).lt("price_max_per_night", 1500);
+    case "premium":
+      return query.gte("price_max_per_night", 1500).lt("price_max_per_night", 3000);
+    case "ultra":
+      return query.gte("price_max_per_night", 3000);
+    default:
+      return query;
+  }
+}
+
+export async function queryRetreatsForDirectory(
+  args: DirectoryQueryArgs
+): Promise<DirectoryQueryResult> {
+  const { region, tag, budget, page, pageSize } = args;
+  const offset = Math.max(0, (page - 1) * pageSize);
+
+  const buildBase = () => {
+    let q: any = supabase
+      .from("retreats")
+      .select("*", { count: "exact" })
+      .neq("slug", "test")
+      .gt("wrd_score", 0);
+    if (region && region !== "All") q = q.eq("region", region);
+    if (tag && tag !== "all") q = applyBestForFilter(q, tag);
+    if (budget && budget !== "all") q = applyBudgetFilter(q, budget);
+    return q;
+  };
+
+  const { data, error, count } = await buildBase()
+    .order("wrd_score", { ascending: false })
+    .order("slug", { ascending: true })
+    .range(offset, offset + pageSize - 1);
+
+  if (error) {
+    console.error("queryRetreatsForDirectory error:", error.message);
+    return { retreats: [], total: 0 };
+  }
+
+  return {
+    retreats: (data || []).map(mapRow),
+    total: count || 0,
+  };
+}
+
 export async function getRetreatsByRegion(region: string): Promise<WellnessRetreat[]> {
   const { data, error } = await supabase
     .from("retreats")
