@@ -24,8 +24,8 @@
   --color-dark-900: #0a0a0a;
   --color-dark-950: #050505;
 
-  --font-family-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-family-serif: var(--font-cormorant), Georgia, serif;
+  --font-family-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
 }
 
 * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
@@ -49,6 +49,52 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* ═══ PURE-CSS ANIMATIONS (replaces framer-motion above-the-fold) ═══ */
+@keyframes rv-fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes rv-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes rv-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.rv-fade-up {
+  opacity: 0;
+  animation: rv-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.rv-fade-in {
+  opacity: 0;
+  animation: rv-fade-in 1.2s ease-out forwards;
+}
+.rv-marquee-track {
+  display: flex;
+  white-space: nowrap;
+  width: max-content;
+  animation: rv-marquee 45s linear infinite;
+  will-change: transform;
+}
+.rv-stagger > * {
+  opacity: 0;
+  animation: rv-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.rv-stagger > *:nth-child(1) { animation-delay: 0s; }
+.rv-stagger > *:nth-child(2) { animation-delay: 0.1s; }
+.rv-stagger > *:nth-child(3) { animation-delay: 0.2s; }
+.rv-stagger > *:nth-child(4) { animation-delay: 0.3s; }
+.rv-stagger > *:nth-child(5) { animation-delay: 0.4s; }
+.rv-stagger > *:nth-child(6) { animation-delay: 0.5s; }
+.rv-stagger > *:nth-child(7) { animation-delay: 0.6s; }
+.rv-stagger > *:nth-child(8) { animation-delay: 0.7s; }
+@media (prefers-reduced-motion: reduce) {
+  .rv-fade-up, .rv-fade-in, .rv-stagger > * { animation: none; opacity: 1; }
+  .rv-marquee-track { animation: none; }
 }
 
 /* ═══ DIVIDER ═══ */

@@ -47,8 +47,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        serif: ["Georgia", "Cambria", "Times New Roman", "Times", "serif"],
-        sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
+        serif: ["var(--font-cormorant)", "Georgia", "Cambria", "Times New Roman", "serif"],
+        sans: ["var(--font-inter)", "system-ui", "-apple-system", "sans-serif"],
       },
     },
   },

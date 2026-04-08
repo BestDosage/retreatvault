@@ -9,11 +9,16 @@ export const metadata: Metadata = {
     "Discover the world's top-rated wellness retreats scored across 15 data-driven categories. Compare luxury spas, medical clinics, yoga ashrams & detox centers. No paid placements.",
 };
 
+import Image from "next/image";
+import dynamic from "next/dynamic";
 import { getAllRetreats, getRegions } from "@/lib/data";
 import AnimateIn, { StaggerContainer, StaggerItem, Counter, TextReveal, Marquee } from "@/components/AnimateIn";
 import TierBadge from "@/components/TierBadge";
-import HorizontalScroll from "@/components/HorizontalScroll";
-import HeroAnimation from "@/components/HeroAnimation";
+
+// Below-the-fold — dynamically import so it stays out of the initial bundle.
+const HorizontalScroll = dynamic(() => import("@/components/HorizontalScroll"), {
+  loading: () => <div className="h-[480px]" />,
+});
 
 export default async function HomePage() {
   const retreats = await getAllRetreats();
@@ -75,11 +80,19 @@ export default async function HomePage() {
           1. HERO
           ══════════════════════════════════════════════════ */}
       <section className="relative flex h-screen min-h-[750px] flex-col items-center justify-center overflow-hidden">
-        <img src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=1920&h=1080&fit=crop&q=80" alt="" className="absolute inset-0 h-full w-full scale-105 object-cover" />
+        <Image
+          src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?fit=crop"
+          alt=""
+          fill
+          priority
+          fetchPriority="high"
+          sizes="100vw"
+          quality={70}
+          className="scale-105 object-cover"
+        />
         <div className="absolute inset-0 bg-dark-950/75" />
         <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/20 to-dark-950/60" />
         <div className="absolute bottom-0 left-0 right-0 h-56 bg-gradient-to-t from-dark-950 to-transparent" />
-        <HeroAnimation />
 
         <div className="relative z-10 mx-auto max-w-5xl px-6 text-center sm:px-10">
           <AnimateIn delay={0.2} direction="none" duration={1.4}>
@@ -136,7 +149,15 @@ export default async function HomePage() {
           <AnimateIn>
             <div className="relative overflow-hidden rounded-[2rem] border border-gold-400/[0.08]">
               {retreats[3]?.hero_image_url?.startsWith("http") && (
-                <img src={retreats[3].hero_image_url} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                <Image
+                  src={retreats[3].hero_image_url}
+                  alt=""
+                  fill
+                  loading="lazy"
+                  sizes="(max-width: 1024px) 100vw, 1280px"
+                  quality={65}
+                  className="object-cover"
+                />
               )}
               <div className="absolute inset-0 bg-dark-950/80 backdrop-blur-[2px]" />
               <div className="absolute inset-0 bg-gradient-to-r from-dark-950/60 to-dark-950/40" />
@@ -402,7 +423,16 @@ export default async function HomePage() {
                       >
                         <div className="hidden h-20 w-20 shrink-0 overflow-hidden rounded-xl sm:block">
                           {topImage ? (
-                            <img src={topImage} alt="" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
+                            <Image
+                              src={topImage}
+                              alt=""
+                              width={80}
+                              height={80}
+                              loading="lazy"
+                              sizes="80px"
+                              quality={70}
+                              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            />
                           ) : (
                             <div className="flex h-full w-full items-center justify-center bg-dark-800">
                               <span className="text-[9px] uppercase tracking-[0.2em] text-dark-500">{region.name.slice(0, 2)}</span>
