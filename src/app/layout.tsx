@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter, Cormorant_Garamond } from "next/font/google";
 import Image from "next/image";
 import "./globals.css";
-import SmoothScroll from "@/components/SmoothScroll";
 import CompareProvider from "@/components/CompareProvider";
 import CompareBar from "@/components/CompareBar";
 import PressStrip from "@/components/PressStrip";
@@ -60,7 +59,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="" />
       </head>
       <body>
-        <SmoothScroll />
         <CompareProvider>
 
         {/* ═══ NAV ═══ */}

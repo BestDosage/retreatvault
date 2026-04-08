@@ -1,44 +1,29 @@
-"use client";
+// Pure server components — no framer-motion, no client JS.
+// Animations are driven by CSS classes defined in globals.css.
+// This dramatically reduces TBT and main-thread work.
+import type { ReactNode, CSSProperties } from "react";
 
-import { motion, useInView, useSpring, useMotionValue, useTransform } from "framer-motion";
-import { ReactNode, useRef, useEffect, useState } from "react";
-
-// ═══ FADE/SLIDE IN ON SCROLL ═══
+// ═══ FADE/SLIDE IN ═══
 export default function AnimateIn({
   children,
   delay = 0,
-  direction = "up",
-  duration = 0.9,
+  duration,
+  direction: _direction, // accepted for API compat, ignored
   className = "",
 }: {
   children: ReactNode;
   delay?: number;
-  direction?: "up" | "down" | "left" | "right" | "none";
   duration?: number;
+  direction?: "up" | "down" | "left" | "right" | "none";
   className?: string;
 }) {
-  const offsets = {
-    up: { y: 60, x: 0 },
-    down: { y: -60, x: 0 },
-    left: { x: 60, y: 0 },
-    right: { x: -60, y: 0 },
-    none: { x: 0, y: 0 },
-  };
-
+  const style: CSSProperties = {};
+  if (delay) style.animationDelay = `${delay}s`;
+  if (duration) style.animationDuration = `${duration}s`;
   return (
-    <motion.div
-      initial={{ opacity: 0, ...offsets[direction] }}
-      whileInView={{ opacity: 1, x: 0, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{
-        duration,
-        delay,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-      className={className}
-    >
+    <div className={`rv-fade-up ${className}`} style={style}>
       {children}
-    </motion.div>
+    </div>
   );
 }
 
@@ -46,26 +31,13 @@ export default function AnimateIn({
 export function StaggerContainer({
   children,
   className = "",
-  staggerDelay = 0.12,
+  staggerDelay: _staggerDelay, // accepted for API compat, ignored
 }: {
   children: ReactNode;
   className?: string;
   staggerDelay?: number;
 }) {
-  return (
-    <motion.div
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-50px" }}
-      variants={{
-        hidden: {},
-        visible: { transition: { staggerChildren: staggerDelay } },
-      }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className={`rv-stagger ${className}`}>{children}</div>;
 }
 
 export function StaggerItem({
@@ -75,92 +47,13 @@ export function StaggerItem({
   children: ReactNode;
   className?: string;
 }) {
-  return (
-    <motion.div
-      variants={{
-        hidden: { opacity: 0, y: 40 },
-        visible: {
-          opacity: 1,
-          y: 0,
-          transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
-        },
-      }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className={className}>{children}</div>;
 }
 
-// ═══ PARALLAX IMAGE ═══
-export function ParallaxImage({
-  src,
-  alt,
-  className = "",
-  speed = 0.15,
-}: {
-  src: string;
-  alt: string;
-  className?: string;
-  speed?: number;
-}) {
-  return (
-    <motion.div className={`overflow-hidden ${className}`}>
-      <motion.img
-        src={src}
-        alt={alt}
-        className="h-[120%] w-full object-cover"
-        initial={{ y: `-${speed * 100}%` }}
-        whileInView={{ y: `${speed * 100}%` }}
-        viewport={{ once: false, margin: "200px" }}
-        transition={{ duration: 0, ease: "linear" }}
-        style={{ willChange: "transform" }}
-        loading="lazy"
-      />
-    </motion.div>
-  );
-}
-
-// ═══ ANIMATED COUNTER ═══
-export function Counter({
-  target,
-  prefix = "",
-  suffix = "",
-  duration = 2,
-  className = "",
-}: {
-  target: number;
-  prefix?: string;
-  suffix?: string;
-  duration?: number;
-  className?: string;
-}) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const motionVal = useMotionValue(0);
-  const springVal = useSpring(motionVal, { duration: duration * 1000, bounce: 0 });
-  const [display, setDisplay] = useState("0");
-
-  useEffect(() => {
-    if (isInView) motionVal.set(target);
-  }, [isInView, target, motionVal]);
-
-  useEffect(() => {
-    const unsubscribe = springVal.on("change", (v) => {
-      if (target >= 100) setDisplay(Math.round(v).toLocaleString());
-      else setDisplay(v.toFixed(1));
-    });
-    return unsubscribe;
-  }, [springVal, target]);
-
-  return (
-    <span ref={ref} className={className}>
-      {prefix}{display}{suffix}
-    </span>
-  );
-}
-
-// ═══ TEXT REVEAL (CHAR BY CHAR) ═══
+// ═══ TEXT REVEAL ═══
+// Formerly a per-character Framer Motion animation. Now a plain
+// server-rendered element with a simple CSS fade — no hydration cost,
+// and the text is in the HTML immediately (big LCP win).
 export function TextReveal({
   text,
   className = "",
@@ -170,42 +63,48 @@ export function TextReveal({
   className?: string;
   delay?: number;
 }) {
-  const words = text.split(" ");
+  const style: CSSProperties = delay ? { animationDelay: `${delay}s` } : {};
   return (
-    <motion.span
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-50px" }}
-      className={className}
-    >
-      {words.map((word, i) => (
-        <span key={i} className="inline-block overflow-hidden mr-[0.3em]">
-          <motion.span
-            className="inline-block"
-            variants={{
-              hidden: { y: "110%" },
-              visible: {
-                y: "0%",
-                transition: {
-                  duration: 0.7,
-                  delay: delay + i * 0.04,
-                  ease: [0.22, 1, 0.36, 1],
-                },
-              },
-            }}
-          >
-            {word}
-          </motion.span>
-        </span>
-      ))}
-    </motion.span>
+    <span className={`rv-fade-up inline-block ${className}`} style={style}>
+      {text}
+    </span>
   );
 }
 
-// ═══ HORIZONTAL MARQUEE ═══
+// ═══ COUNTER ═══
+// Was an animated count-up using framer-motion useSpring.
+// Now static — number is rendered server-side. Users don't need a
+// counting animation to understand "$6.8T" — and it was costing
+// hydration + continuous main-thread work.
+export function Counter({
+  target,
+  prefix = "",
+  suffix = "",
+  className = "",
+}: {
+  target: number;
+  prefix?: string;
+  suffix?: string;
+  duration?: number;
+  className?: string;
+}) {
+  const display =
+    target >= 100 ? Math.round(target).toLocaleString() : target.toFixed(1);
+  return (
+    <span className={className}>
+      {prefix}
+      {display}
+      {suffix}
+    </span>
+  );
+}
+
+// ═══ MARQUEE ═══
+// Was a framer-motion infinite x animation. Now pure CSS keyframes —
+// zero JS, browser-optimized, same visual result.
 export function Marquee({
   children,
-  speed = 30,
+  speed: _speed, // accepted for API compat, ignored (CSS drives timing)
   className = "",
 }: {
   children: ReactNode;
@@ -214,14 +113,36 @@ export function Marquee({
 }) {
   return (
     <div className={`overflow-hidden ${className}`}>
-      <motion.div
-        className="flex whitespace-nowrap"
-        animate={{ x: [0, "-50%"] }}
-        transition={{ duration: speed, repeat: Infinity, ease: "linear" }}
-      >
+      <div className="rv-marquee-track">
         {children}
         {children}
-      </motion.div>
+      </div>
+    </div>
+  );
+}
+
+// ═══ PARALLAX IMAGE ═══
+// Was a framer-motion parallax. Now a plain lazy img (parallax is
+// barely visible on desktop and costs continuous scroll-linked JS).
+export function ParallaxImage({
+  src,
+  alt,
+  className = "",
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  speed?: number;
+}) {
+  return (
+    <div className={`overflow-hidden ${className}`}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt={alt}
+        className="h-full w-full object-cover"
+        loading="lazy"
+      />
     </div>
   );
 }

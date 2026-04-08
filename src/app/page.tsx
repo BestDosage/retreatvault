@@ -10,11 +10,15 @@ export const metadata: Metadata = {
 };
 
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { getAllRetreats, getRegions } from "@/lib/data";
 import AnimateIn, { StaggerContainer, StaggerItem, Counter, TextReveal, Marquee } from "@/components/AnimateIn";
 import TierBadge from "@/components/TierBadge";
-import HorizontalScroll from "@/components/HorizontalScroll";
-import HeroAnimation from "@/components/HeroAnimation";
+
+// Below-the-fold — dynamically import so it stays out of the initial bundle.
+const HorizontalScroll = dynamic(() => import("@/components/HorizontalScroll"), {
+  loading: () => <div className="h-[480px]" />,
+});
 
 export default async function HomePage() {
   const retreats = await getAllRetreats();
@@ -89,7 +93,6 @@ export default async function HomePage() {
         <div className="absolute inset-0 bg-dark-950/75" />
         <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/20 to-dark-950/60" />
         <div className="absolute bottom-0 left-0 right-0 h-56 bg-gradient-to-t from-dark-950 to-transparent" />
-        <HeroAnimation />
 
         <div className="relative z-10 mx-auto max-w-5xl px-6 text-center sm:px-10">
           <AnimateIn delay={0.2} direction="none" duration={1.4}>
