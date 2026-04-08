@@ -19,38 +19,14 @@ const BEST_FOR = [
   { value: "Best for Meditation", label: "Meditation" },
 ];
 
-// Mirrors deriveIdealGuestProfile() in lib/retreat-intelligence.ts
-const PRIMARY_GOALS = [
-  { value: "all", label: "Any Goal" },
-  { value: "Medical Wellness & Longevity", label: "Medical & Longevity" },
-  { value: "Fitness Transformation", label: "Fitness Transformation" },
-  { value: "Spiritual & Mindfulness", label: "Spiritual & Mindfulness" },
-  { value: "Luxury Spa & Pampering", label: "Luxury Spa" },
-  { value: "Burnout Recovery", label: "Burnout Recovery" },
-  { value: "Relaxation & Renewal", label: "Relaxation & Renewal" },
-];
-
-const EXPERIENCE_LEVELS = [
-  { value: "all", label: "Any Experience" },
-  { value: "First Retreat", label: "First Retreat" },
-  { value: "Any Level", label: "Any Level" },
-  { value: "Seasoned Retreater", label: "Seasoned Retreater" },
-];
-
-const TRAVEL_STYLES = [
-  { value: "all", label: "Any Travel Style" },
-  { value: "Solo Seekers", label: "Solo Seekers" },
-  { value: "Couples", label: "Couples" },
-  { value: "Solo or Couples", label: "Solo or Couples" },
-  { value: "Groups & Couples", label: "Groups & Couples" },
-];
-
+// Budget bands are applied directly against price_max_per_night in
+// src/app/retreats/page.tsx — no derivation dependency.
 const BUDGET_TIERS = [
   { value: "all", label: "Any Budget" },
-  { value: "Accessible Luxury", label: "Accessible Luxury (<$500)" },
-  { value: "Mid-Range", label: "Mid-Range ($500–$1,500)" },
-  { value: "Premium", label: "Premium ($1,500–$3,000)" },
-  { value: "Ultra-Premium", label: "Ultra-Premium ($3,000+)" },
+  { value: "accessible", label: "Accessible Luxury (<$500)" },
+  { value: "mid", label: "Mid-Range ($500–$1,500)" },
+  { value: "premium", label: "Premium ($1,500–$3,000)" },
+  { value: "ultra", label: "Ultra-Premium ($3,000+)" },
 ];
 
 const SORT_OPTIONS = [
@@ -69,9 +45,6 @@ export default function RetreatFilters() {
   const searchParams = useSearchParams();
   const activeRegion = searchParams.get("region") || "All";
   const activeBestFor = searchParams.get("tag") || "all";
-  const activeGoal = searchParams.get("goal") || "all";
-  const activeExperience = searchParams.get("experience") || "all";
-  const activeTravel = searchParams.get("travel") || "all";
   const activeBudget = searchParams.get("budget") || "all";
   const activeSort = searchParams.get("sort") || "score_desc";
 
@@ -80,7 +53,13 @@ export default function RetreatFilters() {
       const params = new URLSearchParams(searchParams.toString());
       if (value === "All" || value === "all" || value === "score_desc") params.delete(key);
       else params.set(key, value);
-      // Always reset pagination when a filter changes
+      // Strip any stale params from the old filter set so their presence in
+      // a bookmarked URL can't retrigger the removed code paths.
+      params.delete("tier");
+      params.delete("goal");
+      params.delete("experience");
+      params.delete("travel");
+      // Reset pagination when a filter changes
       params.delete("page");
       router.push(`/retreats${params.toString() ? `?${params.toString()}` : ""}`);
     },
@@ -106,29 +85,11 @@ export default function RetreatFilters() {
         ))}
       </div>
 
-      {/* Filter dropdowns */}
+      {/* Filter dropdowns — just Best For + Budget + Sort */}
       <div className="flex flex-wrap gap-3">
         <select aria-label="Best For" value={activeBestFor} onChange={(e) => updateParams("tag", e.target.value)} className={selectClass}>
           {BEST_FOR.map((t) => (
             <option key={t.value} value={t.value} className="bg-dark-900">{t.label}</option>
-          ))}
-        </select>
-
-        <select aria-label="Primary Goal" value={activeGoal} onChange={(e) => updateParams("goal", e.target.value)} className={selectClass}>
-          {PRIMARY_GOALS.map((g) => (
-            <option key={g.value} value={g.value} className="bg-dark-900">{g.label}</option>
-          ))}
-        </select>
-
-        <select aria-label="Experience Level" value={activeExperience} onChange={(e) => updateParams("experience", e.target.value)} className={selectClass}>
-          {EXPERIENCE_LEVELS.map((x) => (
-            <option key={x.value} value={x.value} className="bg-dark-900">{x.label}</option>
-          ))}
-        </select>
-
-        <select aria-label="Travel Style" value={activeTravel} onChange={(e) => updateParams("travel", e.target.value)} className={selectClass}>
-          {TRAVEL_STYLES.map((x) => (
-            <option key={x.value} value={x.value} className="bg-dark-900">{x.label}</option>
           ))}
         </select>
 

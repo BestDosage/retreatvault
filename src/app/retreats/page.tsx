@@ -17,38 +17,48 @@ import RetreatFilters from "@/components/RetreatFilters";
 import AnimateIn, { StaggerContainer, StaggerItem } from "@/components/AnimateIn";
 import { WellnessRetreat } from "@/lib/types";
 import { deriveBestForTags } from "@/components/BestForTags";
-import { deriveIdealGuestProfile } from "@/lib/retreat-intelligence";
+
+// Budget bands match the values exposed in RetreatFilters.tsx.
+// Applied directly to price_max_per_night — no score/profile derivation,
+// which means these filters can't crash on retreats with missing data.
+function matchesBudget(r: WellnessRetreat, budget: string): boolean {
+  const price = r.price_max_per_night || 0;
+  switch (budget) {
+    case "accessible": return price > 0 && price < 500;
+    case "mid":        return price >= 500 && price < 1500;
+    case "premium":    return price >= 1500 && price < 3000;
+    case "ultra":      return price >= 3000;
+    default:           return true;
+  }
+}
 
 interface FilterArgs {
   region: string | null;
   tag: string | null;
-  goal: string | null;
-  experience: string | null;
-  travel: string | null;
   budget: string | null;
   sort: string | null;
 }
 
 function filterAndSort(retreats: WellnessRetreat[], args: FilterArgs): WellnessRetreat[] {
-  const { region, tag, goal, experience, travel, budget, sort } = args;
+  const { region, tag, budget, sort } = args;
   let f = [...retreats];
 
   if (region && region !== "All") f = f.filter((r) => r.region === region);
 
   if (tag && tag !== "all") {
-    f = f.filter((r) => deriveBestForTags(r).includes(tag));
+    // deriveBestForTags uses optional chaining on scores, so it's safe even
+    // when a retreat has missing category scores — it just returns fewer tags.
+    f = f.filter((r) => {
+      try {
+        return deriveBestForTags(r).includes(tag);
+      } catch {
+        return false;
+      }
+    });
   }
 
-  // Ideal-guest filters: derive once per retreat, not once per filter, for speed.
-  if ((goal && goal !== "all") || (experience && experience !== "all") || (travel && travel !== "all") || (budget && budget !== "all")) {
-    f = f.filter((r) => {
-      const p = deriveIdealGuestProfile(r);
-      if (goal && goal !== "all" && p.primaryGoal !== goal) return false;
-      if (experience && experience !== "all" && p.experienceLevel !== experience) return false;
-      if (travel && travel !== "all" && p.travelStyle !== travel) return false;
-      if (budget && budget !== "all" && p.budgetTier !== budget) return false;
-      return true;
-    });
+  if (budget && budget !== "all") {
+    f = f.filter((r) => matchesBudget(r, budget));
   }
 
   switch (sort) {
@@ -63,15 +73,12 @@ function filterAndSort(retreats: WellnessRetreat[], args: FilterArgs): WellnessR
 
 const PAGE_SIZE = 60;
 
-export default async function RetreatsPage({ searchParams }: { searchParams: Promise<{ region?: string; tag?: string; goal?: string; experience?: string; travel?: string; budget?: string; sort?: string; page?: string }> }) {
+export default async function RetreatsPage({ searchParams }: { searchParams: Promise<{ region?: string; tag?: string; budget?: string; sort?: string; page?: string }> }) {
   const params = await searchParams;
   const all = await getAllRetreats();
   const filtered = filterAndSort(all, {
     region: params.region || null,
     tag: params.tag || null,
-    goal: params.goal || null,
-    experience: params.experience || null,
-    travel: params.travel || null,
     budget: params.budget || null,
     sort: params.sort || null,
   });
@@ -88,9 +95,6 @@ export default async function RetreatsPage({ searchParams }: { searchParams: Pro
   const baseQuery = new URLSearchParams();
   if (params.region) baseQuery.set("region", params.region);
   if (params.tag) baseQuery.set("tag", params.tag);
-  if (params.goal) baseQuery.set("goal", params.goal);
-  if (params.experience) baseQuery.set("experience", params.experience);
-  if (params.travel) baseQuery.set("travel", params.travel);
   if (params.budget) baseQuery.set("budget", params.budget);
   if (params.sort) baseQuery.set("sort", params.sort);
   const buildPageUrl = (p: number) => {
