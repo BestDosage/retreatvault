@@ -57,11 +57,19 @@ function mapRow(row: any): WellnessRetreat {
   };
 }
 
-export async function getAllRetreats(): Promise<WellnessRetreat[]> {
+// Module-scope cache: fetch all retreats once per build/cold start.
+// This prevents N+1 Supabase queries during static generation of 9,289 pages.
+// Uses a promise lock so concurrent callers share a single in-flight fetch.
+let _retreatsCache: WellnessRetreat[] | null = null;
+let _retreatsBySlugCache: Map<string, WellnessRetreat> = new Map();
+let _retreatsPromise: Promise<WellnessRetreat[]> | null = null;
+
+async function _fetchAllRetreats(): Promise<WellnessRetreat[]> {
   // Supabase defaults to 1000 rows per query — paginate to get all retreats
   const PAGE_SIZE = 1000;
   const all: any[] = [];
   let from = 0;
+  let attempts = 0;
   while (true) {
     const { data, error } = await supabase
       .from("retreats")
@@ -72,29 +80,44 @@ export async function getAllRetreats(): Promise<WellnessRetreat[]> {
       .range(from, from + PAGE_SIZE - 1);
 
     if (error) {
-      console.error("Supabase getAllRetreats error:", error.message);
-      return all.map(mapRow);
+      // Retry up to 3 times on transient errors (timeouts, network)
+      attempts += 1;
+      console.error(`Supabase getAllRetreats error (attempt ${attempts}):`, error.message);
+      if (attempts >= 3) {
+        const partial = all.map(mapRow);
+        _retreatsCache = partial;
+        _retreatsBySlugCache = new Map(partial.map((r) => [r.slug, r]));
+        return partial;
+      }
+      // brief backoff
+      await new Promise((r) => setTimeout(r, 500 * attempts));
+      continue;
     }
     if (!data || data.length === 0) break;
     all.push(...data);
     if (data.length < PAGE_SIZE) break;
     from += PAGE_SIZE;
+    attempts = 0; // reset on success
   }
-  return all.map(mapRow);
+
+  const mapped = all.map(mapRow);
+  _retreatsCache = mapped;
+  _retreatsBySlugCache = new Map(mapped.map((r) => [r.slug, r]));
+  return mapped;
+}
+
+export async function getAllRetreats(): Promise<WellnessRetreat[]> {
+  if (_retreatsCache) return _retreatsCache;
+  // Share a single in-flight promise across all concurrent callers
+  if (!_retreatsPromise) {
+    _retreatsPromise = _fetchAllRetreats();
+  }
+  return _retreatsPromise;
 }
 
 export async function getRetreatBySlug(slug: string): Promise<WellnessRetreat | undefined> {
-  const { data, error } = await supabase
-    .from("retreats")
-    .select("*")
-    .eq("slug", slug)
-    .single();
-
-  if (error || !data) {
-    console.error("Supabase getRetreatBySlug error:", error?.message);
-    return undefined;
-  }
-  return mapRow(data);
+  if (!_retreatsCache) await getAllRetreats();
+  return _retreatsBySlugCache.get(slug);
 }
 
 export async function getRetreatsByRegion(region: string): Promise<WellnessRetreat[]> {
@@ -112,17 +135,11 @@ export async function getRetreatsByRegion(region: string): Promise<WellnessRetre
 }
 
 export async function getRegions(): Promise<{ name: string; count: number }[]> {
-  const { data, error } = await supabase
-    .from("retreats")
-    .select("region")
-    .neq("slug", "test")
-    .gt("wrd_score", 0);
-
-  if (error || !data) return [];
-
+  // Derive from cached retreats — no extra Supabase query
+  const retreats = await getAllRetreats();
   const validRegions = ["USA", "Europe", "Canada", "Mexico", "Asia"];
   const regionMap = new Map<string, number>();
-  data.forEach((r: any) => {
+  retreats.forEach((r) => {
     if (validRegions.includes(r.region)) {
       regionMap.set(r.region, (regionMap.get(r.region) || 0) + 1);
     }
@@ -132,33 +149,50 @@ export async function getRegions(): Promise<{ name: string; count: number }[]> {
     .sort((a, b) => b.count - a.count);
 }
 
-export async function getRetreatVideos(retreatId: string): Promise<{ video_id: string; title: string; channel_name: string; thumbnail_url: string }[]> {
-  const { data, error } = await supabase
-    .from("retreat_youtube_videos")
-    .select("*")
-    .eq("retreat_id", retreatId);
+// Caches for related data — fetch all once, look up per retreat
+let _videosCache: Map<string, { video_id: string; title: string; channel_name: string; thumbnail_url: string }[]> | null = null;
+let _awardsCache: Map<string, { name: string; year: number; issuing_body: string; url: string }[]> | null = null;
 
-  if (error || !data) return [];
-  return data.map((v: any) => ({
-    video_id: v.video_id,
-    title: v.title || "",
-    channel_name: v.channel_name || "",
-    thumbnail_url: v.thumbnail_url || `https://img.youtube.com/vi/${v.video_id}/hqdefault.jpg`,
-  }));
+async function loadVideosCache() {
+  if (_videosCache) return _videosCache;
+  const { data } = await supabase.from("retreat_youtube_videos").select("*");
+  const map = new Map<string, any[]>();
+  (data || []).forEach((v: any) => {
+    if (!map.has(v.retreat_id)) map.set(v.retreat_id, []);
+    map.get(v.retreat_id)!.push({
+      video_id: v.video_id,
+      title: v.title || "",
+      channel_name: v.channel_name || "",
+      thumbnail_url: v.thumbnail_url || `https://img.youtube.com/vi/${v.video_id}/hqdefault.jpg`,
+    });
+  });
+  _videosCache = map;
+  return map;
 }
 
-export async function getRetreatAwards(retreatId: string): Promise<{ name: string; year: number; issuing_body: string; url: string }[]> {
-  const { data, error } = await supabase
-    .from("retreat_awards")
-    .select("*")
-    .eq("retreat_id", retreatId)
-    .order("year", { ascending: false });
+async function loadAwardsCache() {
+  if (_awardsCache) return _awardsCache;
+  const { data } = await supabase.from("retreat_awards").select("*").order("year", { ascending: false });
+  const map = new Map<string, any[]>();
+  (data || []).forEach((a: any) => {
+    if (!map.has(a.retreat_id)) map.set(a.retreat_id, []);
+    map.get(a.retreat_id)!.push({
+      name: a.name,
+      year: a.year,
+      issuing_body: a.issuing_body || "",
+      url: a.url || "",
+    });
+  });
+  _awardsCache = map;
+  return map;
+}
 
-  if (error || !data) return [];
-  return data.map((a: any) => ({
-    name: a.name,
-    year: a.year,
-    issuing_body: a.issuing_body || "",
-    url: a.url || "",
-  }));
+export async function getRetreatVideos(retreatId: string) {
+  const cache = await loadVideosCache();
+  return cache.get(retreatId) || [];
+}
+
+export async function getRetreatAwards(retreatId: string) {
+  const cache = await loadAwardsCache();
+  return cache.get(retreatId) || [];
 }
