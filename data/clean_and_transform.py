@@ -1,12 +1,12 @@
 """
 Clean & Transform Scraped Retreat Data
 =======================================
-Takes raw JSON from both scrapers, cleans/filters/deduplicates,
+Takes raw JSON from all scrapers, cleans/filters/deduplicates,
 and outputs retreat records ready for WRD scoring and Supabase seeding.
 
 Usage: python3 clean_and_transform.py
 
-Input:  bookretreats-raw.json, retreatguru-raw.json
+Input:  bookretreats-raw.json, retreatguru-raw.json, healingholidays-raw.json
 Output: retreats-cleaned.json (ready for scoring + seeding)
         retreats-rejected.json (filtered out, with reasons)
 """
@@ -251,6 +251,71 @@ def clean_retreatguru(raw_data):
     return cleaned
 
 
+def clean_healingholidays(raw_data):
+    """Clean and normalize Healing Holidays data."""
+    cleaned = []
+    for r in raw_data:
+        name = r.get("name", "").strip()
+        if not name:
+            continue
+
+        # Location
+        country = r.get("country", "")
+        city = r.get("city", "")
+        region_raw = r.get("region", "")
+        region = map_country_to_region(country or region_raw or city)
+
+        # Hero image — Healing Holidays scrape didn't capture images,
+        # so this will be empty until enriched later.
+        hero = r.get("hero_image_url", "")
+
+        rating = r.get("rating")
+
+        # Price — field may be price_min_per_night or price_total_from
+        price_per_night = r.get("price_min_per_night")
+        price_total = r.get("price_total_from")
+
+        # Clean website URL
+        website = r.get("website_url", "")
+        if website and not website.startswith("http"):
+            website = ""
+
+        slug = r.get("slug") or slugify(name)
+
+        cleaned.append({
+            "source": "healingholidays",
+            "source_url": r.get("source_url", ""),
+            "slug": slug,
+            "name": name,
+            "subtitle": "",
+            "country": country,
+            "region": region,
+            "city": city,
+            "hero_image_url": hero,
+            "gallery_images": [img for img in r.get("gallery_images", []) if isinstance(img, str)][:8],
+            "rating": rating,
+            "review_count": 0,
+            "price_min_per_night": price_per_night,
+            "price_max_per_night": None,
+            "total_price_min": price_total,
+            "total_price_max": None,
+            "duration_days": None,
+            "dietary_options": r.get("dietary_options", []),
+            "amenities": r.get("amenities", []),
+            "program_types": r.get("program_types", []),
+            "specialty_tags": r.get("specialty_tags", []),
+            "property_type": r.get("property_type", []),
+            "host_name": "",
+            "website_url": website,
+            "description": r.get("description", ""),
+            "reviews": [],
+            "lat": r.get("lat"),
+            "lng": r.get("lng"),
+        })
+
+    return cleaned
+
+
 def normalize_for_dedup(text):
     """Strip to alphanumeric lowercase for fast exact-match dedup."""
     return re.sub(r"[^a-z0-9]", "", text.lower())
@@ -311,9 +376,12 @@ def apply_quality_filter(retreats):
         if len(r["name"]) < 5:
             reasons.append("name_too_short")
 
-        # Must have an image
+        # Must have an image (or be from a curated source where images can be enriched later)
         if not r["hero_image_url"]:
-            reasons.append("no_image")
+            if r.get("source") not in ("healingholidays",):
+                reasons.append("no_image")
+            else:
+                r["needs_image_enrichment"] = True
 
         # Must have either rating OR enough descriptive data
         has_rating = bool(r.get("rating")) and (r.get("review_count") or 0) >= 1
@@ -352,6 +420,7 @@ def main():
     # Load raw data
     br_raw = []
     rg_raw = []
+    hh_raw = []
 
     try:
         with open("bookretreats-raw.json") as f:
@@ -367,7 +436,14 @@ def main():
     except FileNotFoundError:
         print("retreatguru-raw.json not found — skipping")
 
-    if not br_raw and not rg_raw:
+    try:
+        with open("healingholidays-raw.json") as f:
+            hh_raw = json.load(f)
+        print(f"Loaded {len(hh_raw)} Healing Holidays records")
+    except FileNotFoundError:
+        print("healingholidays-raw.json not found — skipping")
+
+    if not br_raw and not rg_raw and not hh_raw:
         print("No data to process!")
         return
 
@@ -375,12 +451,14 @@ def main():
     print("\n=== Phase 1: Cleaning ===")
     br_clean = clean_bookretreats(br_raw)
     rg_clean = clean_retreatguru(rg_raw)
-    print(f"  BookRetreats: {len(br_raw)} → {len(br_clean)} (after requiring name + image)")
-    print(f"  Retreat.guru: {len(rg_raw)} → {len(rg_clean)} (after requiring name + image)")
+    hh_clean = clean_healingholidays(hh_raw)
+    print(f"  BookRetreats:      {len(br_raw)} → {len(br_clean)} (after requiring name + image)")
+    print(f"  Retreat.guru:      {len(rg_raw)} → {len(rg_clean)} (after requiring name + image)")
+    print(f"  Healing Holidays:  {len(hh_raw)} → {len(hh_clean)} (after requiring name)")
 
-    # Phase 2: Merge — prefer BookRetreats (better pricing data) over Retreat.guru
+    # Phase 2: Merge — prefer BookRetreats (better pricing data), then Retreat.guru, then Healing Holidays
     print("\n=== Phase 2: Deduplication ===")
-    all_retreats = br_clean + rg_clean
+    all_retreats = br_clean + rg_clean + hh_clean
     unique, dupes = deduplicate(all_retreats, existing_slugs)
     print(f"  Total: {len(all_retreats)} → {len(unique)} unique ({len(dupes)} duplicates removed)")
 
