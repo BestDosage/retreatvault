@@ -1,13 +1,43 @@
 import { MetadataRoute } from "next";
-import { getAllRetreats } from "@/lib/data";
+import { createClient } from "@supabase/supabase-js";
 import { blogPosts } from "@/data/blog-posts";
 
 const BASE_URL = "https://www.retreatvault.com";
 const CHUNK_SIZE = 5000;
 
+/** Direct Supabase client — bypasses unstable_cache to get fresh counts at build time. */
+function supabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { auth: { persistSession: false } },
+  );
+}
+
+/** Fetch all retreat slugs directly (no unstable_cache). */
+async function getAllRetreatSlugs(): Promise<string[]> {
+  const slugs: string[] = [];
+  let offset = 0;
+  const PAGE = 1000;
+  for (;;) {
+    const { data, error } = await supabase()
+      .from("retreats")
+      .select("slug")
+      .neq("slug", "test")
+      .gt("wrd_score", 0)
+      .order("slug")
+      .range(offset, offset + PAGE - 1);
+    if (error || !data || data.length === 0) break;
+    for (const r of data) if (r.slug) slugs.push(r.slug);
+    if (data.length < PAGE) break;
+    offset += PAGE;
+  }
+  return slugs;
+}
+
 export async function generateSitemaps() {
-  const retreats = await getAllRetreats();
-  const total = 7 + blogPosts.length + retreats.length;
+  const slugs = await getAllRetreatSlugs();
+  const total = 7 + blogPosts.length + slugs.length;
   const chunks = Math.max(1, Math.ceil(total / CHUNK_SIZE));
   return Array.from({ length: chunks }, (_, i) => ({ id: i }));
 }
@@ -17,7 +47,7 @@ export default async function sitemap({
 }: {
   id: number;
 }): Promise<MetadataRoute.Sitemap> {
-  const retreats = await getAllRetreats();
+  const slugs = await getAllRetreatSlugs();
   const now = new Date();
 
   const staticPages: MetadataRoute.Sitemap = [
@@ -30,8 +60,8 @@ export default async function sitemap({
     { url: `${BASE_URL}/contact`, lastModified: now, changeFrequency: "yearly", priority: 0.5 },
   ];
 
-  const retreatPages: MetadataRoute.Sitemap = retreats.map((r) => ({
-    url: `${BASE_URL}/retreats/${r.slug}`,
+  const retreatPages: MetadataRoute.Sitemap = slugs.map((slug) => ({
+    url: `${BASE_URL}/retreats/${slug}`,
     lastModified: now,
     changeFrequency: "weekly" as const,
     priority: 0.8,
