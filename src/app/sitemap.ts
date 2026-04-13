@@ -2,33 +2,49 @@ import { MetadataRoute } from "next";
 import { getAllRetreats } from "@/lib/data";
 import { blogPosts } from "@/data/blog-posts";
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+const BASE_URL = "https://www.retreatvault.com";
+const CHUNK_SIZE = 5000;
+
+export async function generateSitemaps() {
   const retreats = await getAllRetreats();
-  const baseUrl = "https://www.retreatvault.com";
+  const total = 7 + blogPosts.length + retreats.length;
+  const chunks = Math.max(1, Math.ceil(total / CHUNK_SIZE));
+  return Array.from({ length: chunks }, (_, i) => ({ id: i }));
+}
+
+export default async function sitemap({
+  id,
+}: {
+  id: number;
+}): Promise<MetadataRoute.Sitemap> {
+  const retreats = await getAllRetreats();
+  const now = new Date();
 
   const staticPages: MetadataRoute.Sitemap = [
-    { url: baseUrl, lastModified: new Date(), changeFrequency: "weekly", priority: 1.0 },
-    { url: `${baseUrl}/retreats`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
-    { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: "daily", priority: 0.8 },
-    { url: `${baseUrl}/quiz`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
-    { url: `${baseUrl}/methodology`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${baseUrl}/compare`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
-    { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.5 },
+    { url: BASE_URL, lastModified: now, changeFrequency: "weekly", priority: 1.0 },
+    { url: `${BASE_URL}/retreats`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${BASE_URL}/blog`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
+    { url: `${BASE_URL}/quiz`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${BASE_URL}/methodology`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${BASE_URL}/compare`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${BASE_URL}/contact`, lastModified: now, changeFrequency: "yearly", priority: 0.5 },
   ];
 
   const retreatPages: MetadataRoute.Sitemap = retreats.map((r) => ({
-    url: `${baseUrl}/retreats/${r.slug}`,
-    lastModified: new Date(),
+    url: `${BASE_URL}/retreats/${r.slug}`,
+    lastModified: now,
     changeFrequency: "weekly" as const,
     priority: 0.8,
   }));
 
   const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
+    url: `${BASE_URL}/blog/${post.slug}`,
     lastModified: new Date(post.updated_date),
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }));
 
-  return [...staticPages, ...retreatPages, ...blogPages];
+  const allUrls = [...staticPages, ...retreatPages, ...blogPages];
+  const start = id * CHUNK_SIZE;
+  return allUrls.slice(start, start + CHUNK_SIZE);
 }
