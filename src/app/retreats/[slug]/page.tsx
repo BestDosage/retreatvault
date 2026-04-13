@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllRetreats, getRetreatBySlug, getRetreatAwards, getRetreatVideos } from "@/lib/data";
+import SimilarRetreatCard from "@/components/SimilarRetreatCard";
 
 // On Vercel Pro: pre-build all 9,289 retreats at build time.
 // The module-scope cache in src/lib/data.ts keeps this fast (single Supabase fetch).
@@ -73,10 +75,17 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
   const retreat = await getRetreatBySlug(slug);
   if (!retreat) notFound();
 
-  const [awards, videos] = await Promise.all([
+  const [awards, videos, allRetreats] = await Promise.all([
     getRetreatAwards(retreat.id),
     getRetreatVideos(retreat.id),
+    getAllRetreats(),
   ]);
+
+  // Similar retreats: same region, closest WRD score, exclude self
+  const similarRetreats = allRetreats
+    .filter((r) => r.region === retreat.region && r.slug !== retreat.slug)
+    .sort((a, b) => Math.abs(a.wrd_score - retreat.wrd_score) - Math.abs(b.wrd_score - retreat.wrd_score))
+    .slice(0, 4);
 
   const scoreEntries = Object.entries(retreat.scores) as [keyof RetreatScores, (typeof retreat.scores)[keyof RetreatScores]][];
   const sortedScores = [...scoreEntries].sort(([, a], [, b]) => b.score - a.score);
@@ -236,7 +245,12 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
           <div className="rounded-3xl border border-white/[0.04] bg-white/[0.015] p-8 sm:p-12">
             <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Analysis</p>
             <h2 className="mt-3 font-serif text-3xl font-light text-white">Score Breakdown</h2>
-            <p className="mt-2 text-[12px] text-dark-500">15 categories, weighted by impact on the wellness experience</p>
+            <div className="mt-2 flex items-center gap-3">
+              <p className="text-[12px] text-dark-500">15 categories, weighted by impact on the wellness experience</p>
+              <Link href="/methodology" className="shrink-0 text-[11px] font-medium text-gold-400 transition-colors hover:text-gold-300">
+                How we score&nbsp;&rarr;
+              </Link>
+            </div>
             <div className="mt-10 space-y-2">
               {sortedScores.map(([key, cat]) => (
                 <ScoreBar key={key} score={cat.score} label={CATEGORY_LABELS[key]} weight={SCORE_WEIGHTS[key]} />
@@ -449,6 +463,66 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
                   </svg>
                 </a>
               </div>
+            </div>
+          </div>
+        </AnimateIn>
+
+        {/* ═══ SIMILAR RETREATS ═══ */}
+        {similarRetreats.length > 0 && (
+          <AnimateIn className="mb-20">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Discover</p>
+            <h2 className="mt-3 font-serif text-3xl font-light text-white">You May Also Like</h2>
+            <p className="mt-2 text-[12px] text-dark-500">Similar retreats in {retreat.region} with comparable Vault scores</p>
+            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {similarRetreats.map((r) => (
+                <SimilarRetreatCard key={r.slug} retreat={r} />
+              ))}
+            </div>
+          </AnimateIn>
+        )}
+
+        {/* ═══ EXPLORE MORE ═══ */}
+        <AnimateIn className="mb-24">
+          <div className="rounded-3xl border border-white/[0.04] bg-white/[0.015] p-8 sm:p-12">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Keep Exploring</p>
+            <h2 className="mt-3 font-serif text-3xl font-light text-white">Explore More</h2>
+            <div className="mt-8 grid gap-4 sm:grid-cols-3">
+              <Link
+                href={`/retreats?region=${retreat.region}`}
+                className="group/link flex items-center justify-between rounded-2xl border border-white/[0.04] bg-white/[0.02] p-6 transition-all duration-300 hover:border-gold-500/15 hover:bg-white/[0.04]"
+              >
+                <div>
+                  <p className="text-[13px] font-medium text-white">More {retreat.region} Retreats</p>
+                  <p className="mt-1 text-[11px] text-dark-500">Browse the full directory</p>
+                </div>
+                <svg className="h-4 w-4 text-dark-500 transition-all duration-300 group-hover/link:translate-x-0.5 group-hover/link:text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+              <Link
+                href="/compare"
+                className="group/link flex items-center justify-between rounded-2xl border border-white/[0.04] bg-white/[0.02] p-6 transition-all duration-300 hover:border-gold-500/15 hover:bg-white/[0.04]"
+              >
+                <div>
+                  <p className="text-[13px] font-medium text-white">Compare Retreats</p>
+                  <p className="mt-1 text-[11px] text-dark-500">Side-by-side analysis</p>
+                </div>
+                <svg className="h-4 w-4 text-dark-500 transition-all duration-300 group-hover/link:translate-x-0.5 group-hover/link:text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+              <Link
+                href="/quiz"
+                className="group/link flex items-center justify-between rounded-2xl border border-white/[0.04] bg-white/[0.02] p-6 transition-all duration-300 hover:border-gold-500/15 hover:bg-white/[0.04]"
+              >
+                <div>
+                  <p className="text-[13px] font-medium text-white">Find Your Perfect Retreat</p>
+                  <p className="mt-1 text-[11px] text-dark-500">Take the personalized quiz</p>
+                </div>
+                <svg className="h-4 w-4 text-dark-500 transition-all duration-300 group-hover/link:translate-x-0.5 group-hover/link:text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
             </div>
           </div>
         </AnimateIn>
