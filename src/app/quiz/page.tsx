@@ -49,5 +49,22 @@ export default async function QuizPage() {
     },
   }));
 
-  return <QuizClient retreats={retreatData} />;
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.retreatvault.com" },
+      { "@type": "ListItem", position: 2, name: "Quiz" },
+    ],
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <QuizClient retreats={retreatData} />
+    </>
+  );
 }

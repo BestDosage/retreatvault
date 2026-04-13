@@ -18,5 +18,22 @@ export default async function BlogPage() {
     retreatImageMap[r.slug] = { name: r.name, image: r.hero_image_url };
   }
 
-  return <BlogListClient posts={blogPosts} retreatImages={retreatImageMap} />;
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.retreatvault.com" },
+      { "@type": "ListItem", position: 2, name: "Journal" },
+    ],
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <BlogListClient posts={blogPosts} retreatImages={retreatImageMap} />
+    </>
+  );
 }

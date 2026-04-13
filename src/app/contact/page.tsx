@@ -9,7 +9,21 @@ export const metadata: Metadata = {
 import AnimateIn from "@/components/AnimateIn";
 
 export default function ContactPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.retreatvault.com" },
+      { "@type": "ListItem", position: 2, name: "Contact" },
+    ],
+  };
+
   return (
+    <>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+    />
     <div className="min-h-screen pt-28 pb-20">
       <div className="mx-auto max-w-4xl px-6 sm:px-10">
         {/* Hero */}
@@ -147,5 +161,6 @@ export default function ContactPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

@@ -26,18 +26,33 @@ export default async function ComparePage({
     .map((slug) => allRetreats.find((r) => r.slug === slug))
     .filter(Boolean) as WellnessRetreat[];
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.retreatvault.com" },
+      { "@type": "ListItem", position: 2, name: "Compare" },
+    ],
+  };
+
   if (selected.length < 2) {
     return (
-      <div className="min-h-screen pt-32">
-        <div className="mx-auto max-w-3xl px-6 text-center">
-          <p className="text-[9px] font-semibold uppercase tracking-[0.4em] text-gold-500">Compare</p>
-          <h1 className="mt-4 font-serif text-4xl font-light text-white">Select 2-3 Retreats</h1>
-          <p className="mt-4 text-[14px] text-dark-400">
-            Visit the <a href="/retreats" className="text-gold-400 hover:text-gold-300">directory</a> and
-            click &ldquo;Compare&rdquo; on retreat cards to add them to your comparison.
-          </p>
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        />
+        <div className="min-h-screen pt-32">
+          <div className="mx-auto max-w-3xl px-6 text-center">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.4em] text-gold-500">Compare</p>
+            <h1 className="mt-4 font-serif text-4xl font-light text-white">Select 2-3 Retreats</h1>
+            <p className="mt-4 text-[14px] text-dark-400">
+              Visit the <a href="/retreats" className="text-gold-400 hover:text-gold-300">directory</a> and
+              click &ldquo;Compare&rdquo; on retreat cards to add them to your comparison.
+            </p>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -46,6 +61,11 @@ export default async function ComparePage({
   const colWidth = selected.length === 2 ? "min-w-[180px] w-[50%]" : "min-w-[160px] w-[33.333%]";
 
   return (
+    <>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+    />
     <div className="min-h-screen pt-28 pb-20">
       <div className="mx-auto max-w-[1440px] px-4 sm:px-10 lg:px-16">
         {/* Header */}
@@ -283,5 +303,6 @@ export default async function ComparePage({
         </div>
       </div>
     </div>
+    </>
   );
 }
