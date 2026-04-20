@@ -94,7 +94,7 @@ export default async function RegionPage({ params }: { params: Promise<Params> }
         <section className="border-b border-white/[0.06] px-6 pb-16 pt-32 md:px-12 lg:px-20">
           <div className="mx-auto max-w-7xl">
             {/* Breadcrumb */}
-            <nav className="mb-8 flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-dark-500">
+            <nav className="mb-8 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-dark-400">
               <a href="/" className="transition-colors hover:text-gold-400">Home</a>
               <span className="text-dark-700">/</span>
               <a href="/retreats" className="transition-colors hover:text-gold-400">Retreats</a>
@@ -132,7 +132,7 @@ export default async function RegionPage({ params }: { params: Promise<Params> }
                   <span className="font-serif text-[15px] text-white group-hover:text-gold-400 transition-colors">
                     {c.country}
                   </span>
-                  <span className="ml-3 text-[12px] text-dark-500">
+                  <span className="ml-3 text-[12px] text-dark-400">
                     {c.count}
                   </span>
                 </a>
@@ -147,7 +147,7 @@ export default async function RegionPage({ params }: { params: Promise<Params> }
             <h2 className="font-serif text-2xl font-light text-white">
               Top Retreats in {displayName}
             </h2>
-            <p className="mt-2 text-[13px] text-dark-500">
+            <p className="mt-2 text-[13px] text-dark-300">
               Ranked by Retreat Vault score
             </p>
             <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -164,7 +164,7 @@ export default async function RegionPage({ params }: { params: Promise<Params> }
             <h2 className="font-serif text-2xl font-light text-white">
               Complete {displayName} Directory
             </h2>
-            <p className="mt-2 text-[13px] text-dark-500">
+            <p className="mt-2 text-[13px] text-dark-300">
               Every retreat in {displayName}, organized by country
             </p>
 
@@ -181,65 +181,40 @@ export default async function RegionPage({ params }: { params: Promise<Params> }
                         {country}
                       </a>
                     </h3>
-                    <span className="text-[11px] text-dark-600">
+                    <span className="text-[11px] text-dark-400">
                       {retreats.length} {retreats.length === 1 ? "retreat" : "retreats"}
                     </span>
                   </div>
 
-                  <div className="mt-4 overflow-x-auto">
-                    <table className="w-full text-left">
-                      <thead>
-                        <tr className="border-b border-white/[0.06] text-[10px] uppercase tracking-[0.2em] text-dark-600">
-                          <th className="pb-3 pr-6 font-medium">Name</th>
-                          <th className="pb-3 pr-6 font-medium">City</th>
-                          <th className="pb-3 pr-6 font-medium text-right">Score</th>
-                          <th className="pb-3 pr-6 font-medium text-right">Price</th>
-                          <th className="pb-3 font-medium" />
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {retreats.map((r) => (
-                          <tr
-                            key={r.slug}
-                            className="border-b border-white/[0.03] transition-colors hover:bg-white/[0.02]"
-                          >
-                            <td className="py-3 pr-6">
-                              <a
-                                href={`/retreats/${r.slug}`}
-                                className="text-[14px] font-medium text-white hover:text-gold-400 transition-colors"
-                              >
-                                {r.name}
-                              </a>
-                            </td>
-                            <td className="py-3 pr-6 text-[13px] text-dark-400">
-                              {r.city}
-                            </td>
-                            <td className="py-3 pr-6 text-right">
-                              <span className="font-serif text-[14px] text-gold-400">
-                                {r.wrd_score.toFixed(1)}
+                  <div className="mt-4 space-y-2">
+                    {retreats.map((r) => (
+                      <a
+                        key={r.slug}
+                        href={`/retreats/${r.slug}`}
+                        className="group flex flex-col gap-1 rounded-xl border border-white/[0.04] bg-white/[0.02] p-4 transition-all hover:border-gold-400/20 hover:bg-white/[0.04] md:flex-row md:items-center md:gap-6 md:rounded-none md:border-0 md:border-b md:bg-transparent md:px-0 md:py-3"
+                      >
+                        <span className="text-[14px] font-medium text-white group-hover:text-gold-400 transition-colors md:flex-1">
+                          {r.name}
+                        </span>
+                        <span className="text-[13px] text-dark-300 md:w-40">
+                          {r.city}
+                        </span>
+                        <div className="flex items-center justify-between md:contents">
+                          <span className="font-serif text-[14px] text-gold-400 md:w-20 md:text-right">
+                            {r.wrd_score.toFixed(1)}
+                          </span>
+                          <span className="text-[13px] text-dark-200 md:w-48 md:text-right">
+                            ${r.price_min_per_night.toLocaleString()}
+                            {r.price_min_per_night !== r.price_max_per_night && (
+                              <span className="text-dark-400">
+                                &ndash;${r.price_max_per_night.toLocaleString()}
                               </span>
-                            </td>
-                            <td className="py-3 pr-6 text-right text-[13px] text-dark-300">
-                              ${r.price_min_per_night.toLocaleString()}
-                              {r.price_min_per_night !== r.price_max_per_night && (
-                                <span className="text-dark-500">
-                                  &ndash;${r.price_max_per_night.toLocaleString()}
-                                </span>
-                              )}
-                              <span className="ml-1 text-[10px] text-dark-600">/night</span>
-                            </td>
-                            <td className="py-3 text-right">
-                              <a
-                                href={`/retreats/${r.slug}`}
-                                className="text-[11px] text-dark-500 hover:text-gold-400 transition-colors"
-                              >
-                                View full review &rarr;
-                              </a>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                            )}
+                            <span className="ml-1 text-[11px] text-dark-400">/night</span>
+                          </span>
+                        </div>
+                      </a>
+                    ))}
                   </div>
                 </div>
               ))}

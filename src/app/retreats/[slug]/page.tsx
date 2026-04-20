@@ -147,7 +147,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         <div className="absolute bottom-0 left-0 right-0 z-10">
           <div className="mx-auto max-w-[1440px] px-6 pb-16 sm:px-10 lg:px-16">
             <AnimateIn delay={0.2}>
-              <nav className="mb-8 flex items-center gap-2 text-[11px] text-dark-300">
+              <nav className="mb-8 flex items-center gap-2 text-xs text-dark-300">
                 <a href="/retreats" className="transition-colors hover:text-gold-400">Directory</a>
                 <span className="text-dark-600">/</span>
                 <a href={`/retreats?region=${retreat.region}`} className="transition-colors hover:text-gold-400">{retreat.region}</a>
@@ -171,7 +171,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
                   </div>
                 </AnimateIn>
                 <AnimateIn delay={0.35}>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-gold-400/80">
+                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gold-400/80">
                     {retreat.city}, {retreat.country}
                   </p>
                 </AnimateIn>
@@ -208,12 +208,12 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
           ].map((stat) => (
             <StaggerItem key={stat.label}>
               <div className="rounded-2xl border border-white/[0.04] bg-white/[0.02] p-6">
-                <div className="text-[8px] font-semibold uppercase tracking-[0.25em] text-dark-500">{stat.label}</div>
+                <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-dark-500">{stat.label}</div>
                 <div className="mt-2 flex items-center gap-1.5">
                   {stat.star && <svg className="h-4 w-4 text-gold-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>}
                   <span className="font-serif text-2xl font-light text-white">{stat.value}</span>
                 </div>
-                <div className="mt-1 text-[11px] capitalize text-dark-500">{stat.sub}</div>
+                <div className="mt-1 text-[11px] capitalize text-dark-400">{stat.sub}</div>
               </div>
             </StaggerItem>
           ))}
@@ -222,7 +222,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         {/* ═══ EDITORIAL SUMMARY ═══ */}
         <AnimateIn className="mb-20">
           <div className="rounded-3xl border border-white/[0.04] bg-white/[0.02] px-8 py-10 sm:px-12 sm:py-12">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Editorial Summary</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Editorial Summary</p>
             <p className="mt-5 font-serif text-[17px] font-light leading-[1.85] text-dark-200 sm:text-[18px]">
               {editorialSummary}
             </p>
@@ -258,10 +258,10 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         {/* ═══ SCORE BREAKDOWN ═══ */}
         <AnimateIn className="mb-20">
           <div className="rounded-3xl border border-white/[0.04] bg-white/[0.015] p-8 sm:p-12">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Analysis</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Analysis</p>
             <h2 className="mt-3 font-serif text-3xl font-light text-white">Score Breakdown</h2>
             <div className="mt-2 flex items-center gap-3">
-              <p className="text-[12px] text-dark-500">15 categories, weighted by impact on the wellness experience</p>
+              <p className="text-[12px] text-dark-400">15 categories, weighted by impact on the wellness experience</p>
               <Link href="/methodology" className="shrink-0 text-[11px] font-medium text-gold-400 transition-colors hover:text-gold-300">
                 How we score&nbsp;&rarr;
               </Link>
@@ -278,7 +278,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         <div className="mb-20 grid gap-8 lg:grid-cols-2">
           <AnimateIn>
             <div className="rounded-3xl border border-white/[0.04] bg-white/[0.015] p-6 sm:p-8">
-              <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Visual Profile</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Visual Profile</p>
               <h3 className="mt-2 font-serif text-xl font-light text-white">Category Radar</h3>
               <div className="mt-4">
                 <RadarChart scores={retreat.scores} name={retreat.name} />
@@ -325,7 +325,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         {/* ═══ ANALYST NOTES ═══ */}
         <div className="mb-20">
           <AnimateIn>
-            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Expert Review</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Expert Review</p>
             <h2 className="mt-3 font-serif text-3xl font-light text-white">Analyst Notes</h2>
           </AnimateIn>
           <StaggerContainer className="mt-8 grid gap-4 sm:grid-cols-2" staggerDelay={0.05}>
@@ -338,7 +338,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
                       {cat.score.toFixed(1)}
                     </span>
                   </div>
-                  <p className="mt-3 text-[12px] leading-relaxed text-dark-400">{cat.notes}</p>
+                  <p className="mt-3 text-[12px] leading-relaxed text-dark-300">{cat.notes}</p>
                 </div>
               </StaggerItem>
             ))}
@@ -348,7 +348,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         {/* ═══ FAQ ═══ */}
         <div className="mb-20">
           <AnimateIn>
-            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Common Questions</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Common Questions</p>
             <h2 className="mt-3 font-serif text-3xl font-light text-white">Frequently Asked</h2>
           </AnimateIn>
           <StaggerContainer className="mt-8 space-y-4" staggerDelay={0.06}>
@@ -366,7 +366,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         {/* ═══ GALLERY ═══ */}
         {galleryImages.length > 0 && (
           <AnimateIn className="mb-20">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Gallery</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Gallery</p>
             <h2 className="mt-3 font-serif text-3xl font-light text-white">Visual Tour</h2>
             <div className="mt-8 grid gap-3 sm:grid-cols-3">
               {galleryImages.map((img: string, i: number) => (
@@ -390,7 +390,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         {/* ═══ VIDEOS ═══ */}
         {videos.length > 0 && (
           <AnimateIn className="mb-20">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Media</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Media</p>
             <h2 className="mt-3 font-serif text-3xl font-light text-white">Video</h2>
             <div className={`mt-8 grid gap-4 ${videos.length > 1 ? "sm:grid-cols-2" : "max-w-3xl"}`}>
               {videos.map((video) => (
@@ -407,7 +407,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
                   </div>
                   <div className="bg-white/[0.02] p-4">
                     <h3 className="text-[13px] font-medium text-white">{video.title}</h3>
-                    <p className="mt-1 text-[11px] text-dark-500">{video.channel_name}</p>
+                    <p className="mt-1 text-[11px] text-dark-400">{video.channel_name}</p>
                   </div>
                 </div>
               ))}
@@ -419,7 +419,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         <AnimateIn className="mb-20">
           {/* Best For tags */}
           <div className="mb-8">
-            <h3 className="mb-4 text-[9px] font-semibold uppercase tracking-[0.25em] text-gold-500">Best For</h3>
+            <h3 className="mb-4 text-[11px] font-semibold uppercase tracking-[0.25em] text-gold-500">Best For</h3>
             <BestForChips retreat={retreat} />
           </div>
           <div className="grid gap-10 sm:grid-cols-3">
@@ -429,7 +429,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
               { title: "Programs", items: retreat.program_types, color: "border-white/[0.06] bg-white/[0.02] text-dark-300" },
             ].map((section) => (
               <div key={section.title}>
-                <h3 className="text-[9px] font-semibold uppercase tracking-[0.25em] text-gold-500">{section.title}</h3>
+                <h3 className="text-[11px] font-semibold uppercase tracking-[0.25em] text-gold-500">{section.title}</h3>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {section.items.map((item) => (
                     <span key={item} className={`rounded-full border px-3 py-1.5 text-[10px] font-medium capitalize ${section.color}`}>
@@ -446,7 +446,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         {awards.length > 0 && (
           <AnimateIn className="mb-20">
             <div className="rounded-3xl border border-gold-400/8 bg-gradient-to-br from-white/[0.02] to-transparent p-8 sm:p-10">
-              <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Recognition</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Recognition</p>
               <h2 className="mt-3 font-serif text-3xl font-light text-white">Awards</h2>
               <div className="mt-8 space-y-5">
                 {awards.map((award, i) => (
@@ -456,7 +456,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
                     </div>
                     <div>
                       <span className="text-[14px] font-medium text-white">{award.name}</span>
-                      <span className="ml-3 text-[12px] text-dark-500">{award.year} &mdash; {award.issuing_body}</span>
+                      <span className="ml-3 text-[12px] text-dark-400">{award.year} &mdash; {award.issuing_body}</span>
                     </div>
                   </div>
                 ))}
@@ -506,7 +506,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         {/* ═══ EXPLORE MORE ═══ */}
         <AnimateIn className="mb-24">
           <div className="rounded-3xl border border-white/[0.04] bg-white/[0.015] p-8 sm:p-12">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Keep Exploring</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Keep Exploring</p>
             <h2 className="mt-3 font-serif text-3xl font-light text-white">Explore More</h2>
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
               <Link
@@ -515,9 +515,9 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
               >
                 <div>
                   <p className="text-[13px] font-medium text-white">More {retreat.region} Retreats</p>
-                  <p className="mt-1 text-[11px] text-dark-500">Browse the full directory</p>
+                  <p className="mt-1 text-[11px] text-dark-400">Browse the full directory</p>
                 </div>
-                <svg className="h-4 w-4 text-dark-500 transition-all duration-300 group-hover/link:translate-x-0.5 group-hover/link:text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className="h-4 w-4 text-dark-400 transition-all duration-300 group-hover/link:translate-x-0.5 group-hover/link:text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
@@ -527,9 +527,9 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
               >
                 <div>
                   <p className="text-[13px] font-medium text-white">Compare Retreats</p>
-                  <p className="mt-1 text-[11px] text-dark-500">Side-by-side analysis</p>
+                  <p className="mt-1 text-[11px] text-dark-400">Side-by-side analysis</p>
                 </div>
-                <svg className="h-4 w-4 text-dark-500 transition-all duration-300 group-hover/link:translate-x-0.5 group-hover/link:text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className="h-4 w-4 text-dark-400 transition-all duration-300 group-hover/link:translate-x-0.5 group-hover/link:text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
@@ -539,9 +539,9 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
               >
                 <div>
                   <p className="text-[13px] font-medium text-white">Find Your Perfect Retreat</p>
-                  <p className="mt-1 text-[11px] text-dark-500">Take the personalized quiz</p>
+                  <p className="mt-1 text-[11px] text-dark-400">Take the personalized quiz</p>
                 </div>
-                <svg className="h-4 w-4 text-dark-500 transition-all duration-300 group-hover/link:translate-x-0.5 group-hover/link:text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className="h-4 w-4 text-dark-400 transition-all duration-300 group-hover/link:translate-x-0.5 group-hover/link:text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </Link>

@@ -62,21 +62,21 @@ export default function SimilarRetreats({
               </div>
 
               <div className="p-5">
-                <p className="text-[8px] font-semibold uppercase tracking-[0.25em] text-gold-400/70">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-gold-400">
                   {r.city}, {r.country}
                 </p>
                 <h3 className="mt-1.5 font-serif text-lg font-light text-white">
                   {r.name}
                 </h3>
                 <div className="mt-3 flex items-center justify-between">
-                  <span className="text-[12px] text-dark-400">
+                  <span className="text-[12px] text-dark-300">
                     From{" "}
                     <span className="text-white">
                       ${r.price_min_per_night.toLocaleString()}
                     </span>
                     /night
                   </span>
-                  <span className="text-[10px] font-medium uppercase tracking-wider text-gold-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                  <span className="text-xs font-medium uppercase tracking-wider text-gold-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                     View &rarr;
                   </span>
                 </div>
