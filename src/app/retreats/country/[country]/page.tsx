@@ -15,11 +15,7 @@ export const dynamicParams = true;
 
 type Params = { country: string };
 
-export async function generateStaticParams(): Promise<Params[]> {
-  const retreats = await getAllRetreats();
-  const countries = getAllCountries(retreats);
-  return countries.map((c) => ({ country: c.slug }));
-}
+// No generateStaticParams — render on-demand via dynamicParams + ISR
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { country: countrySlug } = await params;

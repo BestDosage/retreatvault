@@ -31,10 +31,7 @@ const REGION_INTROS: Record<string, string> = {
 
 type Params = { region: string };
 
-export async function generateStaticParams(): Promise<Params[]> {
-  const regions = await getRegions();
-  return regions.map((r) => ({ region: slugifyRegion(r.name) }));
-}
+// No generateStaticParams — only 5 regions, render on-demand via dynamicParams + ISR
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { region } = await params;
