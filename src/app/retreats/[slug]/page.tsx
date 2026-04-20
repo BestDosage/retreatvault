@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getAllRetreats, getRetreatBySlug, getRetreatAwards, getRetreatVideos } from "@/lib/data";
-import SimilarRetreatCard from "@/components/SimilarRetreatCard";
+import { getAllRetreats, getRetreatBySlug, getRetreatAwards, getRetreatVideos, getSimilarRetreats } from "@/lib/data";
+import SimilarRetreats from "@/components/SimilarRetreats";
+import { generateRetreatSummary, generateRetreatFaqs, generateMetaDescription } from "@/lib/retreat-summary";
 
 // On Vercel Pro: pre-build all 9,289 retreats at build time.
 // The module-scope cache in src/lib/data.ts keeps this fast (single Supabase fetch).
@@ -26,25 +27,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const retreat = await getRetreatBySlug(slug);
   if (!retreat) return { title: "Retreat Not Found" };
 
-  const topScores = Object.entries(retreat.scores)
-    .sort(([, a], [, b]) => (b as any).score - (a as any).score)
-    .slice(0, 3)
-    .map(([k]) => {
-      const labels: Record<string, string> = {
-        nutrition: "Nutrition", fitness: "Fitness", mindfulness: "Mindfulness",
-        spa: "Spa", sleep: "Sleep", medical: "Medical", personalization: "Personalization",
-        amenities: "Amenities", pricing_value: "Value", activities: "Activities",
-      };
-      return labels[k] || k;
-    });
+  const description = generateMetaDescription(retreat);
 
   return {
     title: `${retreat.name} Review — Rated ${retreat.wrd_score}/10 (${retreat.score_tier === "elite" ? "Elite" : retreat.score_tier === "exceptional" ? "Exceptional" : "Recommended"})`,
-    description: `${retreat.name} in ${retreat.city} scored ${retreat.wrd_score}/10. ${retreat.subtitle}. Top categories: ${topScores.join(", ")}. From $${retreat.price_min_per_night}/night. Read the full data-driven review.`,
+    description,
     alternates: { canonical: `/retreats/${slug}` },
     openGraph: {
       title: `${retreat.name} — ${retreat.wrd_score}/10 Vault Score`,
-      description: `${retreat.subtitle}. Top categories: ${topScores.join(", ")}.`,
+      description,
       images: retreat.hero_image_url ? [{ url: retreat.hero_image_url }] : [],
     },
   };
@@ -75,17 +66,11 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
   const retreat = await getRetreatBySlug(slug);
   if (!retreat) notFound();
 
-  const [awards, videos, allRetreats] = await Promise.all([
+  const [awards, videos, similarRetreats] = await Promise.all([
     getRetreatAwards(retreat.id),
     getRetreatVideos(retreat.id),
-    getAllRetreats(),
+    getSimilarRetreats(retreat),
   ]);
-
-  // Similar retreats: same region, closest WRD score, exclude self
-  const similarRetreats = allRetreats
-    .filter((r) => r.region === retreat.region && r.slug !== retreat.slug)
-    .sort((a, b) => Math.abs(a.wrd_score - retreat.wrd_score) - Math.abs(b.wrd_score - retreat.wrd_score))
-    .slice(0, 4);
 
   const scoreEntries = Object.entries(retreat.scores) as [keyof RetreatScores, (typeof retreat.scores)[keyof RetreatScores]][];
   const sortedScores = [...scoreEntries].sort(([, a], [, b]) => b.score - a.score);
@@ -100,8 +85,24 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
   const scoreHistory = deriveScoreHistory(retreat);
   const effect72 = derive72HourEffect(retreat);
 
+  const editorialSummary = generateRetreatSummary(retreat);
+  const faqs = generateRetreatFaqs(retreat);
+
   const hasImage = retreat.hero_image_url?.startsWith("http");
   const galleryImages = (retreat.gallery_images || []).filter((img: string) => img?.startsWith("http"));
+
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  };
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -119,6 +120,10 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       {/* ════════════════ HERO ════════════════ */}
       <section className="relative h-[70vh] min-h-[500px] overflow-hidden">
@@ -213,6 +218,16 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
             </StaggerItem>
           ))}
         </StaggerContainer>
+
+        {/* ═══ EDITORIAL SUMMARY ═══ */}
+        <AnimateIn className="mb-20">
+          <div className="rounded-3xl border border-white/[0.04] bg-white/[0.02] px-8 py-10 sm:px-12 sm:py-12">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Editorial Summary</p>
+            <p className="mt-5 font-serif text-[17px] font-light leading-[1.85] text-dark-200 sm:text-[18px]">
+              {editorialSummary}
+            </p>
+          </div>
+        </AnimateIn>
 
         {/* ═══ SPARKLINE + IDEAL GUEST ═══ */}
         <div className="mb-20 grid gap-6 sm:grid-cols-2">
@@ -324,6 +339,24 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
                     </span>
                   </div>
                   <p className="mt-3 text-[12px] leading-relaxed text-dark-400">{cat.notes}</p>
+                </div>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
+        </div>
+
+        {/* ═══ FAQ ═══ */}
+        <div className="mb-20">
+          <AnimateIn>
+            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Common Questions</p>
+            <h2 className="mt-3 font-serif text-3xl font-light text-white">Frequently Asked</h2>
+          </AnimateIn>
+          <StaggerContainer className="mt-8 space-y-4" staggerDelay={0.06}>
+            {faqs.map((faq, i) => (
+              <StaggerItem key={i}>
+                <div className="rounded-2xl border border-white/[0.04] bg-white/[0.02] p-6 sm:p-8">
+                  <h3 className="font-serif text-[16px] font-medium text-white">{faq.question}</h3>
+                  <p className="mt-3 text-[13px] leading-relaxed text-dark-300">{faq.answer}</p>
                 </div>
               </StaggerItem>
             ))}
@@ -468,18 +501,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         </AnimateIn>
 
         {/* ═══ SIMILAR RETREATS ═══ */}
-        {similarRetreats.length > 0 && (
-          <AnimateIn className="mb-20">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Discover</p>
-            <h2 className="mt-3 font-serif text-3xl font-light text-white">You May Also Like</h2>
-            <p className="mt-2 text-[12px] text-dark-500">Similar retreats in {retreat.region} with comparable Vault scores</p>
-            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {similarRetreats.map((r) => (
-                <SimilarRetreatCard key={r.slug} retreat={r} />
-              ))}
-            </div>
-          </AnimateIn>
-        )}
+        <SimilarRetreats retreats={similarRetreats} region={retreat.region} />
 
         {/* ═══ EXPLORE MORE ═══ */}
         <AnimateIn className="mb-24">
@@ -488,7 +510,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
             <h2 className="mt-3 font-serif text-3xl font-light text-white">Explore More</h2>
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
               <Link
-                href={`/retreats?region=${retreat.region}`}
+                href={`/retreats/region/${retreat.region.toLowerCase()}`}
                 className="group/link flex items-center justify-between rounded-2xl border border-white/[0.04] bg-white/[0.02] p-6 transition-all duration-300 hover:border-gold-500/15 hover:bg-white/[0.04]"
               >
                 <div>

@@ -398,3 +398,67 @@ export async function getRetreatAwards(retreatId: string) {
   const cache = await loadAwardsCache();
   return cache.get(retreatId) || [];
 }
+
+export function slugifyRegion(region: string): string {
+  return region.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+export function slugifyCountry(country: string): string {
+  return country.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+export function getCountriesInRegion(
+  retreats: WellnessRetreat[],
+  region: string
+): { country: string; slug: string; count: number }[] {
+  const countMap = new Map<string, number>();
+  retreats
+    .filter((r) => slugifyRegion(r.region) === slugifyRegion(region))
+    .forEach((r) => {
+      countMap.set(r.country, (countMap.get(r.country) || 0) + 1);
+    });
+  return Array.from(countMap.entries())
+    .map(([country, count]) => ({ country, slug: slugifyCountry(country), count }))
+    .sort((a, b) => b.count - a.count);
+}
+
+export function getAllCountries(retreats: WellnessRetreat[]): { country: string; slug: string; region: string; count: number }[] {
+  const countMap = new Map<string, { country: string; region: string; count: number }>();
+  retreats.forEach((r) => {
+    const key = slugifyCountry(r.country);
+    const existing = countMap.get(key);
+    if (existing) {
+      existing.count += 1;
+    } else {
+      countMap.set(key, { country: r.country, region: r.region, count: 1 });
+    }
+  });
+  return Array.from(countMap.entries())
+    .map(([slug, data]) => ({ slug, ...data }))
+    .sort((a, b) => b.count - a.count);
+}
+
+export async function getSimilarRetreats(retreat: WellnessRetreat, count = 6): Promise<WellnessRetreat[]> {
+  const all = await getAllRetreats();
+  const scored: { r: WellnessRetreat; s: number }[] = [];
+
+  for (const r of all) {
+    if (r.slug === retreat.slug) continue;
+    let s = 0;
+    if (r.region === retreat.region) s += 10;
+    if (r.country === retreat.country) s += 6;
+    // Price proximity (±30%)
+    const avgPrice = (retreat.price_min_per_night + retreat.price_max_per_night) / 2;
+    const rAvg = (r.price_min_per_night + r.price_max_per_night) / 2;
+    if (avgPrice > 0 && rAvg > 0 && Math.abs(rAvg - avgPrice) / avgPrice <= 0.3) s += 4;
+    // Score proximity (±1.5)
+    if (Math.abs(r.wrd_score - retreat.wrd_score) <= 1.5) s += 3;
+    // Specialty tag overlap
+    const overlap = r.specialty_tags.filter((t) => retreat.specialty_tags.includes(t)).length;
+    s += Math.min(overlap, 4);
+    scored.push({ r, s });
+  }
+
+  scored.sort((a, b) => b.s - a.s);
+  return scored.slice(0, count).map((x) => x.r);
+}
