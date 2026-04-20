@@ -11,6 +11,7 @@ import { WellnessRetreat } from "@/lib/types";
 import RetreatCard from "@/components/RetreatCard";
 
 export const revalidate = 86400;
+export const dynamicParams = true;
 
 type Params = { country: string };
 
