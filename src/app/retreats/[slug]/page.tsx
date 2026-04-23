@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getAllRetreats, getRetreatBySlug, getRetreatAwards, getRetreatVideos, getSimilarRetreats } from "@/lib/data";
+import { getAllRetreats, getRetreatBySlug, getRetreatAwards, getRetreatVideos, getSimilarRetreats, getEditorialReview, getRetreatReviews, deriveReviewThemes } from "@/lib/data";
 import SimilarRetreats from "@/components/SimilarRetreats";
+import EditorialReview from "@/components/EditorialReview";
+import GuestSentiment from "@/components/GuestSentiment";
 import { generateRetreatSummary, generateRetreatFaqs, generateMetaDescription } from "@/lib/retreat-summary";
 
 // On Vercel Pro: pre-build all 9,289 retreats at build time.
@@ -71,6 +73,10 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
     getRetreatVideos(retreat.id),
     getSimilarRetreats(retreat),
   ]);
+
+  const editorialReview = await getEditorialReview(retreat.id);
+  const guestReviews = await getRetreatReviews(retreat.id);
+  const reviewThemes = deriveReviewThemes(guestReviews);
 
   const scoreEntries = Object.entries(retreat.scores) as [keyof RetreatScores, (typeof retreat.scores)[keyof RetreatScores]][];
   const sortedScores = [...scoreEntries].sort(([, a], [, b]) => b.score - a.score);
@@ -255,6 +261,36 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
           </AnimateIn>
         </div>
 
+        {/* ═══ EDITORIAL REVIEW ═══ */}
+        {editorialReview && (
+          <AnimateIn className="mb-20">
+            <EditorialReview
+              retreatName={retreat.name}
+              reviewHtml={editorialReview.reviewHtml}
+              verdict={editorialReview.verdict}
+              bestFor={editorialReview.bestFor}
+              notIdealFor={editorialReview.notIdealFor}
+              alternatives={editorialReview.alternatives}
+              lastUpdated={editorialReview.lastUpdated}
+            />
+          </AnimateIn>
+        )}
+
+        {/* ═══ EDITORIAL REVIEW ═══ */}
+        {editorialReview && (
+          <AnimateIn className="mb-20">
+            <EditorialReview
+              retreatName={retreat.name}
+              reviewHtml={editorialReview.reviewHtml}
+              verdict={editorialReview.verdict}
+              bestFor={editorialReview.bestFor}
+              notIdealFor={editorialReview.notIdealFor}
+              alternatives={editorialReview.alternatives}
+              lastUpdated={editorialReview.lastUpdated}
+            />
+          </AnimateIn>
+        )}
+
         {/* ═══ SCORE BREAKDOWN ═══ */}
         <AnimateIn className="mb-20">
           <div className="rounded-3xl border border-white/[0.04] bg-white/[0.015] p-8 sm:p-12">
@@ -362,6 +398,36 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
             ))}
           </StaggerContainer>
         </div>
+
+        {/* ═══ GUEST SENTIMENT ═══ */}
+        {(retreat.google_review_count > 0 || guestReviews.length > 0) && (
+          <AnimateIn className="mb-20">
+            <GuestSentiment
+              retreatName={retreat.name}
+              googleRating={retreat.google_rating}
+              googleCount={retreat.google_review_count}
+              tripadvisorRating={retreat.tripadvisor_rating}
+              tripadvisorCount={retreat.tripadvisor_review_count}
+              reviews={guestReviews}
+              themes={reviewThemes}
+            />
+          </AnimateIn>
+        )}
+
+        {/* ═══ GUEST SENTIMENT ═══ */}
+        {(retreat.google_review_count > 0 || guestReviews.length > 0) && (
+          <AnimateIn className="mb-20">
+            <GuestSentiment
+              retreatName={retreat.name}
+              googleRating={retreat.google_rating}
+              googleCount={retreat.google_review_count}
+              tripadvisorRating={retreat.tripadvisor_rating}
+              tripadvisorCount={retreat.tripadvisor_review_count}
+              reviews={guestReviews}
+              themes={reviewThemes}
+            />
+          </AnimateIn>
+        )}
 
         {/* ═══ GALLERY ═══ */}
         {galleryImages.length > 0 && (

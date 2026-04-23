@@ -322,26 +322,26 @@ export function derive72HourEffect(retreat: WellnessRetreat): SeventyTwoHourEffe
   const spa = s.spa?.score || 0;
 
   let p1 = "Arrival orientation and initial wellness assessment. ";
-  if (mindful >= 8) p1 += "Digital detox begins \u2014 cortisol levels start dropping within hours. ";
+  if (mindful >= 8) p1 += "Digital detox begins \u2014 stress begins to ease as you settle in. ";
   if (nutrition >= 8) p1 += "First clean, anti-inflammatory meal resets blood sugar patterns. ";
   if (spa >= 8) p1 += "Welcome treatment releases physical tension from travel. ";
   if (fitness >= 8) p1 += "Gentle movement session activates parasympathetic nervous system. ";
 
   let p2 = "";
-  if (sleep >= 8) p2 += "First full night of quality sleep in an optimized environment \u2014 HRV begins improving. ";
-  if (nutrition >= 8.5) p2 += "Gut inflammation starts reducing as processed foods are eliminated. ";
-  if (mindful >= 8.5) p2 += "Guided breathwork and meditation measurably lower resting heart rate. ";
+  if (sleep >= 8) p2 += "First full night of quality sleep in an optimized environment \u2014 sleep quality starts to improve. ";
+  if (nutrition >= 8.5) p2 += "Digestion starts improving with clean, whole-food meals. ";
+  if (mindful >= 8.5) p2 += "Guided breathwork and meditation deepen relaxation. ";
   if (medical >= 8) p2 += "Diagnostic results available \u2014 personalized protocol adjustments made. ";
   if (fitness >= 8.5) p2 += "Full movement program engages \u2014 endorphin and serotonin levels elevate. ";
   if (!p2) p2 = "Sleep quality begins improving in the optimized environment. Body starts responding to clean nutrition and reduced stimulation. ";
 
   let p3 = "";
   if (sleep >= 8.5) p3 += "Deep sleep architecture normalizes \u2014 guests report feeling truly rested for the first time. ";
-  if (mindful >= 9) p3 += "Nervous system regulation takes hold \u2014 anxiety levels measurably decrease. ";
-  if (nutrition >= 9) p3 += "Inflammation markers begin dropping. Energy stabilizes without caffeine dependency. ";
-  if (medical >= 9) p3 += "Clinical protocols show initial biomarker improvements. ";
+  if (mindful >= 9) p3 += "Nervous system begins to reset \u2014 guests report feeling noticeably calmer. ";
+  if (nutrition >= 9) p3 += "Energy and clarity begin to stabilize. Many guests notice reduced caffeine dependency. ";
+  if (medical >= 9) p3 += "Personalized protocols begin taking effect. ";
   if (spa >= 9) p3 += "Cumulative bodywork releases stored tension patterns. ";
-  if (!p3) p3 = "Nervous system regulation takes hold. Guests report improved clarity, energy, and a sense of renewal. The transformation compounds from here. ";
+  if (!p3) p3 = "Guests report improved clarity, energy, and a sense of renewal. The benefits compound from here. ";
 
   return { phase1: p1.trim(), phase2: p2.trim(), phase3: p3.trim() };
 }

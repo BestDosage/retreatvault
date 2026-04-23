@@ -18,7 +18,7 @@ Chart.register(CategoryScale, LinearScale, BarElement, Tooltip);
 export function LongevityPanel({ data }: { data: LongevityIndex }) {
   return (
     <div className="rounded-3xl border border-white/[0.04] bg-white/[0.015] p-6 sm:p-8">
-      <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Proprietary Index</p>
+      <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Estimated Index</p>
       <div className="mt-2 flex items-center justify-between">
         <h3 className="font-serif text-xl font-light text-white">Longevity Technology</h3>
         <div className="flex items-center gap-2">
@@ -38,6 +38,7 @@ export function LongevityPanel({ data }: { data: LongevityIndex }) {
           </div>
         ))}
       </div>
+      <p className="mt-4 text-[9px] italic text-dark-600">Estimated from scoring data. May not reflect actual offerings.</p>
     </div>
   );
 }
@@ -48,7 +49,7 @@ export function LongevityPanel({ data }: { data: LongevityIndex }) {
 export function DigitalDetoxPanel({ data }: { data: DigitalDetoxData }) {
   return (
     <div className="rounded-3xl border border-white/[0.04] bg-white/[0.015] p-6 sm:p-8">
-      <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Unplugged Index</p>
+      <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Estimated Index</p>
       <div className="mt-2 flex items-center justify-between">
         <h3 className="font-serif text-xl font-light text-white">Digital Detox Score</h3>
         <span className="font-serif text-2xl font-light text-gold-300">{data.score.toFixed(1)}<span className="text-[9px] text-dark-500">/10</span></span>
@@ -72,6 +73,7 @@ export function DigitalDetoxPanel({ data }: { data: DigitalDetoxData }) {
           </div>
         ))}
       </div>
+      <p className="mt-4 text-[9px] italic text-dark-600">Estimated from scoring data. May not reflect actual offerings.</p>
     </div>
   );
 }
@@ -186,7 +188,7 @@ export function SleepSciencePanel({ data }: { data: SleepScienceData }) {
 
   return (
     <div className="rounded-3xl border border-white/[0.04] bg-white/[0.015] p-6 sm:p-8">
-      <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Sleep Lab</p>
+      <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Estimated Profile</p>
       <div className="mt-2 flex items-center justify-between">
         <h3 className="font-serif text-xl font-light text-white">Sleep Science Rating</h3>
         <span className="font-serif text-2xl font-light text-gold-300">{data.score.toFixed(1)}<span className="text-[9px] text-dark-500">/10</span></span>
@@ -219,6 +221,7 @@ export function SleepSciencePanel({ data }: { data: SleepScienceData }) {
           ))}
         </motion.div>
       )}
+      <p className="mt-4 text-[9px] italic text-dark-600">Estimated from scoring data. May not reflect actual offerings.</p>
     </div>
   );
 }
@@ -306,7 +309,7 @@ export function SeasonalChart({ months }: { months: MonthData[] }) {
 
   return (
     <div ref={ref} className="rounded-3xl border border-white/[0.04] bg-white/[0.015] p-6 sm:p-8">
-      <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Timing</p>
+      <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Estimated Timing</p>
       <h3 className="mt-2 font-serif text-xl font-light text-white">Best Months to Visit</h3>
       <div className="mt-2 flex gap-4 text-[10px] text-dark-500">
         <span><span className="mr-1 inline-block h-2 w-2 rounded-sm bg-gold-400/60" />Weather</span>
@@ -324,6 +327,7 @@ export function SeasonalChart({ months }: { months: MonthData[] }) {
           ))}
         </div>
       )}
+      <p className="mt-4 text-[9px] italic text-dark-600">Estimated from location data. Check with the retreat for actual seasonal details.</p>
     </div>
   );
 }
@@ -354,8 +358,8 @@ export function ScoreSparkline({ history, categoryHighlights }: { history: Score
     <div ref={ref} className="rounded-2xl border border-white/[0.04] bg-white/[0.015] p-5">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Trend</p>
-          <h4 className="mt-1 text-[13px] font-medium text-white">Vault Score History</h4>
+          <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Projected Trend</p>
+          <h4 className="mt-1 text-[13px] font-medium text-white">Vault Score Trajectory</h4>
         </div>
         <span className={`text-[11px] font-medium ${trend >= 0 ? "text-emerald-400" : "text-red-400"}`}>
           {trend >= 0 ? "\u25B2" : "\u25BC"} {Math.abs(trend).toFixed(1)} since 2024
@@ -406,6 +410,7 @@ export function ScoreSparkline({ history, categoryHighlights }: { history: Score
           ))}
         </div>
       )}
+      <p className="mt-3 text-[9px] italic text-dark-600">Projected from current data. Not based on historical measurements.</p>
     </div>
   );
 }
@@ -416,9 +421,9 @@ export function ScoreSparkline({ history, categoryHighlights }: { history: Score
 export function SeventyTwoHourCard({ effect }: { effect: SeventyTwoHourEffect }) {
   return (
     <div className="rounded-3xl border border-gold-400/[0.08] bg-gradient-to-br from-white/[0.025] to-white/[0.01] p-6 sm:p-8">
-      <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Exclusive Insight</p>
+      <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">What to Expect</p>
       <h3 className="mt-2 font-serif text-2xl font-light text-white">The 72-Hour Effect</h3>
-      <p className="mt-2 text-[11px] text-dark-500">What happens to your body in the first three days</p>
+      <p className="mt-2 text-[11px] text-dark-500">A general guide to the retreat experience based on available programs</p>
 
       <div className="mt-8 space-y-6">
         {[
@@ -442,6 +447,7 @@ export function SeventyTwoHourCard({ effect }: { effect: SeventyTwoHourEffect })
           </motion.div>
         ))}
       </div>
+      <p className="mt-6 text-[9px] italic text-dark-600">Estimated from scoring data. Individual experiences vary.</p>
     </div>
   );
 }

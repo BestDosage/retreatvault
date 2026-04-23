@@ -447,13 +447,10 @@ export async function getSimilarRetreats(retreat: WellnessRetreat, count = 6): P
     let s = 0;
     if (r.region === retreat.region) s += 10;
     if (r.country === retreat.country) s += 6;
-    // Price proximity (±30%)
     const avgPrice = (retreat.price_min_per_night + retreat.price_max_per_night) / 2;
     const rAvg = (r.price_min_per_night + r.price_max_per_night) / 2;
     if (avgPrice > 0 && rAvg > 0 && Math.abs(rAvg - avgPrice) / avgPrice <= 0.3) s += 4;
-    // Score proximity (±1.5)
     if (Math.abs(r.wrd_score - retreat.wrd_score) <= 1.5) s += 3;
-    // Specialty tag overlap
     const overlap = r.specialty_tags.filter((t) => retreat.specialty_tags.includes(t)).length;
     s += Math.min(overlap, 4);
     scored.push({ r, s });
@@ -461,4 +458,112 @@ export async function getSimilarRetreats(retreat: WellnessRetreat, count = 6): P
 
   scored.sort((a, b) => b.s - a.s);
   return scored.slice(0, count).map((x) => x.r);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Editorial reviews
+// ═══════════════════════════════════════════════════════════════════════
+
+let _editorialCache: Map<string, any> | null = null;
+
+async function loadEditorialCache() {
+  if (_editorialCache) return _editorialCache;
+  const { data } = await supabase
+    .from("retreat_editorial_reviews")
+    .select("*")
+    .eq("status", "published");
+  const map = new Map<string, any>();
+  (data || []).forEach((r: any) => {
+    map.set(r.retreat_id, {
+      reviewHtml: r.review_html,
+      verdict: r.verdict,
+      bestFor: r.best_for || [],
+      notIdealFor: r.not_ideal_for || [],
+      alternatives: r.alternatives || [],
+      lastUpdated: new Date(r.last_updated).toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+      }),
+    });
+  });
+  _editorialCache = map;
+  return map;
+}
+
+export async function getEditorialReview(retreatId: string) {
+  const cache = await loadEditorialCache();
+  return cache.get(retreatId) || null;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Guest reviews with sentiment themes
+// ═══════════════════════════════════════════════════════════════════════
+
+export interface ReviewTheme {
+  label: string;
+  count: number;
+  sentiment: "positive" | "negative";
+}
+
+let _reviewsCache: Map<string, any[]> | null = null;
+
+async function loadReviewsCache() {
+  if (_reviewsCache) return _reviewsCache;
+  const { data } = await supabase
+    .from("retreat_reviews")
+    .select("*")
+    .order("review_date", { ascending: false });
+  const map = new Map<string, any[]>();
+  (data || []).forEach((r: any) => {
+    if (!map.has(r.retreat_id)) map.set(r.retreat_id, []);
+    map.get(r.retreat_id)!.push({
+      source: r.source,
+      rating: parseFloat(r.rating) || 0,
+      text: r.text || "",
+      author: r.author || "Anonymous",
+      date: r.review_date ? new Date(r.review_date).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "",
+      sentiment: r.sentiment || "neutral",
+    });
+  });
+  _reviewsCache = map;
+  return map;
+}
+
+export async function getRetreatReviews(retreatId: string) {
+  const cache = await loadReviewsCache();
+  return cache.get(retreatId) || [];
+}
+
+export function deriveReviewThemes(reviews: any[]): ReviewTheme[] {
+  if (reviews.length === 0) return [];
+
+  const themeKeywords: Record<string, { terms: string[]; sentiment: "positive" | "negative" }> = {
+    "Great food": { terms: ["food", "meal", "cuisine", "chef", "dining", "breakfast", "dinner"], sentiment: "positive" },
+    "Beautiful location": { terms: ["beautiful", "stunning", "view", "scenery", "nature", "setting"], sentiment: "positive" },
+    "Excellent staff": { terms: ["staff", "friendly", "helpful", "attentive", "service", "team"], sentiment: "positive" },
+    "Transformative": { terms: ["transform", "life-changing", "amazing experience", "changed my"], sentiment: "positive" },
+    "Peaceful": { terms: ["peaceful", "serene", "quiet", "calm", "relaxing", "tranquil"], sentiment: "positive" },
+    "Clean & comfortable": { terms: ["clean", "comfortable", "spacious", "room", "bed"], sentiment: "positive" },
+    "Overpriced": { terms: ["expensive", "overpriced", "not worth", "pricey", "costly"], sentiment: "negative" },
+    "Needs improvement": { terms: ["disappointing", "expected more", "could be better", "mediocre"], sentiment: "negative" },
+    "Poor communication": { terms: ["communication", "disorganized", "confusing", "unclear", "response"], sentiment: "negative" },
+  };
+
+  const themeCounts: Record<string, { count: number; sentiment: "positive" | "negative" }> = {};
+
+  for (const review of reviews) {
+    const text = (review.text || "").toLowerCase();
+    for (const [theme, config] of Object.entries(themeKeywords)) {
+      if (config.terms.some((term: string) => text.includes(term))) {
+        if (!themeCounts[theme]) themeCounts[theme] = { count: 0, sentiment: config.sentiment };
+        themeCounts[theme].count++;
+      }
+    }
+  }
+
+  return Object.entries(themeCounts)
+    .filter(([, v]) => v.count >= 2)
+    .sort((a, b) => b[1].count - a[1].count)
+    .slice(0, 6)
+    .map(([label, v]) => ({ label, count: v.count, sentiment: v.sentiment }));
 }
