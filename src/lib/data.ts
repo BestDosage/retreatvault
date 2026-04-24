@@ -438,6 +438,28 @@ export function getAllCountries(retreats: WellnessRetreat[]): { country: string;
     .sort((a, b) => b.count - a.count);
 }
 
+export function slugifyCity(city: string): string {
+  return city.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+export function getAllCities(retreats: WellnessRetreat[]): { city: string; slug: string; country: string; region: string; count: number }[] {
+  const cityMap = new Map<string, { city: string; country: string; region: string; count: number }>();
+  retreats.forEach((r) => {
+    if (!r.city || r.city.length < 2) return;
+    const slug = slugifyCity(r.city);
+    const existing = cityMap.get(slug);
+    if (existing) {
+      existing.count += 1;
+    } else {
+      cityMap.set(slug, { city: r.city, country: r.country, region: r.region, count: 1 });
+    }
+  });
+  return Array.from(cityMap.entries())
+    .map(([slug, data]) => ({ slug, ...data }))
+    .filter((c) => c.count >= 3) // Only cities with 3+ retreats
+    .sort((a, b) => b.count - a.count);
+}
+
 export async function getSimilarRetreats(retreat: WellnessRetreat, count = 6): Promise<WellnessRetreat[]> {
   const all = await getAllRetreats();
   const scored: { r: WellnessRetreat; s: number }[] = [];

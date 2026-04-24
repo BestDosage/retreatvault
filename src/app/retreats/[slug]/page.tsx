@@ -126,6 +126,57 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
     ],
   };
 
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: retreat.name,
+    description: retreat.subtitle,
+    image: retreat.hero_image_url || undefined,
+    brand: { "@type": "Brand", name: retreat.name },
+    offers: {
+      "@type": "AggregateOffer",
+      lowPrice: retreat.price_min_per_night,
+      highPrice: retreat.price_max_per_night,
+      priceCurrency: "USD",
+      availability: "https://schema.org/InStock",
+      url: retreat.website_url,
+    },
+    aggregateRating: retreat.google_rating > 0 ? {
+      "@type": "AggregateRating",
+      ratingValue: retreat.google_rating,
+      bestRating: 5,
+      worstRating: 1,
+      reviewCount: retreat.google_review_count,
+    } : undefined,
+  };
+
+  const localBusinessJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "HealthAndBeautyBusiness",
+    name: retreat.name,
+    description: retreat.subtitle,
+    image: retreat.hero_image_url || undefined,
+    url: retreat.website_url,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: retreat.city,
+      addressCountry: retreat.country,
+    },
+    geo: retreat.coordinates?.lat ? {
+      "@type": "GeoCoordinates",
+      latitude: retreat.coordinates.lat,
+      longitude: retreat.coordinates.lng,
+    } : undefined,
+    aggregateRating: retreat.google_rating > 0 ? {
+      "@type": "AggregateRating",
+      ratingValue: retreat.google_rating,
+      bestRating: 5,
+      worstRating: 1,
+      reviewCount: retreat.google_review_count,
+    } : undefined,
+    priceRange: `$${retreat.price_min_per_night}-$${retreat.price_max_per_night}`,
+  };
+
   return (
     <div className="min-h-screen">
       <script
@@ -135,6 +186,14 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
       />
       {/* ════════════════ HERO ════════════════ */}
       <section className="relative h-[70vh] min-h-[500px] overflow-hidden">

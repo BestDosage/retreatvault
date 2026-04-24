@@ -180,6 +180,142 @@ export const GUIDES: GuideConfig[] = [
     category: "goal",
     relatedGuides: ["best-medical-wellness-retreats", "best-budget-wellness-retreats"],
   },
+  // ═══ BATCH 2: Additional guides ═══
+  {
+    slug: "best-ayurveda-retreats",
+    title: "Best Ayurveda Retreats",
+    subtitle: "Authentic Ayurvedic programming with real practitioners, not spa theater",
+    metaDescription: "Top-rated Ayurveda retreats with authentic Panchakarma, dosha analysis, and Ayurvedic physicians. Data-scored by RetreatvVault.",
+    intro: `<p>Ayurveda is one of the most co-opted words in wellness. Half the retreats claiming "Ayurvedic programming" are doing oil massages and calling it Panchakarma. We filtered for retreats where Ayurveda is the actual foundation — on-site vaidyas, dosha-based meal plans, real Panchakarma protocols, and scores that back it up.</p>`,
+    filters: (r) => {
+      const tags = [...(r.specialty_tags || []), ...(r.program_types || [])].join(" ").toLowerCase();
+      return tags.includes("ayurved") && (r.scores?.medical?.score || 0) >= 7.5;
+    },
+    sortBy: (a, b) => b.wrd_score - a.wrd_score,
+    maxRetreats: 20,
+    category: "goal",
+    relatedGuides: ["best-medical-wellness-retreats", "best-retreats-for-nutrition"],
+  },
+  {
+    slug: "best-yoga-retreats",
+    title: "Best Yoga Retreats",
+    subtitle: "For practitioners who want depth, not just a class on the beach",
+    metaDescription: "The best yoga retreats worldwide, scored for mindfulness, personalization, and teaching quality. From beginner-friendly to advanced teacher training.",
+    intro: `<p>Every resort with a yoga mat calls itself a yoga retreat. These aren't those. We filtered for retreats scoring 8.5+ in mindfulness with yoga as a core specialty — meaning structured daily practice, qualified teachers (not fitness instructors who did a weekend cert), and programming that goes beyond flow-and-go.</p>`,
+    filters: (r) => {
+      const tags = [...(r.specialty_tags || []), ...(r.program_types || [])].join(" ").toLowerCase();
+      return (tags.includes("yoga") || tags.includes("meditation")) && (r.scores?.mindfulness?.score || 0) >= 8.5;
+    },
+    sortBy: (a, b) => (b.scores?.mindfulness?.score || 0) - (a.scores?.mindfulness?.score || 0),
+    maxRetreats: 25,
+    category: "goal",
+    relatedGuides: ["best-retreats-for-digital-detox", "best-retreats-for-solo-travelers"],
+  },
+  {
+    slug: "best-weight-loss-retreats",
+    title: "Best Weight Loss & Body Transformation Retreats",
+    subtitle: "Clinically supervised programs with nutrition science, not crash diets",
+    metaDescription: "Top weight loss retreats with medical supervision, nutrition science, and fitness programming. Data-scored results, not marketing promises.",
+    intro: `<p>Weight loss retreats range from dangerous crash-diet camps to genuinely transformative clinical programs. We filtered for retreats scoring 8.5+ in both nutrition AND fitness, with medical oversight (7+). These places use metabolic testing, physician-supervised protocols, and sustainable nutrition education — not juice cleanses and shame.</p>`,
+    filters: (r) => {
+      const nutr = r.scores?.nutrition?.score || 0;
+      const fit = r.scores?.fitness?.score || 0;
+      const med = r.scores?.medical?.score || 0;
+      return nutr >= 8.5 && fit >= 8.5 && med >= 7;
+    },
+    sortBy: (a, b) => {
+      const scoreA = (a.scores?.nutrition?.score || 0) + (a.scores?.fitness?.score || 0);
+      const scoreB = (b.scores?.nutrition?.score || 0) + (b.scores?.fitness?.score || 0);
+      return scoreB - scoreA;
+    },
+    maxRetreats: 20,
+    category: "goal",
+    relatedGuides: ["best-retreats-for-fitness", "best-medical-wellness-retreats"],
+  },
+  {
+    slug: "best-retreats-no-minimum-stay",
+    title: "Best Retreats with No Minimum Stay",
+    subtitle: "Quality wellness without committing to a full week",
+    metaDescription: "Top-rated wellness retreats with 1-2 night minimum stays. Perfect for weekend getaways or testing the retreat experience without a week-long commitment.",
+    intro: `<p>Most serious retreats require 3-7 nights minimum. That makes sense for deep programs, but it's a barrier for first-timers and busy people who can't disappear for a week. These retreats score 7+ overall with minimum stays of 1-2 nights — meaning you can get a real taste without the calendar commitment.</p>`,
+    filters: (r) => r.minimum_stay_nights <= 2 && r.wrd_score >= 7,
+    sortBy: (a, b) => b.wrd_score - a.wrd_score,
+    maxRetreats: 25,
+    category: "style",
+    relatedGuides: ["best-retreats-for-first-timers", "best-budget-wellness-retreats"],
+  },
+  {
+    slug: "best-retreats-in-asia",
+    title: "Best Wellness Retreats in Asia",
+    subtitle: "The spiritual heartland of global wellness, scored and ranked",
+    metaDescription: "The highest-rated wellness retreats across Asia — India, Thailand, Bali, Sri Lanka, and beyond. Data-driven rankings from RetreatvVault.",
+    intro: `<p>Asia invented most of what the Western wellness industry now sells. Ayurveda, yoga, Thai massage, Balinese healing, Traditional Chinese Medicine — this is where those traditions live and breathe. We filtered for retreats in Asia scoring 8+ overall. The pricing advantage is real: you'll find elite-level programming at half the cost of equivalent European or American retreats.</p>`,
+    filters: (r) => r.region === "Asia" && r.wrd_score >= 8,
+    sortBy: (a, b) => b.wrd_score - a.wrd_score,
+    maxRetreats: 25,
+    category: "style",
+    relatedGuides: ["best-ayurveda-retreats", "best-yoga-retreats", "best-budget-wellness-retreats"],
+  },
+  {
+    slug: "best-retreats-in-europe",
+    title: "Best Wellness Retreats in Europe",
+    subtitle: "Centuries of thermal tradition meets modern clinical precision",
+    metaDescription: "Top-rated European wellness retreats — from Alpine medical clinics to Mediterranean spas. Scored across 15 categories by RetreatvVault.",
+    intro: `<p>European wellness has a thousand-year head start. The continent's thermal bath tradition, fasting clinics (Buchinger, Mayr), and integrative medical spas are the real thing — not imported wellness trends repackaged for tourists. We filtered for retreats in Europe scoring 8+ overall. Expect higher prices than Asia but also higher medical rigor and infrastructure.</p>`,
+    filters: (r) => r.region === "Europe" && r.wrd_score >= 8,
+    sortBy: (a, b) => b.wrd_score - a.wrd_score,
+    maxRetreats: 25,
+    category: "style",
+    relatedGuides: ["best-medical-wellness-retreats", "best-luxury-wellness-retreats"],
+  },
+  {
+    slug: "best-retreats-in-usa",
+    title: "Best Wellness Retreats in the USA",
+    subtitle: "No passport required — top-scoring retreats across America",
+    metaDescription: "The best wellness retreats in the United States, scored across 15 categories. From Arizona desert to California coast. No passport needed.",
+    intro: `<p>You don't need to fly to Bali. The US has some of the highest-scoring retreats in our database — Canyon Ranch, Golden Door, Miraval, and dozens of lesser-known properties that deliver serious results. We filtered for USA retreats scoring 7.5+ overall. The advantage: direct flights, no visa, no jet lag eating into your recovery time.</p>`,
+    filters: (r) => r.region === "USA" && r.wrd_score >= 7.5,
+    sortBy: (a, b) => b.wrd_score - a.wrd_score,
+    maxRetreats: 30,
+    category: "style",
+    relatedGuides: ["best-retreats-for-first-timers", "best-retreats-for-burnout-recovery"],
+  },
+  {
+    slug: "best-spa-retreats",
+    title: "Best Spa-Focused Wellness Retreats",
+    subtitle: "When the spa IS the reason you're going",
+    metaDescription: "The world's best spa retreats, scored 9+ for spa quality, treatment variety, and relaxation. Premium bodywork, thermal facilities, and recovery protocols.",
+    intro: `<p>Some people want medical diagnostics. Some want spiritual awakening. Some people just want an exceptional spa — world-class bodywork, thermal circuits, treatment menus that go deep, and therapists who've been doing this for decades. No judgment. We filtered for retreats scoring 9+ in Spa & Relaxation. These aren't hotels with a spa attached. The spa IS the retreat.</p>`,
+    filters: (r) => (r.scores?.spa?.score || 0) >= 9.0,
+    sortBy: (a, b) => (b.scores?.spa?.score || 0) - (a.scores?.spa?.score || 0),
+    maxRetreats: 20,
+    category: "goal",
+    relatedGuides: ["best-luxury-wellness-retreats", "best-retreats-for-couples"],
+  },
+  {
+    slug: "best-sustainable-wellness-retreats",
+    title: "Best Eco-Friendly & Sustainable Retreats",
+    subtitle: "Wellness that doesn't cost the planet",
+    metaDescription: "Top-rated eco-friendly wellness retreats with strong sustainability practices. Solar power, organic farming, zero waste, and genuine environmental commitment.",
+    intro: `<p>The irony of flying 8,000 miles to "connect with nature" at a resort that trucks in bottled water isn't lost on everyone. These retreats score 8+ in sustainability — meaning real practices like solar power, organic gardens, water reclamation, local sourcing, and carbon offset programs. Not just a recycling bin in the lobby.</p>`,
+    filters: (r) => (r.scores?.sustainability?.score || 0) >= 8.0 && r.wrd_score >= 7,
+    sortBy: (a, b) => (b.scores?.sustainability?.score || 0) - (a.scores?.sustainability?.score || 0),
+    maxRetreats: 20,
+    category: "style",
+    relatedGuides: ["best-retreats-for-digital-detox", "best-budget-wellness-retreats"],
+  },
+  {
+    slug: "best-retreats-for-sleep",
+    title: "Best Retreats for Sleep & Recovery",
+    subtitle: "Fix your sleep architecture, not just your stress",
+    metaDescription: "Top wellness retreats for sleep improvement — optimized environments, sleep tracking, circadian protocols, and recovery-focused programming.",
+    intro: `<p>Bad sleep ruins everything else. Exercise, nutrition, meditation — none of it works if you're running on 5 hours of fragmented rest. These retreats score 8.5+ in Sleep & Recovery, meaning they've invested in sleep-optimized rooms, circadian lighting, evening protocols, and in some cases wearable sleep tracking. This isn't "early bedtime and herbal tea." It's structured sleep rehabilitation.</p>`,
+    filters: (r) => (r.scores?.sleep?.score || 0) >= 8.5,
+    sortBy: (a, b) => (b.scores?.sleep?.score || 0) - (a.scores?.sleep?.score || 0),
+    maxRetreats: 20,
+    category: "goal",
+    relatedGuides: ["best-retreats-for-burnout-recovery", "best-retreats-for-digital-detox"],
+  },
 ];
 
 export function getGuideBySlug(slug: string): GuideConfig | undefined {

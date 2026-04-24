@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
-import { blogPosts } from "@/data/blog-posts";
+import { blogPosts as basePosts } from "@/data/blog-posts";
+import { retreatBlogPosts } from "@/data/retreat-blog-posts";
+
+const blogPosts = [...retreatBlogPosts, ...basePosts];
 import { getAllRetreats } from "@/lib/data";
 import BlogListClient from "./BlogListClient";
 
