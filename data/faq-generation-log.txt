@@ -1,0 +1,157 @@
+[dotenv@17.3.1] injecting env (4) from .env.local -- tip: ⚡️ secrets for agents: https://dotenvx.com/as2
+Generating FAQs (limit: 10000, concurrency: 2)...
+Mode: Generate + Insert
+
+Fetched 9409 retreats
+0 already have FAQs
+Generating for 9409 retreats
+
+[2/9409] Atmantan Wellness Centre — 8 FAQs ✓
+  JSON parse failed for Ananda in the Himalayas
+[1/9409] Ananda in the Himalayas — no FAQs generated
+[3/9409] Canyon Ranch Tucson — 8 FAQs ✓
+[4/9409] Chiva-Som International Health Resort — 8 FAQs ✓
+[5/9409] Golden Door — 8 FAQs ✓
+  JSON parse failed for Kamalaya Koh Samui
+[6/9409] Kamalaya Koh Samui — no FAQs generated
+[7/9409] Six Senses Vana — 8 FAQs ✓
+[9/9409] COMO Shambhala Estate — 8 FAQs ✓
+  JSON parse failed for Buchinger Wilhelmi
+[8/9409] Buchinger Wilhelmi — no FAQs generated
+[10/9409] Lanserhof Lans — 8 FAQs ✓
+[11/9409] Lanserhof Tegernsee — 8 FAQs ✓
+[13/9409] Pritikin Longevity Center + Spa — 8 FAQs ✓
+[12/9409] Palazzo Fiuggi Wellness Medical Retreat — 8 FAQs ✓
+[15/9409] Shreyas Retreat — 8 FAQs ✓
+[14/9409] SHA Wellness Clinic — 8 FAQs ✓
+[16/9409] Amanpuri — 8 FAQs ✓
+[17/9409] Cal-a-Vie Health Spa — 8 FAQs ✓
+[18/9409] Canyon Ranch Lenox — 8 FAQs ✓
+[19/9409] Fivelements Retreat Bali — 8 FAQs ✓
+[20/9409] FORESTIS Dolomites — 8 FAQs ✓
+[21/9409] JOALI BEING — 8 FAQs ✓
+[22/9409] Lefay Resort & Spa Lago di Garda — 8 FAQs ✓
+[23/9409] Miraval Arizona Resort & Spa — 8 FAQs ✓
+[24/9409] Mohonk Mountain House — 8 FAQs ✓
+[25/9409] Optimum Health Institute — 8 FAQs ✓
+[26/9409] Sensei Lanai, A Four Seasons Resort — 8 FAQs ✓
+[27/9409] The Farm at San Benito — 8 FAQs ✓
+[29/9409] 1440 Multiversity — 8 FAQs ✓
+[28/9409] The Greenbrier — 8 FAQs ✓
+[30/9409] Absolute Sanctuary — 8 FAQs ✓
+[31/9409] Aman New York — 8 FAQs ✓
+[32/9409] Blackberry Mountain — 8 FAQs ✓
+[33/9409] Body Evolve — 8 FAQs ✓
+[34/9409] Carillon Miami Wellness Resort — 8 FAQs ✓
+[35/9409] Chenot Palace Weggis — 8 FAQs ✓
+[36/9409] Chewton Glen Hotel & Spa — 8 FAQs ✓
+[37/9409] Empower Balance — 8 FAQs ✓
+[38/9409] Hilton Head Health — 8 FAQs ✓
+[39/9409] Lake Austin Spa Resort — 8 FAQs ✓
+[40/9409] Longevity Health & Wellness Hotel — 8 FAQs ✓
+[41/9409] MAYRLIFE — 8 FAQs ✓
+[42/9409] Mii amo — 8 FAQs ✓
+[43/9409] Miraval Austin Resort & Spa — 8 FAQs ✓
+[45/9409] Nemacolin — 8 FAQs ✓
+[44/9409] Montage Palmetto Bluff — 8 FAQs ✓
+[46/9409] Rancho La Puerta — 8 FAQs ✓
+[47/9409] SHA Mexico — 8 FAQs ✓
+[48/9409] Six Senses Douro Valley — 8 FAQs ✓
+[49/9409] The Yeatman — 8 FAQs ✓
+[51/9409] We Care Spa — 8 FAQs ✓
+[50/9409] VIVAMAYR Maria Wörth — 8 FAQs ✓
+[52/9409] 5 Day All-Inclusive Burnout Recovery & Life Reset Retreat, US — 8 FAQs ✓
+[53/9409] Aman Tokyo — 8 FAQs ✓
+[54/9409] Amanoi — 8 FAQs ✓
+[55/9409] Angkor Grace Residence & Wellness Resort — 8 FAQs ✓
+[56/9409] Art of Living Retreat Center — 8 FAQs ✓
+[57/9409] AZ I AM — 8 FAQs ✓
+[58/9409] Borgo Egnazia — 8 FAQs ✓
+[59/9409] Buckhorn Retreat and Conference Center — 8 FAQs ✓
+[60/9409] Bürgenstock Resort — 8 FAQs ✓
+[61/9409] Cara Creek Eco Lodge — 8 FAQs ✓
+[62/9409] Civana Wellness Resort & Spa — 8 FAQs ✓
+[63/9409] Clinique La Prairie — 8 FAQs ✓
+[65/9409] COMO Uma Canggu — 8 FAQs ✓
+[64/9409] COMO Castello Del Nero — 8 FAQs ✓
+[66/9409] Dance The Medicine — 8 FAQs ✓
+[67/9409] Desert Oasis for wellness and bodywork, let go and reconnect. — 8 FAQs ✓
+[68/9409] Divine Nectar Botanicals — 8 FAQs ✓
+[69/9409] Enjoy the Journey Retreats — 8 FAQs ✓
+[71/9409] Faith Retreats — 8 FAQs ✓
+[70/9409] Esalen Institute — 8 FAQs ✓
+[72/9409] Four Seasons Resort Bali at Sayan — 8 FAQs ✓
+[73/9409] Gecko Yoga — 8 FAQs ✓
+[74/9409] Healing Waters Medical Retreat — 8 FAQs ✓
+[75/9409] Hoshinoya Bali — 8 FAQs ✓
+[76/9409] Keep Alive Tours — 8 FAQs ✓
+[77/9409] Kohler Waters Spa at The American Club — 8 FAQs ✓
+[78/9409] Kripalu Center for Yoga & Health — 8 FAQs ✓
+[79/9409] Kuwera Eco Lodge — 8 FAQs ✓
+[81/9409] Limitless Humans Movement — 8 FAQs ✓
+[80/9409] Les Sources de Caudalie — 8 FAQs ✓
+[82/9409] Mangosteen Ayurveda & Wellness Resort — 8 FAQs ✓
+[83/9409] Martina Salad Retreats — 8 FAQs ✓
+[84/9409] Meadowood Napa Valley — 8 FAQs ✓
+[85/9409] Meditation House Porto — 8 FAQs ✓
+[87/9409] Movement and Nature Retreat — 8 FAQs ✓
+[86/9409] Montage Deer Valley — 8 FAQs ✓
+[88/9409] Nestra Center — 8 FAQs ✓
+[89/9409] OCEAN retreats — 8 FAQs ✓
+[90/9409] OM Academy & Mind Spa — 8 FAQs ✓
+[91/9409] Omega Institute for Holistic Studies — 8 FAQs ✓
+[92/9409] Optimal Retreats — 8 FAQs ✓
+[93/9409] Osage Forest of Peace — 8 FAQs ✓
+[94/9409] Prama Institute & Wellness Center — 8 FAQs ✓
+[95/9409] Preidlhof Luxury DolceVita Resort — 8 FAQs ✓
+[96/9409] Priya Glikman and The MindSet — 8 FAQs ✓
+[97/9409] RAKxa Integrative Wellness — 8 FAQs ✓
+[98/9409] Red Mountain Resort — 8 FAQs ✓
+[99/9409] Sacred Ceremonies — 8 FAQs ✓
+[100/9409] Salamander Resort & Spa — 8 FAQs ✓
+[101/9409] SenseTheSense — 8 FAQs ✓
+[102/9409] Shou Sugi Ban House — 8 FAQs ✓
+[103/9409] Svarga Loka Wellness Resort — 8 FAQs ✓
+[104/9409] Terranea Resort — 8 FAQs ✓
+[105/9409] Terre Blanche Hotel Spa Golf Resort — 8 FAQs ✓
+[106/9409] The Boulders Resort & Spa — 8 FAQs ✓
+[107/9409] The Dolder Grand — 8 FAQs ✓
+[108/9409] The Indian School of Yoga — 8 FAQs ✓
+[109/9409] The Lodge at Woodloch — 8 FAQs ✓
+[110/9409] TrueNorth Health Center — 8 FAQs ✓
+[111/9409] Vajrapani Institute — 8 FAQs ✓
+[112/9409] Vietnam Zen Adventures — 8 FAQs ✓
+[113/9409] Vila Vita Parc Resort & Spa — 8 FAQs ✓
+[114/9409] Yoga Within You — 8 FAQs ✓
+[115/9409] YogaFX Yoga Teacher Training RYT 200 Hours Bali — 8 FAQs ✓
+[116/9409] Zen Community of Oregon — 8 FAQs ✓
+[117/9409] Zen Rocks Retreat Center — 8 FAQs ✓
+[118/9409] Zen Yoga Retreats — 8 FAQs ✓
+[119/9409] 1 Team Fitness Retreat — 8 FAQs ✓
+[120/9409] 28 Days Ayurvedic Massage & Panchakarma Therapist in Goa, India — 8 FAQs ✓
+[121/9409] 29 Day Ayurveda and Yoga Detox Retreat in Kathmandu, Nepal — 8 FAQs ✓
+[122/9409] 3 Day Peace & Abundance Wellness Retreat in Georgia, US — 8 FAQs ✓
+[123/9409] 3 Day Sup Yoga & Pilates Lakeside Radiance Retreat, ON, Canada — 8 FAQs ✓
+[124/9409] 3 night 4 days meditation Retreat at Foothill of Himalayas N — 8 FAQs ✓
+[125/9409] 3-Tage-Yoga-Retreat: Perimenopause & Menopause in den Bergen — 8 FAQs ✓
+[126/9409] 7 Day Massage & Yoga Retreat near Kandy, Sri Lanka — 8 FAQs ✓
+[127/9409] Aarogya Naturopathy Village — 8 FAQs ✓
+[128/9409] Acro - Surf - Yoga Retreat — 8 FAQs ✓
+[129/9409] ADLER Spa Resort THERMAE — 8 FAQs ✓
+[131/9409] ALEX DAVIS, CPA, CFP®️ — 8 FAQs ✓
+[130/9409] Adventure Tours Madeira — 8 FAQs ✓
+[132/9409] Ancestral Awakening — 8 FAQs ✓
+[133/9409] Arkana Spiritual Center — 8 FAQs ✓
+[135/9409] Astraea Flora — 8 FAQs ✓
+[134/9409] Arogya Nepal — 8 FAQs ✓
+[136/9409] ATMA Retreats Portugal — 8 FAQs ✓
+[138/9409] Ayaruna Retreats — 8 FAQs ✓
+[137/9409] Avideya — 8 FAQs ✓
+[139/9409] Ayurvedic Panchakarma Wellness Retreat — 8 FAQs ✓
+[140/9409] Ayuthantra Ayurveda & Wellness — 8 FAQs ✓
+[142/9409] Bali Palms — 8 FAQs ✓
+[141/9409] Bali Music Production — 8 FAQs ✓
+[143/9409] Bali Wellness Adventure — 8 FAQs ✓
+[144/9409] Bellport Inn - Full Venue Rental for Retreat Leaders — 8 FAQs ✓
+[145/9409] Blisstopia Retreats — 8 FAQs ✓
+[146/9409] Blooming of Hearts — 8 FAQs ✓

@@ -16,11 +16,8 @@ export const dynamicParams = true;
 
 type Params = { city: string };
 
-export async function generateStaticParams() {
-  const retreats = await getAllRetreats();
-  const cities = getAllCities(retreats);
-  return cities.slice(0, 50).map((c) => ({ city: c.slug }));
-}
+// No generateStaticParams — render all city pages on-demand via ISR
+// This avoids Supabase timeout during build and OOM on Vercel
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { city: citySlug } = await params;
