@@ -21,8 +21,9 @@ export const revalidate = 3600; // refresh every hour
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
+  // Pre-build top 200 by score at build time; rest render on-demand via ISR
   const retreats = await getAllRetreats();
-  return retreats.map((r) => ({ slug: r.slug }));
+  return retreats.slice(0, 200).map((r) => ({ slug: r.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
