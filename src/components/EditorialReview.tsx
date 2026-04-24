@@ -34,7 +34,7 @@ export default function EditorialReview({
 
       {/* Main review body — content is trusted editorial HTML from our generation script */}
       <div
-        className="mt-8 max-w-none text-[13px] leading-[1.85] text-dark-300 [&>p]:mb-4 [&>p:first-child]:text-dark-200 [&>p:first-child]:text-[14px]"
+        className="mt-8 max-w-none text-[14px] leading-[1.85] text-dark-100 [&>p]:mb-4 [&>p:first-child]:text-white [&>p:first-child]:text-[15px]"
         dangerouslySetInnerHTML={{ __html: reviewHtml }}
       />
 
@@ -50,7 +50,7 @@ export default function EditorialReview({
           <p className="text-[9px] font-semibold uppercase tracking-[0.25em] text-emerald-500">Best For</p>
           <ul className="mt-3 space-y-2">
             {bestFor.map((item) => (
-              <li key={item} className="flex items-start gap-2 text-[12px] text-dark-300">
+              <li key={item} className="flex items-start gap-2 text-[12px] text-dark-200">
                 <span className="mt-0.5 text-emerald-400">&#10003;</span>
                 {item}
               </li>
@@ -61,7 +61,7 @@ export default function EditorialReview({
           <p className="text-[9px] font-semibold uppercase tracking-[0.25em] text-red-400/80">Not Ideal For</p>
           <ul className="mt-3 space-y-2">
             {notIdealFor.map((item) => (
-              <li key={item} className="flex items-start gap-2 text-[12px] text-dark-300">
+              <li key={item} className="flex items-start gap-2 text-[12px] text-dark-200">
                 <span className="mt-0.5 text-red-400/60">&#10005;</span>
                 {item}
               </li>
