@@ -9,6 +9,8 @@ import {
 } from "@/lib/data";
 import { WellnessRetreat } from "@/lib/types";
 import RetreatCard from "@/components/RetreatCard";
+import LocationStats from "@/components/LocationStats";
+import { deriveLocationStats } from "@/lib/location-intelligence";
 
 export const revalidate = 86400;
 export const dynamicParams = true;
@@ -76,6 +78,7 @@ export default async function RegionPage({ params }: { params: Promise<Params> }
   const countries = getCountriesInRegion(allRetreats, region);
   const top12 = regionRetreats.slice(0, 12);
   const intro = REGION_INTROS[region] || "";
+  const stats = deriveLocationStats(regionRetreats);
 
   // Group all retreats by country for the compact list
   const byCountry = new Map<string, WellnessRetreat[]>();
@@ -113,6 +116,19 @@ export default async function RegionPage({ params }: { params: Promise<Params> }
                 {intro}
               </p>
             )}
+          </div>
+        </section>
+
+        {/* Location intelligence */}
+        <section className="border-b border-white/[0.06] px-6 py-16 md:px-12 lg:px-20">
+          <div className="mx-auto max-w-7xl">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Market Intelligence</p>
+            <h2 className="mt-3 font-serif text-2xl font-light text-white">
+              {displayName} at a Glance
+            </h2>
+            <div className="mt-8">
+              <LocationStats stats={stats} locationName={displayName} />
+            </div>
           </div>
         </section>
 
