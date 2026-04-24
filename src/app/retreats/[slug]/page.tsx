@@ -7,6 +7,7 @@ import SimilarRetreats from "@/components/SimilarRetreats";
 import EditorialReview from "@/components/EditorialReview";
 import GuestSentiment from "@/components/GuestSentiment";
 import { generateRetreatSummary, generateRetreatFaqs, generateMetaDescription } from "@/lib/retreat-summary";
+import { GUIDES } from "@/data/guides";
 
 // On Vercel Pro: pre-build all 9,289 retreats at build time.
 // The module-scope cache in src/lib/data.ts keeps this fast (single Supabase fetch).
@@ -50,6 +51,7 @@ import AnimateIn, { StaggerContainer, StaggerItem } from "@/components/AnimateIn
 import dynamic from "next/dynamic";
 const RadarChart = dynamic(() => import("@/components/RadarChart"), { ssr: false });
 import VaultVsGuest from "@/components/VaultVsGuest";
+import RealCostCalculator from "@/components/RealCostCalculator";
 import { BestForChips } from "@/components/BestForTags";
 import {
   LongevityPanel, DigitalDetoxPanel, RoiCalculator,
@@ -93,6 +95,8 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
 
   const editorialSummary = generateRetreatSummary(retreat);
   const faqs = generateRetreatFaqs(retreat);
+
+  const matchingGuides = GUIDES.filter((g) => g.filters(retreat));
 
   const hasImage = retreat.hero_image_url?.startsWith("http");
   const galleryImages = (retreat.gallery_images || []).filter((img: string) => img?.startsWith("http"));
@@ -338,6 +342,21 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
           <RoiCalculator data={roi} />
         </AnimateIn>
 
+        {/* ═══ REAL COST CALCULATOR ═══ */}
+        <AnimateIn className="mb-20">
+          <RealCostCalculator
+            retreatName={retreat.name}
+            priceMinPerNight={retreat.price_min_per_night}
+            priceMaxPerNight={retreat.price_max_per_night}
+            pricingModel={retreat.pricing_model}
+            minimumStayNights={retreat.minimum_stay_nights}
+            country={retreat.country}
+            region={retreat.region}
+            airportDistanceKm={retreat.airport_distance_km}
+            nearestAirport={retreat.nearest_airport}
+          />
+        </AnimateIn>
+
         {/* ═══ THE 72-HOUR EFFECT ═══ */}
         <AnimateIn className="mb-20">
           <SeventyTwoHourCard effect={effect72} />
@@ -498,6 +517,26 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
                   </div>
                 ))}
               </div>
+            </div>
+          </AnimateIn>
+        )}
+
+        {/* ═══ FEATURED IN GUIDES ═══ */}
+        {matchingGuides.length > 0 && (
+          <AnimateIn className="mb-20">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Featured In</p>
+            <h2 className="mt-3 font-serif text-3xl font-light text-white">Retreat Guides</h2>
+            <p className="mt-2 text-[12px] text-dark-500">This retreat appears in {matchingGuides.length} curated {matchingGuides.length === 1 ? "guide" : "guides"}</p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              {matchingGuides.map((g) => (
+                <a
+                  key={g.slug}
+                  href={`/guides/${g.slug}`}
+                  className="rounded-full border border-gold-400/15 bg-gold-400/[0.05] px-4 py-2 text-[11px] font-medium text-gold-300 transition-all hover:border-gold-400/30 hover:bg-gold-400/[0.08]"
+                >
+                  {g.title}
+                </a>
+              ))}
             </div>
           </AnimateIn>
         )}

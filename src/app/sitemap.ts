@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { blogPosts } from "@/data/blog-posts";
+import { GUIDES } from "@/data/guides";
 
 const BASE_URL = "https://www.retreatvault.com";
 const FALLBACK_DATE = new Date("2026-04-01");
@@ -108,7 +109,18 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
       priority: 0.7,
     }));
 
-    return [...staticPages, ...regionPages, ...countryPages, ...blogPages];
+    const guideIndexPage: MetadataRoute.Sitemap = [
+      { url: `${BASE_URL}/guides`, lastModified: new Date("2026-04-15"), changeFrequency: "weekly", priority: 0.8 },
+    ];
+
+    const guidePages: MetadataRoute.Sitemap = GUIDES.map((guide) => ({
+      url: `${BASE_URL}/guides/${guide.slug}`,
+      lastModified: new Date("2026-04-15"),
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }));
+
+    return [...staticPages, ...regionPages, ...countryPages, ...blogPages, ...guideIndexPage, ...guidePages];
   }
 
   // Sub-sitemaps 1+: retreats by country

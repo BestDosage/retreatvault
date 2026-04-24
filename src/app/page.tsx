@@ -467,6 +467,44 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ══════════════════════════════════════════════════
+          8. RETREAT GUIDES — curated matchmaker links
+          ══════════════════════════════════════════════════ */}
+      <section className="border-t border-white/[0.06] px-6 py-20 md:px-12 lg:px-20">
+        <div className="mx-auto max-w-7xl">
+          <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Retreat Matchmaker</p>
+          <h2 className="mt-3 font-serif text-3xl font-light text-white md:text-4xl">Find Your Perfect Retreat</h2>
+          <p className="mt-4 text-[14px] text-dark-400">Data-driven guides filtered by your goals, budget, and travel style</p>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+            {[
+              { title: "Burnout Recovery", slug: "best-retreats-for-burnout-recovery" },
+              { title: "Under $500/Night", slug: "best-budget-wellness-retreats" },
+              { title: "Medical & Longevity", slug: "best-medical-wellness-retreats" },
+              { title: "Solo Travelers", slug: "best-retreats-for-solo-travelers" },
+              { title: "First-Timers", slug: "best-retreats-for-first-timers" },
+              { title: "Luxury", slug: "best-luxury-wellness-retreats" },
+              { title: "Couples", slug: "best-retreats-for-couples" },
+              { title: "Fitness", slug: "best-retreats-for-fitness" },
+              { title: "Digital Detox", slug: "best-retreats-for-digital-detox" },
+              { title: "Nutrition", slug: "best-retreats-for-nutrition" },
+            ].map((g) => (
+              <a
+                key={g.slug}
+                href={`/guides/${g.slug}`}
+                className="group rounded-xl border border-white/[0.06] bg-white/[0.02] px-5 py-4 text-center transition-all hover:border-gold-400/25 hover:bg-white/[0.04]"
+              >
+                <span className="text-[13px] font-medium text-white group-hover:text-gold-300 transition-colors">{g.title}</span>
+              </a>
+            ))}
+          </div>
+          <div className="mt-8 text-center">
+            <a href="/guides" className="text-[11px] uppercase tracking-wider text-gold-400 hover:text-gold-300 transition-colors">
+              View All Guides →
+            </a>
+          </div>
+        </div>
+      </section>
     </>
   );
 }
