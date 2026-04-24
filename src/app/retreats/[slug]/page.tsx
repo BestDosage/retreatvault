@@ -453,14 +453,15 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
           </AnimateIn>
         )}
 
-        {/* ═══ VIDEOS ═══ */}
+        {/* ═══ REAL GUEST VIDEOS ═══ */}
         {videos.length > 0 && (
           <AnimateIn className="mb-20">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Media</p>
-            <h2 className="mt-3 font-serif text-3xl font-light text-white">Video</h2>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Real Guest Videos</p>
+            <h2 className="mt-3 font-serif text-3xl font-light text-white">See It For Yourself</h2>
+            <p className="mt-2 text-[12px] text-dark-500">Independent reviews, vlogs, and walkthroughs from real visitors</p>
             <div className={`mt-8 grid gap-4 ${videos.length > 1 ? "sm:grid-cols-2" : "max-w-3xl"}`}>
               {videos.map((video) => (
-                <div key={video.video_id} className="overflow-hidden rounded-2xl border border-white/[0.04]">
+                <div key={video.video_id} className="overflow-hidden rounded-2xl border border-white/[0.04] transition-all duration-300 hover:border-gold-500/15">
                   <div className="relative aspect-video">
                     <iframe
                       src={`https://www.youtube.com/embed/${video.video_id}?rel=0&modestbranding=1`}
