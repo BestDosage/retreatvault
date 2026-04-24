@@ -468,10 +468,12 @@ let _editorialCache: Map<string, any> | null = null;
 
 async function loadEditorialCache() {
   if (_editorialCache) return _editorialCache;
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("retreat_editorial_reviews")
     .select("*")
     .eq("status", "published");
+  if (error) console.error("[loadEditorialCache] error:", error.message);
+  console.log(`[loadEditorialCache] loaded ${data?.length || 0} editorial reviews`);
   const map = new Map<string, any>();
   (data || []).forEach((r: any) => {
     map.set(r.retreat_id, {
