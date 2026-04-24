@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getAllRetreats, getRetreatBySlug, getRetreatAwards, getRetreatVideos, getSimilarRetreats, getEditorialReview, getRetreatReviews, deriveReviewThemes } from "@/lib/data";
+import { getAllRetreats, getRetreatBySlug, getRetreatAwards, getRetreatVideos, getSimilarRetreats, getEditorialReview, getRetreatReviews, deriveReviewThemes, getRetreatFaqs } from "@/lib/data";
 import SimilarRetreats from "@/components/SimilarRetreats";
 import EditorialReview from "@/components/EditorialReview";
 import GuestSentiment from "@/components/GuestSentiment";
@@ -95,7 +95,9 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
   const effect72 = derive72HourEffect(retreat);
 
   const editorialSummary = generateRetreatSummary(retreat);
-  const faqs = generateRetreatFaqs(retreat);
+  // Prefer AI-generated FAQs from Supabase, fall back to template-generated
+  const aiFaqs = await getRetreatFaqs(retreat.id);
+  const faqs = aiFaqs.length > 0 ? aiFaqs : generateRetreatFaqs(retreat);
 
   const matchingGuides = GUIDES.filter((g) => g.filters(retreat));
 

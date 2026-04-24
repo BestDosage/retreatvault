@@ -558,6 +558,37 @@ export async function getRetreatReviews(retreatId: string) {
   return cache.get(retreatId) || [];
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+// Retreat FAQs (AI-generated, stored in Supabase)
+// ═══════════════════════════════════════════════════════════════════════
+
+let _faqsCache: Map<string, { question: string; answer: string }[]> | null = null;
+
+async function loadFaqsCache() {
+  if (_faqsCache) return _faqsCache;
+  const { data, error } = await supabase
+    .from("retreat_faqs")
+    .select("*")
+    .eq("status", "published");
+  if (error) console.error("[loadFaqsCache] error:", error.message);
+  const map = new Map<string, { question: string; answer: string }[]>();
+  (data || []).forEach((r: any) => {
+    try {
+      const faqs = typeof r.faqs === "string" ? JSON.parse(r.faqs) : r.faqs;
+      if (Array.isArray(faqs) && faqs.length > 0) {
+        map.set(r.retreat_id, faqs);
+      }
+    } catch {}
+  });
+  _faqsCache = map;
+  return map;
+}
+
+export async function getRetreatFaqs(retreatId: string): Promise<{ question: string; answer: string }[]> {
+  const cache = await loadFaqsCache();
+  return cache.get(retreatId) || [];
+}
+
 export function deriveReviewThemes(reviews: any[]): ReviewTheme[] {
   if (reviews.length === 0) return [];
 
