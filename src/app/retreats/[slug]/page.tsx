@@ -11,7 +11,7 @@ import { GUIDES } from "@/data/guides";
 
 // On Vercel Pro: pre-build all 9,289 retreats at build time.
 // The module-scope cache in src/lib/data.ts keeps this fast (single Supabase fetch).
-export const revalidate = 86400; // refresh stale pages once a day
+export const revalidate = 3600; // refresh every hour
 
 // Explicitly allow on-demand rendering for any slug not returned by
 // generateStaticParams at build time (e.g. slugs added after the build,
