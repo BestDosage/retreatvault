@@ -276,21 +276,6 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
           </AnimateIn>
         )}
 
-        {/* ═══ EDITORIAL REVIEW ═══ */}
-        {editorialReview && (
-          <AnimateIn className="mb-20">
-            <EditorialReview
-              retreatName={retreat.name}
-              reviewHtml={editorialReview.reviewHtml}
-              verdict={editorialReview.verdict}
-              bestFor={editorialReview.bestFor}
-              notIdealFor={editorialReview.notIdealFor}
-              alternatives={editorialReview.alternatives}
-              lastUpdated={editorialReview.lastUpdated}
-            />
-          </AnimateIn>
-        )}
-
         {/* ═══ SCORE BREAKDOWN ═══ */}
         <AnimateIn className="mb-20">
           <div className="rounded-3xl border border-white/[0.04] bg-white/[0.015] p-8 sm:p-12">
@@ -398,21 +383,6 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
             ))}
           </StaggerContainer>
         </div>
-
-        {/* ═══ GUEST SENTIMENT ═══ */}
-        {(retreat.google_review_count > 0 || guestReviews.length > 0) && (
-          <AnimateIn className="mb-20">
-            <GuestSentiment
-              retreatName={retreat.name}
-              googleRating={retreat.google_rating}
-              googleCount={retreat.google_review_count}
-              tripadvisorRating={retreat.tripadvisor_rating}
-              tripadvisorCount={retreat.tripadvisor_review_count}
-              reviews={guestReviews}
-              themes={reviewThemes}
-            />
-          </AnimateIn>
-        )}
 
         {/* ═══ GUEST SENTIMENT ═══ */}
         {(retreat.google_review_count > 0 || guestReviews.length > 0) && (
