@@ -1,29 +1,27 @@
 /**
  * Data-driven blog posts for RetreatvVault.
  * Generated from actual retreat database statistics.
- * Each post uses real numbers from the 9,400+ retreat dataset.
  */
 
-export interface RetreatBlogPost {
-  slug: string;
-  title: string;
-  excerpt: string;
-  category: string;
-  published_at: string;
-  read_time: number;
-  tags: string[];
-  content: string;
-}
+import { BlogPost } from "@/lib/types";
 
-export const retreatBlogPosts: RetreatBlogPost[] = [
+export const retreatBlogPosts: BlogPost[] = [
   {
     slug: "wellness-retreat-price-index-2026",
     title: "2026 Wellness Retreat Price Index: What It Actually Costs by Region",
-    excerpt: "We analyzed pricing data from 9,400+ retreats across 67 countries. Here's what wellness travel actually costs — broken down by region, country, and quality tier.",
-    category: "Data",
-    published_at: "2026-04-24T10:00:00Z",
-    read_time: 8,
+    subtitle: "We analyzed pricing data from 9,400+ retreats across 67 countries.",
+    author: "Chad Waldman",
+    author_title: "Analytical Chemist & Founder, RetreatVault",
+    published_date: "2026-04-24",
+    updated_date: "2026-04-24",
+    read_time_minutes: 8,
+    hero_image_url: "",
+    hero_image_alt: "",
+    category: "budget",
+    category_label: "Data & Analysis",
     tags: ["wellness retreat cost", "retreat pricing", "how much does a retreat cost", "retreat budget"],
+    meta_description: "We analyzed pricing data from 9,400+ retreats across 67 countries. Here's what wellness travel actually costs — broken down by region, country, and quality tier.",
+    related_retreat_slugs: [],
     content: `## What Does a Wellness Retreat Actually Cost?
 
 Everyone asks. Nobody gives a straight answer. Retreat websites bury their pricing behind "request a quote" buttons. Review sites talk about "luxury" and "budget" without defining what those words mean in dollars.
@@ -94,11 +92,19 @@ Use our [Real Cost Calculator](/retreats) on any retreat page to estimate your a
   {
     slug: "most-reviewed-wellness-retreats",
     title: "The 20 Most-Reviewed Wellness Retreats on Google (And What the Reviews Say)",
-    excerpt: "We ranked every retreat by Google review volume. The most-reviewed retreats aren't always the highest-rated — here's what thousands of real guests are saying.",
-    category: "Data",
-    published_at: "2026-04-24T10:00:00Z",
-    read_time: 6,
+    subtitle: "We ranked every retreat by Google review volume.",
+    author: "Chad Waldman",
+    author_title: "Analytical Chemist & Founder, RetreatVault",
+    published_date: "2026-04-24",
+    updated_date: "2026-04-24",
+    read_time_minutes: 6,
+    hero_image_url: "",
+    hero_image_alt: "",
+    category: "science",
+    category_label: "Data & Analysis",
     tags: ["wellness retreat reviews", "best reviewed retreats", "google reviews wellness"],
+    meta_description: "We ranked every retreat by Google review volume. The most-reviewed retreats aren't always the highest-rated — here's what thousands of real guests are saying.",
+    related_retreat_slugs: [],
     content: `## The Most-Reviewed Wellness Retreats in the World
 
 Google reviews are the closest thing to unfiltered guest feedback. TripAdvisor is gamed. Instagram is curated. Google reviews are where people go when they're genuinely happy — or genuinely angry.
@@ -140,11 +146,19 @@ Browse our [full directory](/retreats) sorted by Vault score, which combines all
   {
     slug: "highest-scoring-retreats-by-country",
     title: "Which Countries Have the Highest-Scoring Retreats? The Data Might Surprise You",
-    excerpt: "We averaged Vault scores across 67 countries. India and Thailand don't top the list — here's which countries actually deliver the best retreat experiences.",
-    category: "Data",
-    published_at: "2026-04-24T10:00:00Z",
-    read_time: 7,
+    subtitle: "We averaged Vault scores across 67 countries.",
+    author: "Chad Waldman",
+    author_title: "Analytical Chemist & Founder, RetreatVault",
+    published_date: "2026-04-24",
+    updated_date: "2026-04-24",
+    read_time_minutes: 7,
+    hero_image_url: "",
+    hero_image_alt: "",
+    category: "science",
+    category_label: "Data & Analysis",
     tags: ["best countries wellness retreats", "where to go for a retreat", "wellness travel destinations"],
+    meta_description: "We averaged Vault scores across 67 countries. India and Thailand don't top the list — here's which countries actually deliver the best retreat experiences.",
+    related_retreat_slugs: [],
     content: `## The Best Countries for Wellness Retreats, According to Data
 
 If you asked most people "where should I go for a wellness retreat?" they'd say Bali, Thailand, or India. Those are fine answers. But our data tells a more nuanced story.
@@ -187,11 +201,19 @@ Explore all countries in our [directory](/retreats).`,
   {
     slug: "retreat-scoring-methodology-explained",
     title: "How We Score 9,400+ Retreats: The RetreatvVault Methodology",
-    excerpt: "Our scoring system uses 15 weighted categories and real data — not subjective opinions. Here's exactly how it works, and why we built it this way.",
-    category: "Methodology",
-    published_at: "2026-04-24T10:00:00Z",
-    read_time: 10,
+    subtitle: "Our scoring system uses 15 weighted categories and real data.",
+    author: "Chad Waldman",
+    author_title: "Analytical Chemist & Founder, RetreatVault",
+    published_date: "2026-04-24",
+    updated_date: "2026-04-24",
+    read_time_minutes: 10,
+    hero_image_url: "",
+    hero_image_alt: "",
+    category: "science",
+    category_label: "Methodology",
     tags: ["retreat scoring", "wellness retreat rating", "how to evaluate retreats", "retreatvault methodology"],
+    meta_description: "Our scoring system uses 15 weighted categories and real data — not subjective opinions. Here's exactly how it works, and why we built it this way.",
+    related_retreat_slugs: [],
     content: `## Why Another Rating System?
 
 Google gives you a number out of 5. TripAdvisor gives you a number out of 5. Neither tells you whether the retreat is good at the specific thing you care about.
@@ -251,11 +273,19 @@ Visit our [full methodology page](/methodology) for detailed scoring criteria an
   {
     slug: "first-wellness-retreat-guide",
     title: "Your First Wellness Retreat: Everything Nobody Tells You",
-    excerpt: "What to pack, what to expect, when to book, and why the first 24 hours are the hardest. An honest guide from someone who's evaluated thousands.",
-    category: "Guide",
-    published_at: "2026-04-24T10:00:00Z",
-    read_time: 9,
+    subtitle: "What to pack, what to expect, and why the first 24 hours are the hardest.",
+    author: "Chad Waldman",
+    author_title: "Analytical Chemist & Founder, RetreatVault",
+    published_date: "2026-04-24",
+    updated_date: "2026-04-24",
+    read_time_minutes: 9,
+    hero_image_url: "",
+    hero_image_alt: "",
+    category: "decision",
+    category_label: "Guide",
     tags: ["first wellness retreat", "what to expect wellness retreat", "wellness retreat tips", "retreat beginner guide"],
+    meta_description: "What to pack, what to expect, when to book, and why the first 24 hours are the hardest. An honest guide from someone who's evaluated thousands.",
+    related_retreat_slugs: [],
     content: `## Your First Retreat: The Honest Version
 
 Most "first retreat" guides are written by the retreats themselves. They want you to book. We want you to book the *right* retreat and actually enjoy it.

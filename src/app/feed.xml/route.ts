@@ -11,8 +11,8 @@ export async function GET() {
     <item>
       <title><![CDATA[${post.title}]]></title>
       <link>${baseUrl}/blog/${post.slug}</link>
-      <description><![CDATA[${post.excerpt}]]></description>
-      <pubDate>${new Date(post.published_at).toUTCString()}</pubDate>
+      <description><![CDATA[${post.meta_description}]]></description>
+      <pubDate>${new Date(post.published_date).toUTCString()}</pubDate>
       <guid isPermaLink="true">${baseUrl}/blog/${post.slug}</guid>
       <category>${post.category}</category>
     </item>`).join("");
