@@ -21,9 +21,9 @@ export const revalidate = 3600; // refresh every hour
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  // Pre-build top 200 by score at build time; rest render on-demand via ISR
-  const retreats = await getAllRetreats();
-  return retreats.slice(0, 200).map((r) => ({ slug: r.slug }));
+  // Skip static generation entirely — all pages render on-demand via ISR.
+  // getAllRetreats() causes Supabase statement timeouts on Vercel build workers.
+  return [];
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
