@@ -68,12 +68,59 @@ export default async function HomePage() {
     url: "https://www.retreatvault.com",
   };
 
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "What is the best wellness retreat for beginners?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "For first-timers, the best wellness retreats combine structured programming with a welcoming, non-intimidating environment. RetreatVault recommends looking for retreats that score highly in programming depth and community culture — two of our 15 scored categories. Top-rated beginner-friendly options include resorts in Costa Rica, Bali, and Tuscany that offer flexible itineraries, beginner yoga classes, nutrition counseling, and guided nature activities. See our First-Timers guide at retreatvault.com/guides/best-retreats-for-first-timers for a curated shortlist.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "How much does a wellness retreat cost?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Wellness retreat costs vary widely by region, duration, and program type. Budget retreats typically run $500 to $1,500 per week (Southeast Asia, Central America). Mid-range retreats cost $1,500 to $3,500 per week (Europe, Mexico, US). Luxury retreats range from $3,500 to $10,000 per week, while ultra-luxury medical and longevity retreats can exceed $10,000 per week. These figures cover accommodation and programming — airfare, transfers, and personal expenses add 20 to 40% to the total. RetreatVault's real cost calculator on each retreat profile shows the true all-in cost.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "What should I pack for a wellness retreat?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "For a wellness retreat, pack comfortable activewear for yoga and fitness classes, layers for early morning and evening sessions, a reusable water bottle, a journal, any prescription medications, and basic toiletries (many retreats provide natural products). Leave alcohol, heavily processed snacks, and work devices at home — most wellness retreats encourage digital detox. Medical retreats may require bloodwork or health records in advance. Check with your specific retreat for any program-specific requirements like white clothing for certain meditation practices.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "How long should a wellness retreat be?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "The minimum effective duration for a wellness retreat is 5 to 7 days — enough time to detox from daily stress and begin absorbing the program. Research and guest data suggest 7 to 14 days produces the most lasting behavioral changes, especially for detox, stress recovery, and habit formation programs. Weekend retreats of 2 to 3 days can be useful for introduction experiences but rarely produce sustained transformation. For medical or longevity programs, 2 to 4 weeks is common. RetreatVault's 72-Hour Effect panel on each retreat profile explains what typically shifts in the first three days of each program.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "What is the difference between a yoga retreat and a wellness retreat?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "A yoga retreat focuses primarily on yoga practice — asana, pranayama, meditation, and sometimes yoga philosophy — often at an ashram or dedicated yoga center. A wellness retreat is broader, integrating multiple modalities: nutrition, fitness, spa treatments, sleep optimization, mental health support, and medical services alongside or instead of yoga. Wellness retreats typically offer more personalization and a wider menu of programs. Many wellness retreats include yoga as one component of a comprehensive program. RetreatVault scores both types across the same 15 categories so you can compare them objectively.",
+        },
+      },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify([jsonLd, websiteJsonLd, speakableJsonLd]),
+          __html: JSON.stringify([jsonLd, websiteJsonLd, speakableJsonLd, faqJsonLd]),
         }}
       />
       {/* ══════════════════════════════════════════════════
