@@ -105,16 +105,14 @@ function slugify(s: string): string {
 }
 
 const RETREATS_PER_SITEMAP = 1000;
+const RETREAT_SITEMAPS = 10; // ~9,400 retreats / 1,000 per sitemap
 
 /**
- * Sitemap index: ID 0 = static + blog + hub pages, ID 1+ = retreat chunks (~1000 each).
+ * Sitemap index: ID 0 = static + blog + hub pages, ID 1-10 = retreat chunks (~1000 each).
+ * Hardcoded count to avoid Supabase timeout during Vercel build.
  */
 export async function generateSitemaps() {
-  const count = await getRetreatCount();
-  const retreatChunks = Math.max(1, Math.ceil(count / RETREATS_PER_SITEMAP));
-  const ids = [{ id: 0 }];
-  for (let i = 1; i <= retreatChunks; i++) ids.push({ id: i });
-  return ids;
+  return Array.from({ length: RETREAT_SITEMAPS + 1 }, (_, i) => ({ id: i }));
 }
 
 export default async function sitemap({ id }: { id: number }): Promise<MetadataRoute.Sitemap> {

@@ -1,16 +1,17 @@
-import { generateSitemaps } from "../sitemap";
-
 const BASE_URL = "https://www.retreatvault.com";
+const RETREAT_SITEMAPS = 10; // ~9,400 retreats / 1,000 per sitemap
 
 export const revalidate = 3600;
 
 export async function GET() {
-  const ids = await generateSitemaps();
   const lastmod = new Date().toISOString();
+
+  // Sitemap 0 = static/hub pages, Sitemaps 1-10 = retreat chunks
+  const ids = Array.from({ length: RETREAT_SITEMAPS + 1 }, (_, i) => i);
 
   const entries = ids
     .map(
-      ({ id }) =>
+      (id) =>
         `  <sitemap>\n    <loc>${BASE_URL}/sitemap/${id}.xml</loc>\n    <lastmod>${lastmod}</lastmod>\n  </sitemap>`,
     )
     .join("\n");
