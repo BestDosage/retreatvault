@@ -138,10 +138,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   ))}
                 </div>
               </div>
+              {/* TODO: Add "Retreat Types" column here with top type links:
+                  <div className="md:col-span-2">
+                    <h4 className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Retreat Types</h4>
+                    <div className="mt-6 flex flex-col gap-3">
+                      <a href="/retreats/type/yoga">Yoga</a>
+                      <a href="/retreats/type/meditation">Meditation</a>
+                      <a href="/retreats/type/detox">Detox</a>
+                      <a href="/retreats/type/luxury">Luxury</a>
+                      <a href="/retreats/type/wellness">Wellness</a>
+                      <a href="/destinations">All Destinations</a>
+                    </div>
+                  </div>
+              */}
               <div className="md:col-span-2">
                 <h4 className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Company</h4>
                 <div className="mt-6 flex flex-col gap-3">
                   <a href="/methodology" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Methodology</a>
+                  <a href="/guides" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Guides</a>
                   <a href="/blog" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Journal</a>
                   <a href="/contact" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Contact</a>
                 </div>

@@ -11,6 +11,7 @@ import { WellnessRetreat } from "@/lib/types";
 import RetreatCard from "@/components/RetreatCard";
 import LocationStats from "@/components/LocationStats";
 import { deriveLocationStats } from "@/lib/location-intelligence";
+import { getCountrySEO, CountrySEOData } from "@/data/country-seo";
 
 export const revalidate = 86400;
 export const dynamicParams = true;
@@ -63,6 +64,149 @@ function BreadcrumbJsonLd({
   );
 }
 
+function FAQJsonLd({ seoData }: { seoData: CountrySEOData }) {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: seoData.faqItems.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  };
+  // Safe: data sourced from static country-seo.ts file, not user input
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
+function CountrySEOContent({
+  seoData,
+  countryName,
+  retreatCount,
+  priceStats,
+  typeCounts,
+}: {
+  seoData: CountrySEOData;
+  countryName: string;
+  retreatCount: number;
+  priceStats: { min: number; max: number; avg: number };
+  typeCounts: { type: string; count: number }[];
+}) {
+  return (
+    <>
+      {/* About section */}
+      <section className="border-b border-white/[0.06] px-6 py-16 md:px-12 lg:px-20">
+        <div className="mx-auto max-w-7xl">
+          <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Destination Guide</p>
+          <h2 className="mt-3 font-serif text-2xl font-light text-white">
+            Why {countryName} for a Wellness Retreat
+          </h2>
+          <div className="mt-6 max-w-3xl space-y-4">
+            {seoData.description.map((paragraph, i) => (
+              <p key={i} className="text-[15px] leading-relaxed text-dark-300">
+                {paragraph}
+              </p>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Cost + Best Time + Types grid */}
+      <section className="border-b border-white/[0.06] px-6 py-16 md:px-12 lg:px-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+            {/* Cost Overview */}
+            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-gold-500">Cost Overview</p>
+              <h3 className="mt-2 font-serif text-lg text-white">Budget Guide</h3>
+              <p className="mt-3 text-[14px] leading-relaxed text-dark-300">
+                {seoData.avgBudget}
+              </p>
+              {priceStats.avg > 0 && (
+                <div className="mt-4 border-t border-white/[0.06] pt-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[12px] text-dark-400">From data ({retreatCount} retreats)</span>
+                  </div>
+                  <div className="mt-2 flex items-baseline gap-2">
+                    <span className="font-serif text-2xl text-gold-400">${priceStats.avg.toLocaleString()}</span>
+                    <span className="text-[12px] text-dark-400">avg/night</span>
+                  </div>
+                  <p className="mt-1 text-[12px] text-dark-500">
+                    Range: ${priceStats.min.toLocaleString()} &ndash; ${priceStats.max.toLocaleString()}/night
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Best Time to Visit */}
+            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-gold-500">When to Go</p>
+              <h3 className="mt-2 font-serif text-lg text-white">Best Time to Visit</h3>
+              <p className="mt-3 text-[14px] leading-relaxed text-dark-300">
+                {seoData.bestTimeToVisit}
+              </p>
+            </div>
+
+            {/* Popular Retreat Types */}
+            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-gold-500">Retreat Types</p>
+              <h3 className="mt-2 font-serif text-lg text-white">Popular in {countryName}</h3>
+              <div className="mt-4 space-y-2">
+                {seoData.topTypes.map((type) => {
+                  const match = typeCounts.find(
+                    (t) => t.type.toLowerCase() === type.toLowerCase()
+                  );
+                  return (
+                    <div key={type} className="flex items-center justify-between">
+                      <span className="text-[14px] text-dark-300">{type}</span>
+                      {match && (
+                        <span className="text-[12px] text-dark-500">{match.count} retreats</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="border-b border-white/[0.06] px-6 py-16 md:px-12 lg:px-20">
+        <div className="mx-auto max-w-7xl">
+          <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Common Questions</p>
+          <h2 className="mt-3 font-serif text-2xl font-light text-white">
+            FAQ: Wellness Retreats in {countryName}
+          </h2>
+          <div className="mt-8 max-w-3xl space-y-6">
+            {seoData.faqItems.map((faq, i) => (
+              <details
+                key={i}
+                className="group rounded-xl border border-white/[0.06] bg-white/[0.02] open:bg-white/[0.04]"
+              >
+                <summary className="flex cursor-pointer items-center justify-between px-6 py-5 text-[15px] font-medium text-white transition-colors hover:text-gold-400">
+                  {faq.question}
+                  <span className="ml-4 text-dark-500 transition-transform group-open:rotate-45">+</span>
+                </summary>
+                <div className="px-6 pb-5">
+                  <p className="text-[14px] leading-relaxed text-dark-300">{faq.answer}</p>
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
 export default async function CountryPage({ params }: { params: Promise<Params> }) {
   const { country: countrySlug } = await params;
   const allRetreats = await getAllRetreats();
@@ -95,6 +239,30 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
   const stats = deriveLocationStats(countryRetreats);
   const useCards = countryRetreats.length <= 30;
 
+  // SEO content for top countries
+  const seoData = getCountrySEO(countrySlug);
+
+  // Derive price stats from actual data
+  const prices = countryRetreats
+    .map((r) => (r.price_min_per_night + r.price_max_per_night) / 2)
+    .filter((p) => p > 0);
+  const priceStats = {
+    min: prices.length > 0 ? Math.round(Math.min(...prices)) : 0,
+    max: prices.length > 0 ? Math.round(Math.max(...prices)) : 0,
+    avg: prices.length > 0 ? Math.round(prices.reduce((a, b) => a + b, 0) / prices.length) : 0,
+  };
+
+  // Derive type counts from actual data
+  const typeCountMap = new Map<string, number>();
+  for (const r of countryRetreats) {
+    for (const tag of [...(r.program_types || []), ...(r.specialty_tags || [])]) {
+      typeCountMap.set(tag, (typeCountMap.get(tag) || 0) + 1);
+    }
+  }
+  const typeCounts = Array.from(typeCountMap.entries())
+    .map(([type, count]) => ({ type, count }))
+    .sort((a, b) => b.count - a.count);
+
   return (
     <>
       <BreadcrumbJsonLd
@@ -103,6 +271,7 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
         regionSlug={regionSlug}
         regionName={regionName}
       />
+      {seoData && <FAQJsonLd seoData={seoData} />}
 
       <main className="min-h-screen bg-dark-950">
         {/* Hero */}
@@ -142,6 +311,17 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
             </div>
           </div>
         </section>
+
+        {/* SEO content sections (top 15 countries) */}
+        {seoData && (
+          <CountrySEOContent
+            seoData={seoData}
+            countryName={countryName}
+            retreatCount={countryRetreats.length}
+            priceStats={priceStats}
+            typeCounts={typeCounts}
+          />
+        )}
 
         {/* Main content */}
         {useCards ? (

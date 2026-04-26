@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { GUIDES } from "@/data/guides";
+import { EDITORIAL_GUIDES } from "@/data/editorial-guides";
 
 export const metadata: Metadata = {
   title: "Wellness Retreat Guides | Retreat Vault",
@@ -13,13 +14,43 @@ const CATEGORY_LABELS: Record<string, string> = {
   budget: "By Budget",
   goal: "By Wellness Goal",
   style: "By Experience",
+  // Editorial guide categories
+  cost: "Cost & Budget Guides",
+  comparison: "Comparison Guides",
+  planning: "Planning & Preparation",
+  timing: "Timing & Logistics",
 };
 
-const CATEGORY_ORDER = ["goal", "persona", "budget", "style"];
+const CATEGORY_ORDER = ["goal", "persona", "budget", "style", "cost", "comparison", "planning", "timing"];
+
+type GuideItem = {
+  slug: string;
+  title: string;
+  subtitle: string;
+  category: string;
+  isEditorial?: boolean;
+};
 
 export default function GuidesIndex() {
-  const grouped = new Map<string, typeof GUIDES>();
-  for (const guide of GUIDES) {
+  // Combine both guide types into a unified list
+  const allGuides: GuideItem[] = [
+    ...GUIDES.map((g) => ({
+      slug: g.slug,
+      title: g.title,
+      subtitle: g.subtitle,
+      category: g.category,
+    })),
+    ...EDITORIAL_GUIDES.map((g) => ({
+      slug: g.slug,
+      title: g.title,
+      subtitle: g.subtitle,
+      category: g.category,
+      isEditorial: true,
+    })),
+  ];
+
+  const grouped = new Map<string, GuideItem[]>();
+  for (const guide of allGuides) {
     const list = grouped.get(guide.category) || [];
     list.push(guide);
     grouped.set(guide.category, list);
@@ -58,6 +89,11 @@ export default function GuidesIndex() {
                       href={`/guides/${g.slug}`}
                       className="group flex flex-col rounded-2xl border border-white/[0.04] bg-white/[0.02] p-8 transition-all duration-300 hover:border-gold-500/20 hover:bg-white/[0.04]"
                     >
+                      {g.isEditorial && (
+                        <span className="mb-2 w-fit rounded-full bg-gold-500/10 px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-gold-400">
+                          Guide
+                        </span>
+                      )}
                       <span className="font-serif text-[18px] font-medium text-white group-hover:text-gold-300 transition-colors">
                         {g.title}
                       </span>
@@ -65,7 +101,7 @@ export default function GuidesIndex() {
                         {g.subtitle}
                       </span>
                       <span className="mt-auto pt-6 text-[11px] font-medium uppercase tracking-wider text-gold-500 group-hover:text-gold-400 transition-colors">
-                        View Guide →
+                        {g.isEditorial ? "Read Guide" : "View Guide"} →
                       </span>
                     </Link>
                   ))}
