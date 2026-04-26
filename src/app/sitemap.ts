@@ -2,9 +2,29 @@ import { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { blogPosts } from "@/data/blog-posts";
 import { GUIDES } from "@/data/guides";
+import { EDITORIAL_GUIDES } from "@/data/editorial-guides";
 
 const BASE_URL = "https://www.retreatvault.com";
 const FALLBACK_DATE = new Date("2026-04-01");
+
+/** All 15 retreat type slugs for /retreats/type/[type] pages. */
+export const RETREAT_TYPE_SLUGS = [
+  "yoga",
+  "meditation",
+  "detox",
+  "ayahuasca",
+  "silent",
+  "wellness",
+  "fitness",
+  "weight-loss",
+  "spiritual",
+  "ayurveda",
+  "plant-medicine",
+  "breathwork",
+  "fasting",
+  "couples",
+  "luxury",
+] as const;
 
 /** Direct Supabase client — bypasses unstable_cache to avoid 2MB limit. */
 function db() {
@@ -17,14 +37,22 @@ function db() {
 
 /** Fetch distinct countries from retreats table (lightweight). */
 async function getDistinctCountries(): Promise<string[]> {
-  const { data } = await db()
-    .from("retreats")
-    .select("country")
-    .neq("slug", "test")
-    .gt("wrd_score", 0);
-  if (!data) return [];
-  const countries = [...new Set(data.map((r: any) => r.country).filter(Boolean))].sort();
-  return countries as string[];
+  const all: string[] = [];
+  let offset = 0;
+  const PAGE = 1000;
+  for (;;) {
+    const { data } = await db()
+      .from("retreats")
+      .select("country")
+      .neq("slug", "test")
+      .gt("wrd_score", 0)
+      .range(offset, offset + PAGE - 1);
+    if (!data || data.length === 0) break;
+    for (const r of data) if (r.country) all.push(r.country);
+    if (data.length < PAGE) break;
+    offset += PAGE;
+  }
+  return [...new Set(all)].sort();
 }
 
 /** Fetch slugs + country + updated_at for one country (lightweight). */
@@ -51,13 +79,22 @@ async function getRetreatSlugsByCountry(country: string): Promise<{ slug: string
 
 /** Fetch distinct regions (lightweight). */
 async function getDistinctRegions(): Promise<string[]> {
-  const { data } = await db()
-    .from("retreats")
-    .select("region")
-    .neq("slug", "test")
-    .gt("wrd_score", 0);
-  if (!data) return [];
-  return [...new Set(data.map((r: any) => r.region).filter(Boolean))].sort() as string[];
+  const all: string[] = [];
+  let offset = 0;
+  const PAGE = 1000;
+  for (;;) {
+    const { data } = await db()
+      .from("retreats")
+      .select("region")
+      .neq("slug", "test")
+      .gt("wrd_score", 0)
+      .range(offset, offset + PAGE - 1);
+    if (!data || data.length === 0) break;
+    for (const r of data) if (r.region) all.push(r.region);
+    if (data.length < PAGE) break;
+    offset += PAGE;
+  }
+  return [...new Set(all)].sort();
 }
 
 function slugify(s: string): string {
@@ -79,12 +116,21 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
     const staticPages: MetadataRoute.Sitemap = [
       { url: BASE_URL, lastModified: new Date("2026-04-15"), changeFrequency: "weekly", priority: 1.0 },
       { url: `${BASE_URL}/retreats`, lastModified: new Date("2026-04-15"), changeFrequency: "weekly", priority: 0.9 },
+      { url: `${BASE_URL}/destinations`, lastModified: new Date("2026-04-26"), changeFrequency: "weekly", priority: 0.9 },
       { url: `${BASE_URL}/blog`, lastModified: new Date("2026-04-15"), changeFrequency: "daily", priority: 0.8 },
       { url: `${BASE_URL}/quiz`, lastModified: new Date("2026-04-01"), changeFrequency: "monthly", priority: 0.8 },
       { url: `${BASE_URL}/methodology`, lastModified: new Date("2026-03-15"), changeFrequency: "monthly", priority: 0.6 },
       { url: `${BASE_URL}/compare`, lastModified: new Date("2026-04-10"), changeFrequency: "weekly", priority: 0.7 },
       { url: `${BASE_URL}/contact`, lastModified: new Date("2026-01-15"), changeFrequency: "yearly", priority: 0.5 },
     ];
+
+    // Retreat type pages: /retreats/type/[type]
+    const typePages: MetadataRoute.Sitemap = RETREAT_TYPE_SLUGS.map((type) => ({
+      url: `${BASE_URL}/retreats/type/${type}`,
+      lastModified: new Date("2026-04-26"),
+      changeFrequency: "weekly" as const,
+      priority: 0.85,
+    }));
 
     const regions = await getDistinctRegions();
     const regionPages: MetadataRoute.Sitemap = regions.map((region) => ({
@@ -120,7 +166,14 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
       priority: 0.8,
     }));
 
-    return [...staticPages, ...regionPages, ...countryPages, ...blogPages, ...guideIndexPage, ...guidePages];
+    const editorialGuidePages: MetadataRoute.Sitemap = EDITORIAL_GUIDES.map((guide) => ({
+      url: `${BASE_URL}/guides/${guide.slug}`,
+      lastModified: new Date(guide.updatedDate),
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    }));
+
+    return [...staticPages, ...typePages, ...regionPages, ...countryPages, ...blogPages, ...guideIndexPage, ...guidePages, ...editorialGuidePages];
   }
 
   // Sub-sitemaps 1+: retreats by country
