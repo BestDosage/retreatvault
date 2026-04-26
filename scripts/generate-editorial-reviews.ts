@@ -5,17 +5,21 @@
  * analyst notes, location context, and competitive positioning.
  *
  * Usage:
- *   npx tsx scripts/generate-editorial-reviews.ts [limit] [--insert]
+ *   npx tsx scripts/generate-editorial-reviews.ts [options]
  *
- *   limit     Number of retreats to process (default: 10)
- *   --insert  Insert directly into Supabase as 'draft' (default: JSON only)
+ *   --batch-size=N    Number of retreats to process (default: 50)
+ *   --concurrency=N   Parallel API calls (default: 3)
+ *   --insert          Insert directly into Supabase as 'published'
+ *   --dry-run         Show which retreats would be processed, no API calls
+ *   --min-score=N     Only generate for retreats with wrd_score >= N (default: 0)
  *
  * Requires in .env.local:
  *   ANTHROPIC_API_KEY=sk-ant-...
  *   NEXT_PUBLIC_SUPABASE_URL=...
- *   SUPABASE_SERVICE_ROLE_KEY=... (or NEXT_PUBLIC_SUPABASE_ANON_KEY)
+ *   SUPABASE_SERVICE_ROLE_KEY=... (for --insert mode)
+ *   NEXT_PUBLIC_SUPABASE_ANON_KEY=... (fallback, read-only)
  *
- * Outputs: data/editorial-reviews.json
+ * Outputs: data/editorial-reviews.json (appended)
  */
 
 import { config } from "dotenv";
@@ -27,9 +31,10 @@ import * as fs from "fs";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  supabaseKey
 );
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -180,6 +185,39 @@ function findAlternatives(
   return alternatives.slice(0, 3);
 }
 
+/** Sleep helper for rate limiting */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/** Retry wrapper with exponential backoff */
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  label: string,
+  maxRetries = 3
+): Promise<T> {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (e: any) {
+      const isRateLimit = e.status === 429 || e.error?.type === "rate_limit_error";
+      const isOverloaded = e.status === 529 || e.error?.type === "overloaded_error";
+      const isRetryable = isRateLimit || isOverloaded || e.status >= 500;
+
+      if (!isRetryable || attempt === maxRetries) {
+        throw e;
+      }
+
+      // Exponential backoff: 2s, 8s, 32s for rate limits; 1s, 4s, 16s otherwise
+      const baseDelay = isRateLimit ? 2000 : 1000;
+      const delay = baseDelay * Math.pow(4, attempt - 1);
+      console.log(`  ${label}: ${e.message} — retrying in ${delay / 1000}s (attempt ${attempt}/${maxRetries})`);
+      await sleep(delay);
+    }
+  }
+  throw new Error("unreachable");
+}
+
 async function generateReviewWithClaude(
   retreat: any,
   allRetreats: any[]
@@ -229,11 +267,15 @@ OUTPUT FORMAT — respond with ONLY valid JSON, no markdown:
   "not_ideal_for": ["Specific guest type 1", "Specific guest type 2"]
 }`;
 
-  const response = await anthropic.messages.create({
-    model: "claude-haiku-4-5-20251001",
-    max_tokens: 1024,
-    messages: [{ role: "user", content: prompt }],
-  });
+  const response = await withRetry(
+    () =>
+      anthropic.messages.create({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 1024,
+        messages: [{ role: "user", content: prompt }],
+      }),
+    retreat.name
+  );
 
   const text =
     response.content[0].type === "text" ? response.content[0].text : "";
@@ -268,38 +310,59 @@ OUTPUT FORMAT — respond with ONLY valid JSON, no markdown:
 
 async function runConcurrent<T>(
   items: T[],
-  fn: (item: T) => Promise<any>,
-  concurrency: number
+  fn: (item: T, index: number) => Promise<any>,
+  concurrency: number,
+  delayMs: number
 ): Promise<void> {
   let index = 0;
   async function worker() {
     while (index < items.length) {
       const i = index++;
-      await fn(items[i]);
+      await fn(items[i], i);
+      // Rate limit: small delay between calls per worker
+      if (delayMs > 0) await sleep(delayMs);
     }
   }
   await Promise.all(Array.from({ length: concurrency }, () => worker()));
 }
 
+function parseArg(args: string[], prefix: string, defaultVal: number): number {
+  const arg = args.find((a) => a.startsWith(prefix));
+  return arg ? parseInt(arg.split("=")[1], 10) : defaultVal;
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const shouldInsert = args.includes("--insert");
-  const limit = parseInt(args.find((a) => !a.startsWith("--")) || "10", 10);
-  const concurrency = parseInt(args.find((a) => a.startsWith("--concurrency="))?.split("=")[1] || "5", 10);
+  const dryRun = args.includes("--dry-run");
+  const batchSize = parseArg(args, "--batch-size=", 50);
+  const concurrency = parseArg(args, "--concurrency=", 3);
+  const minScore = parseArg(args, "--min-score=", 0);
+  // Also support legacy positional limit arg
+  const positionalLimit = parseInt(args.find((a) => /^\d+$/.test(a)) || "0", 10);
+  const limit = positionalLimit > 0 ? positionalLimit : batchSize;
 
   if (!process.env.ANTHROPIC_API_KEY) {
     console.error("Missing ANTHROPIC_API_KEY in .env.local");
     process.exit(1);
   }
 
-  console.log(`Generating editorial reviews (limit: ${limit}, concurrency: ${concurrency})...`);
-  console.log(`Mode: ${shouldInsert ? "Generate + Insert as published" : "Generate JSON only"}\n`);
+  if (shouldInsert && !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.warn("WARNING: SUPABASE_SERVICE_ROLE_KEY not found. Using anon key — inserts may fail due to RLS.");
+    console.warn("Add SUPABASE_SERVICE_ROLE_KEY to .env.local for insert mode.\n");
+  }
+
+  console.log(`Editorial Review Generator`);
+  console.log(`  Batch size: ${limit}`);
+  console.log(`  Concurrency: ${concurrency}`);
+  console.log(`  Min score filter: ${minScore > 0 ? minScore : "none"}`);
+  console.log(`  Mode: ${dryRun ? "DRY RUN" : shouldInsert ? "Generate + Insert to Supabase" : "Generate JSON only"}\n`);
 
   // Fetch all retreats for context
   console.log("Fetching retreats...");
   const allRetreats: any[] = [];
   let offset = 0;
-  const batchSize = 1000;
+  const fetchBatch = 1000;
   while (true) {
     const { data, error } = await supabase
       .from("retreats")
@@ -307,12 +370,12 @@ async function main() {
       .gt("wrd_score", 0)
       .neq("slug", "test")
       .order("wrd_score", { ascending: false })
-      .range(offset, offset + batchSize - 1);
+      .range(offset, offset + fetchBatch - 1);
     if (error) { console.error("Fetch error:", error.message); process.exit(1); }
     if (!data || data.length === 0) break;
     allRetreats.push(...data);
     offset += data.length;
-    if (data.length < batchSize) break;
+    if (data.length < fetchBatch) break;
   }
   console.log(`Fetched ${allRetreats.length} total retreats`);
 
@@ -323,18 +386,36 @@ async function main() {
   const existingIds = new Set((existing || []).map((r: any) => r.retreat_id));
   console.log(`${existingIds.size} retreats already have reviews`);
 
-  // Filter to retreats needing reviews, apply limit
-  const needsReview = allRetreats.filter((r) => !existingIds.has(r.id)).slice(0, limit);
-  console.log(`Generating ${needsReview.length} new reviews\n`);
+  // Filter to retreats needing reviews, sorted by wrd_score DESC, apply limit
+  const needsReview = allRetreats
+    .filter((r) => !existingIds.has(r.id))
+    .filter((r) => minScore <= 0 || (parseFloat(r.wrd_score) || 0) >= minScore)
+    .slice(0, limit);
+
+  const totalRemaining = allRetreats.filter((r) => !existingIds.has(r.id)).length;
+
+  console.log(`Retreats still needing reviews: ${totalRemaining}`);
+  console.log(`Processing this batch: ${needsReview.length}\n`);
 
   if (needsReview.length === 0) {
     console.log("All retreats already have reviews!");
     return;
   }
 
-  // Generate and insert in batches
+  // Dry run: just show the list
+  if (dryRun) {
+    console.log("DRY RUN — would generate reviews for:");
+    for (const r of needsReview) {
+      console.log(`  ${parseFloat(r.wrd_score).toFixed(1)} — ${r.name} (${r.city}, ${r.country})`);
+    }
+    console.log(`\nEstimated cost: ~$${(needsReview.length * 0.002).toFixed(2)} (Haiku 4.5 at ~$0.002/review)`);
+    return;
+  }
+
+  // Generate reviews
   let completed = 0;
   let failed = 0;
+  const allResults: EditorialReview[] = [];
   const insertBatch: EditorialReview[] = [];
   const BATCH_INSERT_SIZE = 25;
 
@@ -353,15 +434,19 @@ async function main() {
       .from("retreat_editorial_reviews")
       .upsert(dbRows, { onConflict: "retreat_id" });
     if (error) console.error(`  DB insert error: ${error.message}`);
+    else console.log(`  Flushed ${rows.length} reviews to Supabase`);
   }
 
-  await runConcurrent(needsReview, async (retreat) => {
+  const startTime = Date.now();
+
+  await runConcurrent(needsReview, async (retreat, _idx) => {
     const idx = ++completed;
     const pct = Math.round((idx / needsReview.length) * 100);
     try {
       const review = await generateReviewWithClaude(retreat, allRetreats);
+      allResults.push(review);
       insertBatch.push(review);
-      console.log(`[${idx}/${needsReview.length}] ${pct}% — ${retreat.name} ✓`);
+      console.log(`[${idx}/${needsReview.length}] ${pct}% — ${retreat.name} (${parseFloat(retreat.wrd_score).toFixed(1)})`);
 
       // Flush batch to Supabase every BATCH_INSERT_SIZE
       if (shouldInsert && insertBatch.length >= BATCH_INSERT_SIZE) {
@@ -372,19 +457,39 @@ async function main() {
       failed++;
       console.log(`[${idx}/${needsReview.length}] ${pct}% — ${retreat.name} FAILED: ${e.message}`);
     }
-  }, concurrency);
+  }, concurrency, 200); // 200ms delay between calls per worker for rate limiting
 
-  // Flush remaining
+  // Flush remaining to Supabase
   if (shouldInsert && insertBatch.length > 0) {
     await insertRows(insertBatch);
   }
+
+  // Append to JSON file
+  const jsonPath = "data/editorial-reviews.json";
+  let existingJson: EditorialReview[] = [];
+  try {
+    existingJson = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
+  } catch { /* file doesn't exist or is invalid */ }
+
+  // Merge: update existing by retreat_id, add new
+  const mergedMap = new Map<string, EditorialReview>();
+  for (const r of existingJson) mergedMap.set(r.retreat_id, r);
+  for (const r of allResults) mergedMap.set(r.retreat_id, r);
+  const merged = Array.from(mergedMap.values());
+  fs.writeFileSync(jsonPath, JSON.stringify(merged, null, 2));
+
+  const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
 
   // Summary
   console.log("\n--- Summary ---");
   console.log(`Generated: ${completed - failed}`);
   console.log(`Failed: ${failed}`);
   console.log(`Already existed: ${existingIds.size}`);
-  console.log(`Total in database: ${existingIds.size + completed - failed}`);
+  console.log(`Total with reviews now: ${existingIds.size + completed - failed}`);
+  console.log(`Still remaining: ${totalRemaining - (completed - failed)}`);
+  console.log(`Time: ${elapsed}s`);
+  console.log(`JSON file: ${jsonPath} (${merged.length} total reviews)`);
+  console.log(`Est. cost this batch: ~$${((completed - failed) * 0.002).toFixed(2)}`);
 }
 
 main().catch(console.error);
