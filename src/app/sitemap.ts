@@ -55,26 +55,27 @@ async function getDistinctCountries(): Promise<string[]> {
   return [...new Set(all)].sort();
 }
 
-/** Fetch slugs + country + updated_at for one country (lightweight). */
-async function getRetreatSlugsByCountry(country: string): Promise<{ slug: string; updated_at: string | null }[]> {
-  const slugs: { slug: string; updated_at: string | null }[] = [];
-  let offset = 0;
-  const PAGE = 1000;
-  for (;;) {
-    const { data, error } = await db()
-      .from("retreats")
-      .select("slug, updated_at")
-      .eq("country", country)
-      .neq("slug", "test")
-      .gt("wrd_score", 0)
-      .order("slug")
-      .range(offset, offset + PAGE - 1);
-    if (error || !data || data.length === 0) break;
-    for (const r of data) if (r.slug) slugs.push({ slug: r.slug, updated_at: r.updated_at });
-    if (data.length < PAGE) break;
-    offset += PAGE;
-  }
-  return slugs;
+/** Fetch total retreat count. */
+async function getRetreatCount(): Promise<number> {
+  const { count } = await db()
+    .from("retreats")
+    .select("id", { count: "exact", head: true })
+    .neq("slug", "test")
+    .gt("wrd_score", 0);
+  return count ?? 0;
+}
+
+/** Fetch a page of retreat slugs ordered alphabetically. */
+async function getRetreatSlugsPage(offset: number, limit: number): Promise<{ slug: string; updated_at: string | null }[]> {
+  const { data } = await db()
+    .from("retreats")
+    .select("slug, updated_at")
+    .neq("slug", "test")
+    .gt("wrd_score", 0)
+    .order("slug")
+    .range(offset, offset + limit - 1);
+  if (!data) return [];
+  return data.filter((r: any) => r.slug).map((r: any) => ({ slug: r.slug, updated_at: r.updated_at }));
 }
 
 /** Fetch distinct regions (lightweight). */
@@ -101,13 +102,16 @@ function slugify(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
+const RETREATS_PER_SITEMAP = 1000;
+
 /**
- * Sitemap index: ID 0 = static + blog + hub pages, ID 1+ = one per country.
+ * Sitemap index: ID 0 = static + blog + hub pages, ID 1+ = retreat chunks (~1000 each).
  */
 export async function generateSitemaps() {
-  const countries = await getDistinctCountries();
+  const count = await getRetreatCount();
+  const retreatChunks = Math.max(1, Math.ceil(count / RETREATS_PER_SITEMAP));
   const ids = [{ id: 0 }];
-  countries.forEach((_, i) => ids.push({ id: i + 1 }));
+  for (let i = 1; i <= retreatChunks; i++) ids.push({ id: i });
   return ids;
 }
 
@@ -176,12 +180,9 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
     return [...staticPages, ...typePages, ...regionPages, ...countryPages, ...blogPages, ...guideIndexPage, ...guidePages, ...editorialGuidePages];
   }
 
-  // Sub-sitemaps 1+: retreats by country
-  const countries = await getDistinctCountries();
-  const country = countries[id - 1];
-  if (!country) return [];
-
-  const slugs = await getRetreatSlugsByCountry(country);
+  // Sub-sitemaps 1+: retreat chunks of ~1000
+  const offset = (id - 1) * RETREATS_PER_SITEMAP;
+  const slugs = await getRetreatSlugsPage(offset, RETREATS_PER_SITEMAP);
   return slugs.map((r) => ({
     url: `${BASE_URL}/retreats/${r.slug}`,
     lastModified: r.updated_at ? new Date(r.updated_at) : FALLBACK_DATE,
