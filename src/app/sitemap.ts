@@ -4,6 +4,8 @@ import { blogPosts } from "@/data/blog-posts";
 import { GUIDES } from "@/data/guides";
 import { EDITORIAL_GUIDES } from "@/data/editorial-guides";
 
+export const revalidate = 3600; // ISR — regenerate sitemaps hourly, not at build time
+
 const BASE_URL = "https://www.retreatvault.com";
 const FALLBACK_DATE = new Date("2026-04-01");
 
