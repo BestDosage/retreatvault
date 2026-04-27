@@ -93,8 +93,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <a href="/blog" className="hidden text-[11px] font-medium uppercase tracking-[0.2em] text-dark-400 transition-colors duration-500 hover:text-white lg:block">
                 Journal
               </a>
-              <a href="/retreats" className="btn-luxury !py-2.5 !px-6 !text-[9px]">
-                Explore
+              <a href="/quiz" className="btn-luxury !py-2.5 !px-6 !text-[9px]">
+                Take the Quiz
               </a>
             </div>
           </div>
@@ -138,19 +138,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   ))}
                 </div>
               </div>
-              {/* TODO: Add "Retreat Types" column here with top type links:
-                  <div className="md:col-span-2">
-                    <h4 className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Retreat Types</h4>
-                    <div className="mt-6 flex flex-col gap-3">
-                      <a href="/retreats/type/yoga">Yoga</a>
-                      <a href="/retreats/type/meditation">Meditation</a>
-                      <a href="/retreats/type/detox">Detox</a>
-                      <a href="/retreats/type/luxury">Luxury</a>
-                      <a href="/retreats/type/wellness">Wellness</a>
-                      <a href="/destinations">All Destinations</a>
-                    </div>
-                  </div>
-              */}
+              <div className="md:col-span-2">
+                <h4 className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Retreat Types</h4>
+                <div className="mt-6 flex flex-col gap-3">
+                  <a href="/retreats/type/yoga" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Yoga</a>
+                  <a href="/retreats/type/meditation" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Meditation</a>
+                  <a href="/retreats/type/detox" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Detox</a>
+                  <a href="/retreats/type/luxury" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Luxury</a>
+                  <a href="/retreats/type/wellness" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Wellness</a>
+                  <a href="/destinations" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">All Destinations</a>
+                </div>
+              </div>
               <div className="md:col-span-2">
                 <h4 className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Company</h4>
                 <div className="mt-6 flex flex-col gap-3">
@@ -158,6 +156,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <a href="/guides" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Guides</a>
                   <a href="/blog" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Journal</a>
                   <a href="/contact" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Contact</a>
+                  <a href="/quiz" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Quiz</a>
+                  <a href="/compare" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Compare</a>
                 </div>
               </div>
             </div>

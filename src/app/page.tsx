@@ -171,13 +171,13 @@ export default async function HomePage() {
           <AnimateIn delay={1.6} duration={0.8}>
             <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <a href="/retreats" className="btn-luxury">
-                Open the Vault
+                Browse All Retreats
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </a>
-              <a href="#how-it-works" className="btn-outline">
-                How We Score
+              <a href="/quiz" className="btn-outline">
+                Take the 2-Min Quiz
               </a>
             </div>
           </AnimateIn>

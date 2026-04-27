@@ -259,9 +259,26 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
                 </AnimateIn>
               </div>
 
-              <AnimateIn delay={0.5} direction="left">
-                <WrdScore score={retreat.wrd_score} size="xl" />
-              </AnimateIn>
+              <div className="flex flex-col items-end gap-4">
+                <AnimateIn delay={0.5} direction="left">
+                  <WrdScore score={retreat.wrd_score} size="xl" />
+                </AnimateIn>
+                {retreat.website_url && (
+                  <AnimateIn delay={0.6} direction="left">
+                    <a
+                      href={retreat.website_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-luxury !py-3 !px-8 !text-[10px]"
+                    >
+                      Visit Website
+                      <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                      </svg>
+                    </a>
+                  </AnimateIn>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -273,11 +290,11 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         {/* ═══ KEY STATS ═══ */}
         <StaggerContainer className="-mt-1 mb-20 grid grid-cols-2 gap-4 sm:grid-cols-4" staggerDelay={0.08}>
           {[
-            { label: "Price Range", value: `$${retreat.price_min_per_night.toLocaleString()}\u2013$${retreat.price_max_per_night.toLocaleString()}`, sub: "per night" },
-            { label: "Google Rating", value: retreat.google_rating.toString(), sub: `${retreat.google_review_count} reviews`, star: true },
-            { label: "Minimum Stay", value: `${retreat.minimum_stay_nights} night${retreat.minimum_stay_nights > 1 ? "s" : ""}`, sub: retreat.pricing_model.replace(/_/g, " ") },
-            { label: "Property", value: retreat.property_size.charAt(0).toUpperCase() + retreat.property_size.slice(1), sub: `Max ${retreat.max_guests} guests` },
-          ].map((stat) => (
+            retreat.price_min_per_night > 0 ? { label: "Price Range", value: `$${retreat.price_min_per_night.toLocaleString()}\u2013$${retreat.price_max_per_night.toLocaleString()}`, sub: "per night" } : null,
+            retreat.google_rating > 0 ? { label: "Google Rating", value: retreat.google_rating.toString(), sub: `${retreat.google_review_count} reviews`, star: true } : null,
+            { label: "Minimum Stay", value: `${retreat.minimum_stay_nights || 1} night${(retreat.minimum_stay_nights || 1) > 1 ? "s" : ""}`, sub: retreat.pricing_model?.replace(/_/g, " ") || "per stay" },
+            retreat.max_guests > 0 ? { label: "Property", value: retreat.property_size.charAt(0).toUpperCase() + retreat.property_size.slice(1), sub: `Max ${retreat.max_guests} guests` } : null,
+          ].filter(Boolean).map((stat) => (
             <StaggerItem key={stat.label}>
               <div className="rounded-2xl border border-white/[0.04] bg-white/[0.02] p-6">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-dark-500">{stat.label}</div>
