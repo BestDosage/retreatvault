@@ -55,6 +55,7 @@ import VaultVsGuest from "@/components/VaultVsGuest";
 import RealCostCalculator from "@/components/RealCostCalculator";
 import { BestForChips } from "@/components/BestForTags";
 import StickyMobileBar from "@/components/StickyMobileBar";
+import EmailCapture from "@/components/EmailCapture";
 import {
   LongevityPanel, DigitalDetoxPanel, RoiCalculator,
   SleepSciencePanel, IdealGuestCard, SeasonalChart,
@@ -661,6 +662,16 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
               </div>
             </div>
           </div>
+        </AnimateIn>
+
+        {/* ═══ EMAIL CAPTURE ═══ */}
+        <AnimateIn className="mb-20">
+          <EmailCapture
+            source="retreat_page"
+            sourceDetail={retreat.slug}
+            headline="Get Retreats Like This in Your Inbox"
+            subtext="We'll send you underpriced retreats similar to this one. Plus new scores and insider intel."
+          />
         </AnimateIn>
 
         {/* ═══ SIMILAR RETREATS ═══ */}

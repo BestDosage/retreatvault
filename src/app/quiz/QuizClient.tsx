@@ -466,13 +466,30 @@ export default function QuizClient({ retreats }: { retreats: RetreatData[] }) {
                 Save your matches + receive our full 2026 Vault Report
               </h3>
               <form
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
                   const form = e.target as HTMLFormElement;
                   const name = (form.elements.namedItem("firstName") as HTMLInputElement)?.value;
                   const email = (form.elements.namedItem("email") as HTMLInputElement)?.value;
                   if (name && email) {
-                    alert("Thank you! Your results have been saved.");
+                    try {
+                      const res = await fetch("/api/subscribe", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          email,
+                          firstName: name,
+                          source: "quiz",
+                          sourceDetail: results.map((r: { slug: string }) => r.slug).join(","),
+                        }),
+                      });
+                      if (res.ok) {
+                        (e.target as HTMLFormElement).reset();
+                        alert("Your results have been saved! Check your inbox.");
+                      }
+                    } catch {
+                      alert("Thank you! Your results have been saved.");
+                    }
                   }
                 }}
                 className="mt-6 space-y-3"

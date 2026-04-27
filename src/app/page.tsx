@@ -15,6 +15,7 @@ import { getAllRetreats, getRegions } from "@/lib/data";
 import AnimateIn, { StaggerContainer, StaggerItem, Counter, TextReveal, Marquee } from "@/components/AnimateIn";
 import TierBadge from "@/components/TierBadge";
 import PressStrip from "@/components/PressStrip";
+import EmailCapture from "@/components/EmailCapture";
 
 // Below-the-fold — dynamically import so it stays out of the initial bundle.
 const HorizontalScroll = dynamic(() => import("@/components/HorizontalScroll"), {
@@ -516,6 +517,13 @@ export default async function HomePage() {
               </StaggerContainer>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ═══ EMAIL CAPTURE ═══ */}
+      <section className="py-20">
+        <div className="mx-auto max-w-xl px-6 sm:px-10">
+          <EmailCapture source="homepage" />
         </div>
       </section>
 

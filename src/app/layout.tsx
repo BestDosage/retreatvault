@@ -6,6 +6,7 @@ import CompareProvider from "@/components/CompareProvider";
 import CompareBar from "@/components/CompareBar";
 import PressStrip from "@/components/PressStrip";
 import MobileNav from "@/components/MobileNav";
+import EmailCapture from "@/components/EmailCapture";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -126,6 +127,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   15 weighted categories. Zero bias. Built by an analytical chemist
                   who demands precision from every score.
                 </p>
+                <div className="mt-6 max-w-sm">
+                  <p className="mb-3 text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Weekly Vault Report</p>
+                  <EmailCapture source="footer" variant="footer" />
+                </div>
               </div>
               <div className="md:col-span-3 md:col-start-7">
                 <h4 className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Regions</h4>
