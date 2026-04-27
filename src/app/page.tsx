@@ -14,6 +14,7 @@ import dynamic from "next/dynamic";
 import { getAllRetreats, getRegions } from "@/lib/data";
 import AnimateIn, { StaggerContainer, StaggerItem, Counter, TextReveal, Marquee } from "@/components/AnimateIn";
 import TierBadge from "@/components/TierBadge";
+import PressStrip from "@/components/PressStrip";
 
 // Below-the-fold — dynamically import so it stays out of the initial bundle.
 const HorizontalScroll = dynamic(() => import("@/components/HorizontalScroll"), {
@@ -187,6 +188,9 @@ export default async function HomePage() {
           <div className="h-12 w-px bg-gradient-to-b from-gold-400/30 to-transparent" />
         </div>
       </section>
+
+      {/* ═══ PRESS STRIP — social proof right below hero ═══ */}
+      <PressStrip />
 
       {/* ══════════════════════════════════════════════════
           2. QUIZ CTA — right below hero

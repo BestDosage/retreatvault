@@ -54,6 +54,7 @@ const RadarChart = dynamic(() => import("@/components/RadarChart"), { ssr: false
 import VaultVsGuest from "@/components/VaultVsGuest";
 import RealCostCalculator from "@/components/RealCostCalculator";
 import { BestForChips } from "@/components/BestForTags";
+import StickyMobileBar from "@/components/StickyMobileBar";
 import {
   LongevityPanel, DigitalDetoxPanel, RoiCalculator,
   SleepSciencePanel, IdealGuestCard, SeasonalChart,
@@ -180,7 +181,14 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-16 md:pb-0">
+      <StickyMobileBar
+        retreatName={retreat.name}
+        websiteUrl={retreat.website_url || null}
+        score={retreat.wrd_score}
+        priceMin={retreat.price_min_per_night}
+        priceMax={retreat.price_max_per_night}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
@@ -294,7 +302,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
             retreat.google_rating > 0 ? { label: "Google Rating", value: retreat.google_rating.toString(), sub: `${retreat.google_review_count} reviews`, star: true } : null,
             { label: "Minimum Stay", value: `${retreat.minimum_stay_nights || 1} night${(retreat.minimum_stay_nights || 1) > 1 ? "s" : ""}`, sub: retreat.pricing_model?.replace(/_/g, " ") || "per stay" },
             retreat.max_guests > 0 ? { label: "Property", value: retreat.property_size.charAt(0).toUpperCase() + retreat.property_size.slice(1), sub: `Max ${retreat.max_guests} guests` } : null,
-          ].filter(Boolean).map((stat) => (
+          ].filter((s): s is NonNullable<typeof s> => s !== null).map((stat) => (
             <StaggerItem key={stat.label}>
               <div className="rounded-2xl border border-white/[0.04] bg-white/[0.02] p-6">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-dark-500">{stat.label}</div>

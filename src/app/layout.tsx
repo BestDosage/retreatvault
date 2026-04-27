@@ -5,6 +5,7 @@ import "./globals.css";
 import CompareProvider from "@/components/CompareProvider";
 import CompareBar from "@/components/CompareBar";
 import PressStrip from "@/components/PressStrip";
+import MobileNav from "@/components/MobileNav";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -93,9 +94,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <a href="/blog" className="hidden text-[11px] font-medium uppercase tracking-[0.2em] text-dark-400 transition-colors duration-500 hover:text-white lg:block">
                 Journal
               </a>
-              <a href="/quiz" className="btn-luxury !py-2.5 !px-6 !text-[9px]">
+              <a href="/quiz" className="hidden sm:inline-flex btn-luxury !py-2.5 !px-6 !text-[9px]">
                 Take the Quiz
               </a>
+              <MobileNav />
             </div>
           </div>
           {/* Fade line */}
@@ -104,9 +106,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <main>{children}</main>
         <CompareBar />
-
-        {/* ═══ PRESS STRIP ═══ */}
-        <PressStrip />
 
         {/* ═══ FOOTER ═══ */}
         <footer className="border-t border-white/[0.04] bg-dark-950">
