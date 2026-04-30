@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { WellnessRetreat } from "@/lib/types";
 import { getRetreatImage } from "@/lib/retreat-images";
 import TierBadge from "./TierBadge";
@@ -21,9 +22,9 @@ export default function RetreatCard({ retreat }: { retreat: WellnessRetreat }) {
   };
 
   return (
-    <div
-      className="group block cursor-pointer transition-transform duration-500 ease-out hover:-translate-y-1.5"
-      onClick={() => (window.location.href = `/retreats/${retreat.slug}`)}
+    <Link
+      href={`/retreats/${retreat.slug}`}
+      className="group block transition-transform duration-500 ease-out hover:-translate-y-1.5"
     >
       {/* Image */}
       <div className="relative aspect-[4/5] overflow-hidden rounded-2xl">
@@ -101,6 +102,6 @@ export default function RetreatCard({ retreat }: { retreat: WellnessRetreat }) {
           <AddToCompareButton retreat={{ id: retreat.id, slug: retreat.slug, name: retreat.name, hero_image_url: retreat.hero_image_url, wrd_score: retreat.wrd_score }} />
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

@@ -30,7 +30,7 @@
 
 * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
-html { scroll-behavior: auto; /* lenis handles this */ }
+html { scroll-behavior: smooth; }
 
 body {
   font-family: var(--font-family-sans);
@@ -41,15 +41,11 @@ body {
 
 ::selection { background: rgba(212,175,55,0.25); color: #fff; }
 
-::-webkit-scrollbar { width: 0px; }
-
-/* ═══ GOLD GRADIENT TEXT ═══ */
-.text-gold-shine {
-  background: linear-gradient(135deg, #b8952a 0%, #f2d896 35%, #d4af37 65%, #c9a96e 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.15); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(212,175,55,0.3); }
+* { scrollbar-width: thin; scrollbar-color: rgba(212,175,55,0.15) transparent; }
 
 /* ═══ PURE-CSS ANIMATIONS (replaces framer-motion above-the-fold) ═══ */
 @keyframes rv-fade-up {
@@ -78,7 +74,6 @@ body {
   white-space: nowrap;
   width: max-content;
   animation: rv-marquee 45s linear infinite;
-  will-change: transform;
 }
 .rv-stagger > * {
   opacity: 0;
@@ -149,6 +144,24 @@ body {
   background-position: -50% 0;
 }
 
+/* Size variants — eliminates Tailwind ! overrides */
+.btn-luxury-sm {
+  padding: 0.625rem 1.5rem;
+  font-size: 0.5625rem;
+}
+.btn-luxury-md {
+  padding: 0.75rem 2rem;
+  font-size: 0.625rem;
+}
+.btn-luxury-lg {
+  padding: 1.25rem 2.5rem;
+  font-size: 0.6875rem;
+}
+.btn-luxury-full {
+  width: 100%;
+  justify-content: center;
+}
+
 /* ═══ OUTLINE BUTTON ═══ */
 .btn-outline {
   display: inline-flex;
@@ -163,6 +176,10 @@ body {
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 100px;
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-outline-sm {
+  padding: 0.625rem 1.5rem;
+  font-size: 0.625rem;
 }
 .btn-outline:hover {
   color: #fff;

@@ -61,7 +61,7 @@ export default function CompareBar() {
               Clear
             </button>
             {items.length >= 2 && (
-              <a href={compareUrl} className="btn-luxury !py-2.5 !px-6 !text-[9px]">
+              <a href={compareUrl} className="btn-luxury btn-luxury-sm">
                 <span className="sm:hidden">Compare</span>
                 <span className="hidden sm:inline">Compare Now</span>
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

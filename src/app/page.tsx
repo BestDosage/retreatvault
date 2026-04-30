@@ -128,7 +128,7 @@ export default async function HomePage() {
       {/* ══════════════════════════════════════════════════
           1. HERO
           ══════════════════════════════════════════════════ */}
-      <section className="relative flex h-screen min-h-[750px] flex-col items-center justify-center overflow-hidden">
+      <section className="relative flex min-h-[100dvh] min-h-[750px] flex-col items-center justify-center overflow-hidden">
         <Image
           src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?fit=crop"
           alt=""
@@ -232,7 +232,7 @@ export default async function HomePage() {
                   </p>
                 </div>
                 <div className="text-center lg:text-right">
-                  <a href="/quiz" className="btn-luxury !px-10 !py-5 !text-[11px]">
+                  <a href="/quiz" className="btn-luxury btn-luxury-lg">
                     Take the Quiz
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -281,7 +281,7 @@ export default async function HomePage() {
         <HorizontalScroll retreats={featured} />
 
         <div className="mt-10 text-center sm:hidden">
-          <a href="/retreats" className="btn-outline !text-[10px]">View All Retreats</a>
+          <a href="/retreats" className="btn-outline btn-outline-sm">View All Retreats</a>
         </div>
       </section>
 

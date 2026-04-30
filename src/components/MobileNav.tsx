@@ -99,7 +99,7 @@ export default function MobileNav() {
               <a
                 href="/quiz"
                 onClick={() => setOpen(false)}
-                className="btn-luxury w-full justify-center !py-4 !text-[11px]"
+                className="btn-luxury btn-luxury-lg btn-luxury-full"
               >
                 Find Your Perfect Retreat
               </a>

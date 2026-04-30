@@ -98,7 +98,7 @@ export default function ContactPage() {
                     placeholder="How can we help?"
                   />
                 </div>
-                <button type="submit" className="btn-luxury w-full !py-3 !text-[10px]">
+                <button type="submit" className="btn-luxury btn-luxury-md btn-luxury-full">
                   Send Message
                 </button>
               </form>

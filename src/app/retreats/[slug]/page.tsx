@@ -278,7 +278,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
                       href={retreat.website_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn-luxury !py-3 !px-8 !text-[10px]"
+                      className="btn-luxury btn-luxury-md"
                     >
                       Visit Website
                       <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

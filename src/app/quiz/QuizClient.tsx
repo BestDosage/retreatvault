@@ -506,7 +506,7 @@ export default function QuizClient({ retreats }: { retreats: RetreatData[] }) {
                   placeholder="Email address"
                   className="w-full rounded-xl border border-white/[0.08] bg-dark-900 px-4 py-3 text-[13px] text-white placeholder-dark-500 outline-none transition-colors focus:border-gold-400/30"
                 />
-                <button type="submit" className="btn-luxury w-full !py-3 !text-[10px]">
+                <button type="submit" className="btn-luxury btn-luxury-md btn-luxury-full">
                   Send My Results
                 </button>
               </form>
@@ -633,7 +633,7 @@ export default function QuizClient({ retreats }: { retreats: RetreatData[] }) {
           <button
             onClick={handleNext}
             disabled={!activeValue}
-            className={`btn-luxury !py-3 !px-8 !text-[10px] transition-all ${
+            className={`btn-luxury btn-luxury-md transition-all ${
               activeValue ? "opacity-100" : "opacity-30 cursor-not-allowed"
             }`}
           >

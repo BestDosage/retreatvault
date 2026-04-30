@@ -105,7 +105,7 @@ export default function EmailCapture({
         <button
           type="submit"
           disabled={status === "loading"}
-          className="btn-luxury w-full !py-3 !text-[10px] disabled:opacity-50"
+          className="btn-luxury btn-luxury-md btn-luxury-full disabled:opacity-50"
         >
           {status === "loading" ? "Subscribing..." : "Get the Vault Report"}
         </button>

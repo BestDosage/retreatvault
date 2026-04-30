@@ -95,7 +95,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <a href="/blog" className="hidden text-[11px] font-medium uppercase tracking-[0.2em] text-dark-400 transition-colors duration-500 hover:text-white lg:block">
                 Journal
               </a>
-              <a href="/quiz" className="hidden sm:inline-flex btn-luxury !py-2.5 !px-6 !text-[9px]">
+              <a href="/quiz" className="hidden sm:inline-flex btn-luxury btn-luxury-sm">
                 Take the Quiz
               </a>
               <MobileNav />
