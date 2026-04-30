@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { getAllRetreats, getRegions } from "@/lib/data";
+import { getFeaturedRetreats, getRegionCounts } from "@/lib/data";
 import AnimateIn, { StaggerContainer, StaggerItem, Counter, TextReveal, Marquee } from "@/components/AnimateIn";
 import TierBadge from "@/components/TierBadge";
 import PressStrip from "@/components/PressStrip";
@@ -23,9 +23,9 @@ const HorizontalScroll = dynamic(() => import("@/components/HorizontalScroll"), 
 });
 
 export default async function HomePage() {
-  const retreats = await getAllRetreats();
+  const retreats = await getFeaturedRetreats(12);
   const featured = retreats.slice(0, 8);
-  const regions = await getRegions();
+  const regions = await getRegionCounts();
   const topRetreat = retreats[0];
 
   const jsonLd = {

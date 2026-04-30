@@ -351,6 +351,38 @@ export async function getRegions(): Promise<{ name: string; count: number }[]> {
     .sort((a, b) => b.count - a.count);
 }
 
+/**
+ * Lightweight homepage queries — avoid loading all 9,400 retreats.
+ * These run direct Supabase queries with LIMIT to stay under timeout.
+ */
+export async function getFeaturedRetreats(limit = 10): Promise<WellnessRetreat[]> {
+  const { data, error } = await supabase
+    .from("retreats")
+    .select("*")
+    .order("wrd_score", { ascending: false })
+    .limit(limit);
+  if (error) {
+    console.error("getFeaturedRetreats error:", error.message);
+    return [];
+  }
+  return (data || []).map(mapRow);
+}
+
+export async function getRegionCounts(): Promise<{ name: string; count: number }[]> {
+  const validRegions = ["USA", "Europe", "Canada", "Mexico", "Asia"];
+  const results: { name: string; count: number }[] = [];
+  for (const region of validRegions) {
+    const { count, error } = await supabase
+      .from("retreats")
+      .select("id", { count: "exact", head: true })
+      .ilike("region", region);
+    if (!error && count) {
+      results.push({ name: region, count });
+    }
+  }
+  return results.sort((a, b) => b.count - a.count);
+}
+
 // Caches for related data — fetch all once, look up per retreat
 let _videosCache: Map<string, { video_id: string; title: string; channel_name: string; thumbnail_url: string }[]> | null = null;
 let _awardsCache: Map<string, { name: string; year: number; issuing_body: string; url: string }[]> | null = null;
