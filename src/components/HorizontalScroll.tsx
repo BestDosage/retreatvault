@@ -7,7 +7,7 @@ import TierBadge from "./TierBadge";
 export default function HorizontalScroll({ retreats }: { retreats: WellnessRetreat[] }) {
   return (
     <div className="relative">
-      <div className="flex gap-6 overflow-x-auto scroll-snap-x px-6 pb-4 sm:px-10 lg:px-16" style={{ scrollbarWidth: "none" }}>
+      <div className="flex gap-6 overflow-x-auto px-6 pb-4 sm:px-10 lg:px-16" style={{ scrollbarWidth: "none", overscrollBehaviorX: "contain" }}>
         {retreats.map((retreat, i) => (
           <motion.a
             key={retreat.id}

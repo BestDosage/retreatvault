@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 
-// Cache the homepage as static — refresh once per hour
+// ISR — render on first request (not at build time where Supabase times out),
+// then cache for 1 hour. The `dynamic = "force-dynamic"` at build time +
+// `revalidate` at runtime gives us ISR without build-time static generation.
 export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Best Wellness Retreats 2026 — Rated & Ranked | RetreatVault",
@@ -10,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 import Image from "next/image";
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 import { getFeaturedRetreats, getRegionCounts, getTopRetreatPerRegion } from "@/lib/data";
 import AnimateIn, { StaggerContainer, StaggerItem, Counter, TextReveal, Marquee } from "@/components/AnimateIn";
 import TierBadge from "@/components/TierBadge";
@@ -18,7 +21,7 @@ import PressStrip from "@/components/PressStrip";
 import EmailCapture from "@/components/EmailCapture";
 
 // Below-the-fold — dynamically import so it stays out of the initial bundle.
-const HorizontalScroll = dynamic(() => import("@/components/HorizontalScroll"), {
+const HorizontalScroll = nextDynamic(() => import("@/components/HorizontalScroll"), {
   loading: () => <div className="h-[480px]" />,
 });
 
