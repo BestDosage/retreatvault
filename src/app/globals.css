@@ -30,7 +30,7 @@
 
 * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: auto; }
 
 body {
   font-family: var(--font-family-sans);
@@ -189,7 +189,7 @@ body {
 
 /* ═══ HORIZONTAL SCROLL SNAP ═══ */
 .scroll-snap-x {
-  scroll-snap-type: x mandatory;
+  scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
 }
 .scroll-snap-x > * {
