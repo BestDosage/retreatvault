@@ -383,6 +383,25 @@ export async function getRegionCounts(): Promise<{ name: string; count: number }
   return results.sort((a, b) => b.count - a.count);
 }
 
+export async function getTopRetreatPerRegion(): Promise<Record<string, WellnessRetreat>> {
+  const validRegions = ["USA", "Europe", "Canada", "Mexico", "Asia"];
+  const results: Record<string, WellnessRetreat> = {};
+  await Promise.all(
+    validRegions.map(async (region) => {
+      const { data, error } = await supabase
+        .from("retreats")
+        .select("*")
+        .ilike("region", region)
+        .order("wrd_score", { ascending: false })
+        .limit(1);
+      if (!error && data && data.length > 0) {
+        results[region] = mapRow(data[0]);
+      }
+    })
+  );
+  return results;
+}
+
 // Caches for related data — fetch all once, look up per retreat
 let _videosCache: Map<string, { video_id: string; title: string; channel_name: string; thumbnail_url: string }[]> | null = null;
 let _awardsCache: Map<string, { name: string; year: number; issuing_body: string; url: string }[]> | null = null;

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { getFeaturedRetreats, getRegionCounts } from "@/lib/data";
+import { getFeaturedRetreats, getRegionCounts, getTopRetreatPerRegion } from "@/lib/data";
 import AnimateIn, { StaggerContainer, StaggerItem, Counter, TextReveal, Marquee } from "@/components/AnimateIn";
 import TierBadge from "@/components/TierBadge";
 import PressStrip from "@/components/PressStrip";
@@ -23,9 +23,12 @@ const HorizontalScroll = dynamic(() => import("@/components/HorizontalScroll"), 
 });
 
 export default async function HomePage() {
-  const retreats = await getFeaturedRetreats(12);
+  const [retreats, regions, topByRegion] = await Promise.all([
+    getFeaturedRetreats(12),
+    getRegionCounts(),
+    getTopRetreatPerRegion(),
+  ]);
   const featured = retreats.slice(0, 8);
-  const regions = await getRegionCounts();
   const topRetreat = retreats[0];
 
   const jsonLd = {
@@ -463,10 +466,10 @@ export default async function HomePage() {
             <div className="lg:col-span-7">
               <StaggerContainer className="space-y-4" staggerDelay={0.1}>
                 {regions.map((region) => {
-                  const regionRetreats = retreats.filter((r) => r.region === region.name);
-                  const topScore = regionRetreats[0]?.wrd_score || 0;
-                  const topName = regionRetreats[0]?.name || "";
-                  const topImage = regionRetreats[0]?.hero_image_url;
+                  const topInRegion = topByRegion[region.name];
+                  const topScore = topInRegion?.wrd_score || 0;
+                  const topName = topInRegion?.name || "";
+                  const topImage = topInRegion?.hero_image_url;
                   return (
                     <StaggerItem key={region.name}>
                       <a
