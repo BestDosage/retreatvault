@@ -167,6 +167,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <div className="mt-5 flex flex-col gap-3">
                   <a href="/methodology" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Methodology</a>
                   <a href="/guides" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Guides</a>
+                  <a href="/science" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Science</a>
                   <a href="/blog" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Journal</a>
                   <a href="/contact" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Contact</a>
                   <a href="/quiz" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Quiz</a>
