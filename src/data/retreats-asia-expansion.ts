@@ -41,7 +41,7 @@ export const asiaExpansionRetreats: WellnessRetreat[] = [
     id: "101",
     slug: "chiva-som-hua-hin",
     name: "Chiva-Som International Health Resort",
-    subtitle: "Legendary destination spa and wellness pioneer on the Gulf of Thailand",
+    subtitle: "Destination spa and wellness resort on the Gulf of Thailand, open since 1995",
     website_url: "https://chivasom.com",
     booking_url: "https://chivasom.com/reservations",
     country: "Thailand",

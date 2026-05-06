@@ -34,7 +34,7 @@ export default function ContactPage() {
               Contact Us
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-[14px] leading-relaxed text-dark-400">
-              RetreatVault is a property of BestDosage LLC &mdash; a wellness company building data-driven
+              RetreatVault is a property of BestDosage LLC &mdash; a wellness company building independent
               tools and content across the wellness industry. We&rsquo;d love to hear from you.
             </p>
           </div>
@@ -147,7 +147,7 @@ export default function ContactPage() {
                 <h3 className="mt-3 font-serif text-lg font-light text-white">BestDosage LLC</h3>
                 <p className="mt-2 text-[12px] leading-relaxed text-dark-400">
                   RetreatVault is built and operated by BestDosage LLC, a wellness company creating
-                  data-driven tools, content, and resources across the global wellness industry.
+                  independent tools, content, and resources across the global wellness industry.
                   Our mission: help people make smarter decisions about their health and wellbeing.
                 </p>
                 <div className="mt-3 flex items-center gap-4">

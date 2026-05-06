@@ -539,8 +539,8 @@ export default async function HomePage() {
       <section className="border-t border-white/[0.06] px-6 py-20 md:px-12 lg:px-20">
         <div className="mx-auto max-w-7xl">
           <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Retreat Matchmaker</p>
-          <h2 className="mt-3 font-serif text-3xl font-light text-white md:text-4xl">Find Your Perfect Retreat</h2>
-          <p className="mt-4 text-[14px] text-dark-400">Data-driven guides filtered by your goals, budget, and travel style</p>
+          <h2 className="mt-3 font-serif text-3xl font-light text-white md:text-4xl">Find your retreat</h2>
+          <p className="mt-4 text-[14px] text-dark-400">Guides filtered by goals, budget, and travel style</p>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {[
               { title: "Burnout Recovery", slug: "best-retreats-for-burnout-recovery" },

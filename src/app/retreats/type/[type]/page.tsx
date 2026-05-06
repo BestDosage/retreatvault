@@ -608,7 +608,7 @@ export default async function RetreatTypePage({ params }: { params: Promise<Para
                   Wellness Retreat Guides
                 </p>
                 <p className="mt-1 text-[13px] text-dark-400">
-                  Data-driven guides by goal, budget, and style
+                  Guides by goal, budget, and style
                 </p>
               </a>
               <a

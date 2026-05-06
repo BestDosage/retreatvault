@@ -5,7 +5,7 @@ import { EDITORIAL_GUIDES } from "@/data/editorial-guides";
 
 export const metadata: Metadata = {
   title: "Wellness Retreat Guides | Retreat Vault",
-  description: "Data-driven guides to finding your perfect wellness retreat. Filtered by goal, budget, travel style, and personality — not marketing hype.",
+  description: "Guides to finding your perfect wellness retreat. Filtered by goal, budget, travel style, and personality — not marketing hype.",
   alternates: { canonical: "https://www.retreatvault.com/guides" },
 };
 

@@ -952,7 +952,7 @@ export const retreats: WellnessRetreat[] = [
     id: "18",
     slug: "kamalaya-koh-samui",
     name: "Kamalaya Koh Samui",
-    subtitle: "Award-winning holistic sanctuary built around a monk's cave in Thailand",
+    subtitle: "Holistic wellness sanctuary built around a monk's cave on Koh Samui",
     website_url: "https://kamalaya.com",
     booking_url: "https://kamalaya.com/book",
     country: "Thailand",
