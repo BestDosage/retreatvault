@@ -1,6 +1,6 @@
 // scripts/google-reviews-scraper/scraper.ts
 
-import { chromium, type Browser, type Page } from "rebrowser-playwright";
+import { chromium, type Browser, type Page } from "playwright";
 import { SELECTORS } from "./selectors";
 import { humanDelay, RateLimiter } from "./rate-limiter";
 import type { GoogleReview, ScrapeResult, ScrapeOptions } from "./types";
@@ -31,9 +31,14 @@ export async function scrapeReviews(
   const opts = { ...DEFAULT_OPTIONS, ...options };
   const errors: string[] = [];
 
-  const url = placeIdOrUrl.startsWith("http")
+  // Force English UI regardless of IP geolocation
+  let url = placeIdOrUrl.startsWith("http")
     ? placeIdOrUrl
     : placeIdToUrl(placeIdOrUrl);
+  const sep = url.includes("?") ? "&" : "?";
+  if (!url.includes("hl=en")) {
+    url = `${url}${sep}hl=en`;
+  }
 
   // Launch browser
   const launchOptions: any = {

@@ -1,0 +1,191 @@
+<h2>Guest Intelligence — data source options</h2>
+<p class="subtitle">Cost, impact, and tooling for each review source. Pick which to invest in.</p>
+
+<div class="options" data-multiselect>
+
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Google Reviews</h3>
+      <p><strong>You already have:</strong> <code>enrich-google-ratings.ts</code> — pulls ratings + review counts via Places API. Currently gets the score but NOT the review text.</p>
+      <p><strong>Upgrade needed:</strong> Switch to Places API v1 <code>reviews</code> field to pull actual review text (5 most recent per request, or use Outscraper for bulk). ~$3-5/retreat for full history via Outscraper.</p>
+      <p><strong>Coverage:</strong> ~180 of 218 retreats have Google listings. 100-500 reviews each.</p>
+
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Broadest coverage — almost every retreat has them</li>
+          <li>Verified visitors (Google checks location history)</li>
+          <li>Already have the API key and script scaffold</li>
+          <li>Structured star ratings for sentiment scoring</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>Reviews skew short (1-3 sentences typical)</li>
+          <li>Outscraper bulk costs ~$650 for all 218 retreats</li>
+          <li>No sub-category ratings (just overall stars)</li>
+        </ul></div>
+      </div>
+
+      <p style="margin-top:12px"><strong>Cost:</strong> $650 one-time (Outscraper bulk) or $0.017/retreat (Places API, 5 reviews only)<br>
+      <strong>Impact:</strong> ★★★★☆ — breadth play, covers every profile</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>TripAdvisor</h3>
+      <p><strong>You have:</strong> Nothing built yet.</p>
+      <p><strong>Needed:</strong> Outscraper TripAdvisor scraper ($0.002/review) or Apify TripAdvisor actor (~$5/1000 reviews). Gets full review text + sub-ratings (Service, Rooms, Location, Cleanliness, Value).</p>
+      <p><strong>Coverage:</strong> ~150 retreats have TA listings. 50-300 reviews each, much longer text than Google.</p>
+
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Longest, most detailed review text (paragraphs, not sentences)</li>
+          <li>Sub-ratings map directly to your 15 scoring categories</li>
+          <li>Travelers who review on TA are your exact ICP — serious planners</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>No existing script — build from scratch</li>
+          <li>TripAdvisor blocks scrapers aggressively</li>
+          <li>Cost ~$300-500 for full corpus via Outscraper</li>
+        </ul></div>
+      </div>
+
+      <p style="margin-top:12px"><strong>Cost:</strong> $300-500 one-time via Outscraper<br>
+      <strong>Impact:</strong> ★★★★★ — highest quality text for synthesis</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Blogger / Media Reviews</h3>
+      <p><strong>You have:</strong> <code>discover-forum-intel.ts</code> — searches Google for Reddit/blog/forum mentions. Returns links but doesn't extract content.</p>
+      <p><strong>Upgrade needed:</strong> Add Firecrawl scraping step — for each discovered URL, scrape the full article text. Then use Claude to extract structured insights (what they liked, disliked, specific program names, room descriptions).</p>
+      <p><strong>Coverage:</strong> Top 50 retreats have 10-30 blog reviews each. Long tail has 1-5.</p>
+
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Richest, most narrative content — full stay descriptions</li>
+          <li>Often includes photos, room details, daily schedules</li>
+          <li>You already have the discovery script</li>
+          <li>Firecrawl is already in your toolchain</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>Unstructured — needs Claude extraction per article ($0.01-0.05 each)</li>
+          <li>Uneven coverage — Ananda has 30 blog reviews, smaller retreats have 0</li>
+          <li>Attribution/copyright considerations for quoting</li>
+        </ul></div>
+      </div>
+
+      <p style="margin-top:12px"><strong>Cost:</strong> ~$50-100 in Firecrawl + Claude API for top 50 retreats<br>
+      <strong>Impact:</strong> ★★★★★ — highest editorial value, but labor-intensive</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="d" onclick="toggleSelect(this)">
+    <div class="letter">D</div>
+    <div class="content">
+      <h3>Instagram / TikTok</h3>
+      <p><strong>You have:</strong> Nothing built.</p>
+      <p><strong>Needed:</strong> Apify Instagram/TikTok scrapers or manual curation. Pull posts tagged at retreat locations or using retreat hashtags. Embed the best ones.</p>
+      <p><strong>Coverage:</strong> Top retreats have 1,000+ tagged posts. Good for visual proof but thin on text insight.</p>
+
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>"See it before you book it" — most persuasive for first-timers</li>
+          <li>Social proof at scale (real people, real photos)</li>
+          <li>Native embeds are free and beautiful</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>Captions are shallow — "amazing experience 🙏" isn't intelligence</li>
+          <li>Instagram embeds slow down pages (Core Web Vitals hit)</li>
+          <li>Content disappears when users delete posts</li>
+          <li>Apify Instagram scraper: ~$10/1000 posts</li>
+        </ul></div>
+      </div>
+
+      <p style="margin-top:12px"><strong>Cost:</strong> ~$50-100 for initial scrape, ongoing curation time<br>
+      <strong>Impact:</strong> ★★★☆☆ — visual proof layer, not intelligence</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="e" onclick="toggleSelect(this)">
+    <div class="letter">E</div>
+    <div class="content">
+      <h3>YouTube</h3>
+      <p><strong>You already have:</strong> <code>discover-youtube-videos.ts</code> + <code>daily-youtube-discovery.sh</code> — finds retreat videos, categorizes official vs independent, stores in Supabase. <code>youtube_videos</code> field exists on every retreat.</p>
+      <p><strong>Upgrade needed:</strong> Pull auto-generated transcripts via YouTube API, then use Claude to extract structured guest insights from the spoken content. A 15-min vlog contains more usable intelligence than 50 Google reviews.</p>
+      <p><strong>Coverage:</strong> Already discovering videos. Top retreats have 20-50 independent vlogs each.</p>
+
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Script already exists and runs daily</li>
+          <li>Video transcripts are the richest review source — 15 min of unfiltered opinion</li>
+          <li>YouTube API transcript access is free (captions endpoint)</li>
+          <li>Embeds work well and don't kill CWV like IG</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>Transcript extraction needs new code (YouTube captions API)</li>
+          <li>Claude processing per transcript: ~$0.02-0.05 each</li>
+          <li>Auto-captions have errors (proper nouns especially)</li>
+        </ul></div>
+      </div>
+
+      <p style="margin-top:12px"><strong>Cost:</strong> ~$20-50 in Claude API for top 50 retreats (transcripts are free)<br>
+      <strong>Impact:</strong> ★★★★★ — richest signal, lowest marginal cost, already half-built</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="f" onclick="toggleSelect(this)">
+    <div class="letter">F</div>
+    <div class="content">
+      <h3>Retreat's Own Testimonials</h3>
+      <p><strong>You have:</strong> <code>enrich-from-websites.ts</code> — scrapes retreat websites for missing data. Could be extended to pull testimonial pages.</p>
+      <p><strong>Needed:</strong> Add testimonial page discovery + extraction. Most retreat sites have a /testimonials or /reviews page with curated quotes.</p>
+      <p><strong>Coverage:</strong> ~120 retreats have testimonial pages. 10-50 quotes each.</p>
+
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Script scaffold already exists</li>
+          <li>Often includes specific program names and outcomes</li>
+          <li>Free to scrape — no API cost</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>Curated = biased toward positive</li>
+          <li>Can't verify authenticity</li>
+          <li>Low editorial value alone — only useful combined with unbiased sources</li>
+        </ul></div>
+      </div>
+
+      <p style="margin-top:12px"><strong>Cost:</strong> ~$0 (Firecrawl credits only)<br>
+      <strong>Impact:</strong> ★★☆☆☆ — supplementary, not standalone</p>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:32px; padding:20px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px">
+  <h3 style="margin-top:0">Recommended stack (best ROI)</h3>
+  <table style="width:100%; border-collapse:collapse; font-size:14px">
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+      <td style="padding:8px 0"><strong>Phase 1</strong></td>
+      <td>YouTube transcripts (E) + Google Reviews (A)</td>
+      <td style="text-align:right">~$700</td>
+      <td style="text-align:right">Cover all 218 profiles</td>
+    </tr>
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+      <td style="padding:8px 0"><strong>Phase 2</strong></td>
+      <td>TripAdvisor (B) + Blogger scraping (C)</td>
+      <td style="text-align:right">~$500</td>
+      <td style="text-align:right">Deep intel for top 50</td>
+    </tr>
+    <tr>
+      <td style="padding:8px 0"><strong>Phase 3</strong></td>
+      <td>Instagram/TikTok visual proof (D) + Testimonials (F)</td>
+      <td style="text-align:right">~$100</td>
+      <td style="text-align:right">Visual layer + supplementary</td>
+    </tr>
+  </table>
+  <p style="margin-top:12px; font-size:13px; opacity:0.7">Total: ~$1,300 to build the most comprehensive guest intelligence layer in wellness travel. Click to select the sources you want to invest in.</p>
+</div>

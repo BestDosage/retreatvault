@@ -4,7 +4,8 @@ import { config } from "dotenv";
 config({ path: ".env.local" });
 
 import { scrapeReviews, placeIdToUrl } from "./scraper";
-import type { ScrapeOptions } from "./types";
+import { scrapeViaApify } from "./apify-backend";
+import type { ScrapeOptions, ScrapeResult } from "./types";
 import * as fs from "fs";
 
 function printUsage() {
@@ -17,24 +18,22 @@ Usage:
 
 Options:
   --max <n>        Max reviews per place (default: 100, 0 = all)
-  --delay <ms>     Scroll delay in ms (default: 1500)
-  --proxy <url>    Proxy URL (e.g., http://user:pass@host:port)
-  --visible        Run browser visibly (not headless)
+  --backend <name> "browser" (default) or "apify" (works from any IP, needs APIFY_API_KEY)
+  --delay <ms>     Scroll delay in ms (default: 1500, browser mode only)
+  --proxy <url>    Proxy URL (browser mode only)
+  --visible        Run browser visibly (browser mode only)
   --output <path>  Output JSON file (default: stdout)
   --file <path>    JSON file with array of {id, name, place_id} objects
 
 Examples:
-  # Single place by Place ID
-  npx tsx scripts/google-reviews-scraper/index.ts ChIJN1t_tDeuEmsRUsoyG83frY4
+  # Single place via Apify (works from any country)
+  npx tsx scripts/google-reviews-scraper/index.ts "https://www.google.com/maps/place/..." --backend apify
 
-  # Single place by URL
-  npx tsx scripts/google-reviews-scraper/index.ts "https://www.google.com/maps/place/..." --max 50
+  # Batch via Apify
+  npx tsx scripts/google-reviews-scraper/index.ts --file data/place-ids.json --backend apify --max 100 --output data/reviews.json
 
-  # Batch from file
-  npx tsx scripts/google-reviews-scraper/index.ts --file data/place-ids.json --max 100 --output data/reviews.json
-
-  # With proxy
-  npx tsx scripts/google-reviews-scraper/index.ts ChIJ... --proxy http://user:pass@proxy.example.com:8080
+  # Direct browser scraping (needs US IP or proxy)
+  npx tsx scripts/google-reviews-scraper/index.ts ChIJ... --proxy http://user:pass@us-proxy:port
 `);
 }
 
@@ -51,6 +50,7 @@ async function main() {
   let target = "";
   let batchFile = "";
   let outputPath = "";
+  let backend = "browser";
 
   for (let i = 0; i < args.length; i++) {
     switch (args[i]) {
@@ -72,10 +72,22 @@ async function main() {
       case "--file":
         batchFile = args[++i];
         break;
+      case "--backend":
+        backend = args[++i];
+        break;
       default:
         if (!args[i].startsWith("--")) target = args[i];
     }
   }
+
+  // Choose extraction function based on backend
+  const extract = async (placeIdOrUrl: string, opts: ScrapeOptions): Promise<ScrapeResult> => {
+    if (backend === "apify") {
+      const url = placeIdOrUrl.startsWith("http") ? placeIdOrUrl : placeIdToUrl(placeIdOrUrl);
+      return scrapeViaApify(url, opts);
+    }
+    return scrapeReviews(placeIdOrUrl, opts);
+  };
 
   // Single place or batch
   if (batchFile) {
@@ -88,7 +100,7 @@ async function main() {
       console.log(`\n[${i + 1}/${places.length}] ${place.name || place.place_id}`);
 
       try {
-        const result = await scrapeReviews(place.place_id, options);
+        const result = await extract(place.place_id, options);
         results.push({ ...result, retreat_id: place.id });
 
         // Save incrementally
@@ -119,7 +131,7 @@ async function main() {
       console.log(JSON.stringify(results, null, 2));
     }
   } else if (target) {
-    const result = await scrapeReviews(target, options);
+    const result = await extract(target, options);
 
     if (outputPath) {
       fs.writeFileSync(outputPath, JSON.stringify(result, null, 2));
