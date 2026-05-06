@@ -3,7 +3,6 @@
 import type { VideoResult, ScrapeOptions, VideoScrapeResult } from "./types";
 import { passesQualityFilter, isOfficialChannel, computeQualityScore } from "./quality-filter";
 
-const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 const SEARCH_URL = "https://www.googleapis.com/youtube/v3/search";
 const VIDEOS_URL = "https://www.googleapis.com/youtube/v3/videos";
 
@@ -37,6 +36,7 @@ export async function searchYouTube(
   retreatName: string,
   options: ScrapeOptions = {}
 ): Promise<VideoScrapeResult> {
+  const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
   if (!YOUTUBE_API_KEY) {
     return { retreat_name: retreatName, platform: "youtube", videos: [], scraped_at: new Date().toISOString(), errors: ["YOUTUBE_API_KEY not set"] };
   }
