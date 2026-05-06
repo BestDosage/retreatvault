@@ -4,6 +4,7 @@ import { config } from "dotenv";
 config({ path: ".env.local" });
 
 import { scrapeReviews, placeIdToUrl } from "./scraper";
+import { scrapeReviewsHttp } from "./http-scraper";
 import { scrapeViaApify } from "./apify-backend";
 import type { ScrapeOptions, ScrapeResult } from "./types";
 import * as fs from "fs";
@@ -86,7 +87,11 @@ async function main() {
       const url = placeIdOrUrl.startsWith("http") ? placeIdOrUrl : placeIdToUrl(placeIdOrUrl);
       return scrapeViaApify(url, opts);
     }
-    return scrapeReviews(placeIdOrUrl, opts);
+    if (backend === "dom") {
+      return scrapeReviews(placeIdOrUrl, opts);
+    }
+    // Default: HTTP API interception (best approach)
+    return scrapeReviewsHttp(placeIdOrUrl, opts);
   };
 
   // Single place or batch
