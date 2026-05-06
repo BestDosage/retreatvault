@@ -101,7 +101,7 @@ export default async function RetreatsPage({ searchParams }: { searchParams: Pro
         </AnimateIn>
         <AnimateIn delay={0.15}>
           <p className="mt-4 text-[13px] text-dark-400">
-            {total.toLocaleString()} retreat{total !== 1 ? "s" : ""} independently scored and ranked
+            Independently scored and ranked
           </p>
         </AnimateIn>
 
