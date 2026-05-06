@@ -125,7 +125,17 @@ export async function scrapeReviewsHttp(
   const opts = { ...DEFAULT_OPTIONS, ...options };
   const errors: string[] = [];
 
-  const launchOptions: any = { headless: opts.headless };
+  const launchOptions: any = {
+    headless: opts.headless,
+    args: [
+      "--window-position=9999,9999", // push far off-screen
+      "--window-size=1,1",           // minimize window size
+      "--no-first-run",
+      "--no-default-browser-check",
+      "--disable-gpu",
+      "--disable-extensions",
+    ],
+  };
   if (opts.proxy) {
     launchOptions.proxy = { server: opts.proxy };
   }
