@@ -69,7 +69,7 @@ export default function MethodologyPage() {
         name: "How do I find the best retreat for my goals?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Take the free RetreatVault quiz — 8 research-backed questions about your wellness goals, travel style, and budget. Our algorithm analyzes 120+ retreats across 15 categories to find your ideal match. You can also filter the directory by region, tier, and price.",
+          text: "Take the free RetreatVault quiz — 8 questions about your wellness goals, travel style, and budget. Our algorithm analyzes 120+ retreats across 15 categories to find your ideal match. You can also filter the directory by region, tier, and price.",
         },
       },
       {

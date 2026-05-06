@@ -26,7 +26,7 @@ const TYPE_CONFIGS: TypeConfig[] = [
     display: "Yoga",
     h1: "Best Yoga Retreats",
     intro:
-      "Whether you practice vinyasa, hatha, yin, or Ashtanga, a dedicated yoga retreat deepens your practice far beyond what studio classes offer. These retreats combine daily asana with meditation, breathwork, and nutrition — many in stunning tropical or mountain settings that amplify the experience. We score every yoga retreat across 15 categories so you can compare honestly.",
+      "Whether you practice vinyasa, hatha, yin, or Ashtanga, a dedicated yoga retreat deepens your practice far beyond what studio classes offer. These retreats combine daily asana with meditation, breathwork, and nutrition — many in remote tropical or mountain locations. We score every yoga retreat across 15 categories so you can compare honestly.",
     keywords: ["yoga", "vinyasa", "hatha", "ashtanga", "yin-yoga", "yoga-retreat"],
     faqs: [
       { question: "How long should a yoga retreat be?", answer: "Most yoga retreats run 5 to 14 days. A 7-day retreat is the sweet spot for beginners — long enough to build momentum without overwhelming your schedule. Advanced practitioners often choose 10-14 day immersions for deeper transformation." },
@@ -236,7 +236,7 @@ const TYPE_CONFIGS: TypeConfig[] = [
     display: "Luxury",
     h1: "Best Luxury Retreats",
     intro:
-      "Luxury wellness retreats deliver transformative health programming in extraordinary settings — private villas, Michelin-caliber cuisine, dedicated wellness butlers, and cutting-edge medical diagnostics. These properties represent the pinnacle of the industry. We score luxury retreats on the same 15 categories as every other retreat, so you can verify whether the price matches the substance.",
+      "Luxury wellness retreats deliver transformative health programming in extraordinary settings — private villas, Michelin-caliber cuisine, dedicated wellness butlers, and advanced medical diagnostics. These properties represent the pinnacle of the industry. We score luxury retreats on the same 15 categories as every other retreat, so you can verify whether the price matches the substance.",
     keywords: ["luxury", "ultra-luxury", "five-star", "premium", "exclusive", "high-end", "luxury-retreat"],
     faqs: [
       { question: "What makes a retreat 'luxury'?", answer: "True luxury retreats combine exceptional accommodation (private villas, suites), personalized programming (1:1 staff ratios), world-class cuisine, and premium wellness services (advanced diagnostics, specialized practitioners). It is not just about thread count — it is about the depth of personalization and clinical excellence." },

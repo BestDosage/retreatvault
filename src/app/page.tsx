@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Best Wellness Retreats 2026 — Rated & Ranked | RetreatVault",
   description:
-    "Discover the world's top-rated wellness retreats scored across 15 data-driven categories. Compare luxury spas, medical clinics, yoga ashrams & detox centers. No paid placements.",
+    "9,400+ wellness retreats scored across 15 categories. Compare luxury spas, medical clinics, yoga ashrams & detox centers. No paid placements.",
 };
 
 import Image from "next/image";
@@ -68,7 +68,7 @@ export default async function HomePage() {
   const speakableJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: "RetreatVault — The World's Most Exclusive Wellness Retreats, Ranked",
+    name: "RetreatVault — 9,400+ Wellness Retreats. Every One Scored.",
     speakable: {
       "@type": "SpeakableSpecification",
       cssSelector: ["h1", ".hero-description"],
@@ -162,7 +162,7 @@ export default async function HomePage() {
 
           <h1 className="mb-8">
             <TextReveal
-              text="The World's Most Exclusive Wellness Retreats, Ranked."
+              text="9,400+ Wellness Retreats. Every One Scored."
               className="font-serif text-[clamp(2rem,5.2vw,4.5rem)] font-light leading-[1.08] text-white"
               delay={0.5}
             />
@@ -170,9 +170,9 @@ export default async function HomePage() {
 
           <AnimateIn delay={1.3} duration={1}>
             <p className="mx-auto mb-14 max-w-lg text-[14px] font-light leading-[1.8] text-dark-200/80">
-              Every retreat scored across 15 weighted categories by an analytical
-              chemist. No paid placements. No affiliate bias. Just data
-              you can trust with a $10,000 decision.
+              Every retreat scored across 15 categories by an analytical chemist.
+              No paid placements, no affiliate bias — just data you can trust
+              with a $10,000 decision.
             </p>
           </AnimateIn>
 
@@ -232,7 +232,7 @@ export default async function HomePage() {
                     Find your<br />perfect retreat
                   </h2>
                   <p className="mt-5 max-w-md text-[14px] leading-relaxed text-dark-200/80">
-                    Answer 8 research-backed questions about your wellness goals,
+                    Answer 8 questions about your goals,
                     travel style, and budget. Our algorithm analyzes 120+
                     retreats across 15 categories to find your perfect match.
                   </p>
@@ -311,7 +311,7 @@ export default async function HomePage() {
             <AnimateIn delay={0.2}>
               <p className="mx-auto mt-5 max-w-lg text-[14px] leading-relaxed text-dark-400">
                 A framework designed by an analytical chemist. Not influencer opinions.
-                Not paid reviews. Science-grade evaluation applied to wellness travel.
+                Not paid reviews. Analytical chemistry methodology applied to wellness travel.
               </p>
             </AnimateIn>
           </div>
@@ -320,19 +320,19 @@ export default async function HomePage() {
             {[
               {
                 step: "01",
-                title: "Deep Research",
+                title: "Deep research",
                 desc: "We analyze each retreat across 15 categories\u200a\u2014\u200anutrition, fitness, medical, spa, sleep, sustainability, and 9 more. Up to 8 sub-criteria per category.",
                 detail: "15 categories \u00b7 120+ data points",
               },
               {
                 step: "02",
-                title: "Independent Scoring",
+                title: "Independent scoring",
                 desc: "Every sub-criterion is scored 1\u201310 using verifiable evidence: menus, staff credentials, certifications, real guest reviews. No self-reported data accepted.",
-                detail: "Evidence-based \u00b7 Zero paid placements",
+                detail: "No paid placements \u00b7 No affiliate bias",
               },
               {
                 step: "03",
-                title: "Weighted Vault Score",
+                title: "Weighted Vault score",
                 desc: "Category scores are weighted by impact on the wellness experience and combined into a single Vault Score out of 10. Tier badges\u200a\u2014\u200aElite, Exceptional, Recommended\u200a\u2014\u200aare assigned.",
                 detail: "Weighted formula \u00b7 Updated quarterly",
               },
