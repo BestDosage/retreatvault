@@ -13,7 +13,7 @@ const DEFAULT_OPTIONS: Required<ScrapeOptions> = {
   maxReviews: 100,
   scrollDelay: 2000,
   proxy: "",
-  headless: true,
+  headless: false, // Google detects headless and hides Reviews tab
   timeout: 30000,
 };
 
