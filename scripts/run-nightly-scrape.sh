@@ -9,6 +9,7 @@
 #   ./scripts/run-nightly-scrape.sh
 
 set -e
+export PATH="/Users/waldman/.nvm/versions/node/v24.14.0/bin:$PATH"
 
 DIR="/Users/waldman/Projects/retreatvault"
 LOG="$DIR/data/scraper-$(date +%Y%m%d).log"
