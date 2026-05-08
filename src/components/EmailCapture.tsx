@@ -32,16 +32,23 @@ export default function EmailCapture({
     const firstName = showName ? (form.elements.namedItem("firstName") as HTMLInputElement)?.value : undefined;
 
     try {
-      const res = await fetch("/api/subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, firstName, source, sourceDetail }),
-      });
+      const { createClient } = await import("@supabase/supabase-js");
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { error } = await supabase
+        .from("email_subscribers")
+        .upsert({
+          email: email.toLowerCase().trim(),
+          first_name: firstName?.trim() || null,
+          source: source || "unknown",
+          source_detail: sourceDetail || null,
+          status: "active",
+          subscribed_at: new Date().toISOString(),
+        }, { onConflict: "email" });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to subscribe");
-      }
+      if (error) throw new Error("Failed to subscribe");
 
       setStatus("success");
     } catch (err) {

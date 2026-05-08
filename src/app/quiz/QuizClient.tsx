@@ -473,17 +473,22 @@ export default function QuizClient({ retreats }: { retreats: RetreatData[] }) {
                   const email = (form.elements.namedItem("email") as HTMLInputElement)?.value;
                   if (name && email) {
                     try {
-                      const res = await fetch("/api/subscribe", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          email,
-                          firstName: name,
+                      const { createClient } = await import("@supabase/supabase-js");
+                      const supabase = createClient(
+                        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+                      );
+                      const { error: subErr } = await supabase
+                        .from("email_subscribers")
+                        .upsert({
+                          email: email.toLowerCase().trim(),
+                          first_name: name.trim(),
                           source: "quiz",
-                          sourceDetail: results.map((r: { slug: string }) => r.slug).join(","),
-                        }),
-                      });
-                      if (res.ok) {
+                          source_detail: results.map((r: { slug: string }) => r.slug).join(","),
+                          status: "active",
+                          subscribed_at: new Date().toISOString(),
+                        }, { onConflict: "email" });
+                      if (!subErr) {
                         (e.target as HTMLFormElement).reset();
                         alert("Your results have been saved! Check your inbox.");
                       }
