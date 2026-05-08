@@ -6,7 +6,7 @@ const blogPosts = [...retreatBlogPosts, ...basePosts];
 import { getAllRetreats } from "@/lib/data";
 import BlogListClient from "./BlogListClient";
 
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "Wellness Retreat Insights — Evidence-Based Guides & Analysis",

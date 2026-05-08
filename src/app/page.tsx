@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 // ISR — render on first request (not at build time where Supabase times out),
 // then cache for 1 hour. The `dynamic = "force-dynamic"` at build time +
 // `revalidate` at runtime gives us ISR without build-time static generation.
-export const revalidate = 3600;
+export const revalidate = 86400;
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
