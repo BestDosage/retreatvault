@@ -184,6 +184,29 @@ export async function scrapeReviewsHttp(
       if (h1) placeName = h1.trim();
     } catch {}
 
+    // Step 2.5: Extract business photos before clicking Reviews
+    let photoUrls: string[] = [];
+    try {
+      const photos = await page.evaluate(() => {
+        const urls = new Set<string>();
+        document.querySelectorAll('img[src*="googleusercontent.com"], img[src*="gstatic.com/mapfiles"]').forEach(img => {
+          const src = (img as HTMLImageElement).src;
+          const w = (img as HTMLImageElement).naturalWidth || (img as HTMLImageElement).width;
+          if (src && !src.includes('/maps/') && !src.includes('streetview') && !src.includes('icon') && (w === 0 || w >= 80)) {
+            const upgraded = src.replace(/=w\d+-h\d+/, '=w800-h600').replace(/=s\d+/, '=s800');
+            urls.add(upgraded);
+          }
+        });
+        return [...urls];
+      });
+      photoUrls = photos.slice(0, 8);
+      if (photoUrls.length > 0) {
+        console.log(`  Found ${photoUrls.length} business photos`);
+      }
+    } catch {
+      // Photos extraction is best-effort
+    }
+
     // Step 3: Click Reviews tab
     console.log("  Looking for Reviews tab...");
     const reviewsTab = page
@@ -258,6 +281,7 @@ export async function scrapeReviewsHttp(
       place_url: page.url(),
       total_reviews_found: finalReviews.length,
       reviews: finalReviews,
+      photo_urls: photoUrls,
       scraped_at: new Date().toISOString(),
       errors,
     };

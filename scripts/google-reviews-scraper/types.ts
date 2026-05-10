@@ -12,6 +12,7 @@ export interface ScrapeResult {
   place_url: string;
   total_reviews_found: number;
   reviews: GoogleReview[];
+  photo_urls: string[];
   scraped_at: string;
   errors: string[];
 }
