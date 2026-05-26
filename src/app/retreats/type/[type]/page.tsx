@@ -4,7 +4,7 @@ import { getAllRetreats, slugifyRegion, slugifyCountry } from "@/lib/data";
 import { WellnessRetreat } from "@/lib/types";
 import RetreatCard from "@/components/RetreatCard";
 
-export const revalidate = 86400;
+export const revalidate = 3600;
 export const dynamicParams = false;
 
 // ═══════════════════════════════════════════════════════════════════════

@@ -11,7 +11,7 @@ import { GUIDES } from "@/data/guides";
 
 // On Vercel Pro: pre-build all 9,289 retreats at build time.
 // The module-scope cache in src/lib/data.ts keeps this fast (single Supabase fetch).
-export const revalidate = 86400; // refresh every hour
+export const revalidate = 3600; // refresh every hour
 
 // Explicitly allow on-demand rendering for any slug not returned by
 // generateStaticParams at build time (e.g. slugs added after the build,
@@ -21,9 +21,27 @@ export const revalidate = 86400; // refresh every hour
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  // Skip static generation entirely — all pages render on-demand via ISR.
-  // getAllRetreats() causes Supabase statement timeouts on Vercel build workers.
-  return [];
+  // Pre-render the top 500 retreats by WRD score at build time.
+  // Remaining ~8,900 pages render on-demand via ISR (dynamicParams = true).
+  // Falls back to [] if Supabase times out during the build.
+  try {
+    const { createClient } = await import("@supabase/supabase-js");
+    const client = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { global: { fetch: (url, opts) => fetch(url, { ...opts, signal: AbortSignal.timeout(30_000) }) } }
+    );
+    const { data, error } = await client
+      .from("retreats")
+      .select("slug")
+      .order("wrd_score", { ascending: false })
+      .limit(500);
+    if (error || !data) return [];
+    return data.map((r: { slug: string }) => ({ slug: r.slug }));
+  } catch {
+    // Supabase timeout or network error — fall back to full on-demand ISR
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {

@@ -13,7 +13,7 @@ import LocationStats from "@/components/LocationStats";
 import { deriveLocationStats } from "@/lib/location-intelligence";
 import { getCountrySEO, CountrySEOData } from "@/data/country-seo";
 
-export const revalidate = 86400;
+export const revalidate = 3600;
 export const dynamicParams = true;
 
 type Params = { country: string };
