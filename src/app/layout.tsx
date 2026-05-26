@@ -180,6 +180,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <span className="text-[10px] text-dark-500">&copy; {new Date().getFullYear()} RetreatVault.com</span>
               <span className="text-[9px] uppercase tracking-[0.3em] text-dark-600">Precision-Rated Wellness Travel</span>
             </div>
+            <div className="border-t border-white/[0.04] pt-4 pb-6">
+              <p className="text-[10px] uppercase tracking-[0.15em] text-dark-600 mb-2">Also by Chad Waldman</p>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-dark-600">
+                <a href="https://bestdosage.com" target="_blank" rel="noopener" className="hover:text-dark-400 transition-colors">BestDosage — Find wellness practitioners</a>
+                <a href="https://oktodive.com" target="_blank" rel="noopener" className="hover:text-dark-400 transition-colors">OkToDive — Compare dive sites</a>
+                <a href="https://sourchad.com" target="_blank" rel="noopener" className="hover:text-dark-400 transition-colors">SourChad — Fermentation science</a>
+                <a href="https://dumpstercomparison.com" target="_blank" rel="noopener" className="hover:text-dark-400 transition-colors">DumpsterComparison — Compare dumpster rental</a>
+              </div>
+            </div>
           </div>
         </footer>
         </CompareProvider>
