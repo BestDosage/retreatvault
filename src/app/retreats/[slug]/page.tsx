@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllRetreats, getRetreatBySlug, getRetreatAwards, getRetreatVideos, getSimilarRetreats, getEditorialReview, getRetreatReviews, deriveReviewThemes, getRetreatFaqs } from "@/lib/data";
 import { getRetreatImage } from "@/lib/retreat-images";
+import YouTubeFacade from "@/components/YouTubeFacade";
 import SimilarRetreats from "@/components/SimilarRetreats";
 import EditorialReview from "@/components/EditorialReview";
 import GuestSentiment from "@/components/GuestSentiment";
@@ -568,14 +569,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
               {videos.map((video) => (
                 <div key={video.video_id} className="overflow-hidden rounded-2xl border border-white/[0.04] transition-all duration-300 hover:border-gold-500/15">
                   <div className="relative aspect-video">
-                    <iframe
-                      src={`https://www.youtube.com/embed/${video.video_id}?rel=0&modestbranding=1`}
-                      title={video.title}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      className="absolute inset-0 h-full w-full"
-                      loading="lazy"
-                    />
+                    <YouTubeFacade videoId={video.video_id} title={video.title} />
                   </div>
                   <div className="bg-white/[0.02] p-4">
                     <h3 className="text-[13px] font-medium text-white">{video.title}</h3>

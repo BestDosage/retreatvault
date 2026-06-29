@@ -420,7 +420,8 @@ async function loadVideosCache() {
       video_id: v.video_id,
       title: v.title || "",
       channel_name: v.channel_name || "",
-      thumbnail_url: v.thumbnail_url || `https://img.youtube.com/vi/${v.video_id}/hqdefault.jpg`,
+      // Not rendered — videos use a generated play-button facade (no external thumbnail).
+      thumbnail_url: "",
     });
   });
   _videosCache = map;
