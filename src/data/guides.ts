@@ -15,6 +15,11 @@ export interface GuideConfig {
   metaDescription: string;
   intro: string; // Chad-voice editorial intro (HTML)
   filters: (retreat: WellnessRetreat) => boolean;
+  // Structural constraints that must always hold (price ceiling, region, tags).
+  // Used as a relaxed fallback when the strict `filters` yields too few results,
+  // so a guide page never renders empty while staying on-topic. Score-threshold
+  // guides can omit this — the fallback then ranks all retreats by `sortBy`.
+  baseFilter?: (retreat: WellnessRetreat) => boolean;
   sortBy?: (a: WellnessRetreat, b: WellnessRetreat) => number;
   maxRetreats?: number;
   category: "persona" | "budget" | "goal" | "style";
@@ -52,6 +57,7 @@ export const GUIDES: GuideConfig[] = [
     intro: `<p>The wellness retreat industry wants you to believe transformation costs $3,000/night. It doesn't. Some of the highest-scoring retreats in our database charge under $500/night — and a few under $200. The difference isn't quality. It's location, scale, and whether they spend their budget on marble lobbies or actual programming.</p>
 <p>We filtered for retreats scoring 7.0+ overall with max nightly rates under $500. Then sorted by value score — how much wellness you actually get per dollar spent.</p>`,
     filters: (r) => r.price_max_per_night > 0 && r.price_max_per_night <= 500 && r.wrd_score >= 7.0,
+    baseFilter: (r) => r.price_max_per_night > 0 && r.price_max_per_night <= 500,
     sortBy: (a, b) => (b.scores?.pricing_value?.score || 0) - (a.scores?.pricing_value?.score || 0),
     maxRetreats: 25,
     category: "budget",
@@ -116,6 +122,7 @@ export const GUIDES: GuideConfig[] = [
     intro: `<p>Luxury in wellness means nothing unless the programming matches the price tag. A $2,000/night room with a $50 massage menu is just an expensive hotel. We filtered for retreats charging $1,500+ per night that score 8.5+ overall — meaning they deliver elite-level programming across nutrition, spa, medical, and personalization. Not just marble bathrooms.</p>
 <p>These retreats earned their price through depth of expertise, staff ratios, clinical infrastructure, and the kind of attention that makes you feel like the only guest. If you're spending this much, you should get measurably more than a mid-range retreat offers.</p>`,
     filters: (r) => r.price_min_per_night >= 1500 && r.wrd_score >= 8.5,
+    baseFilter: (r) => r.price_min_per_night >= 1000,
     sortBy: (a, b) => b.wrd_score - a.wrd_score,
     maxRetreats: 20,
     category: "budget",
@@ -132,6 +139,7 @@ export const GUIDES: GuideConfig[] = [
       const amenities = r.scores?.amenities?.score || 0;
       return amenities >= 8.5 && r.price_max_per_night >= 1000;
     },
+    baseFilter: (r) => r.price_max_per_night >= 800,
     sortBy: (a, b) => (b.scores?.amenities?.score || 0) - (a.scores?.amenities?.score || 0),
     maxRetreats: 20,
     category: "persona",
@@ -191,6 +199,7 @@ export const GUIDES: GuideConfig[] = [
       const tags = [...(r.specialty_tags || []), ...(r.program_types || [])].join(" ").toLowerCase();
       return tags.includes("ayurved") && (r.scores?.medical?.score || 0) >= 7.5;
     },
+    baseFilter: (r) => [...(r.specialty_tags || []), ...(r.program_types || [])].join(" ").toLowerCase().includes("ayurved"),
     sortBy: (a, b) => b.wrd_score - a.wrd_score,
     maxRetreats: 20,
     category: "goal",
@@ -205,6 +214,10 @@ export const GUIDES: GuideConfig[] = [
     filters: (r) => {
       const tags = [...(r.specialty_tags || []), ...(r.program_types || [])].join(" ").toLowerCase();
       return (tags.includes("yoga") || tags.includes("meditation")) && (r.scores?.mindfulness?.score || 0) >= 8.5;
+    },
+    baseFilter: (r) => {
+      const tags = [...(r.specialty_tags || []), ...(r.program_types || [])].join(" ").toLowerCase();
+      return tags.includes("yoga") || tags.includes("meditation");
     },
     sortBy: (a, b) => (b.scores?.mindfulness?.score || 0) - (a.scores?.mindfulness?.score || 0),
     maxRetreats: 25,
@@ -239,6 +252,7 @@ export const GUIDES: GuideConfig[] = [
     metaDescription: "Top-rated wellness retreats with 1-2 night minimum stays. Perfect for weekend getaways or testing the retreat experience without a week-long commitment.",
     intro: `<p>Most serious retreats require 3-7 nights minimum. That makes sense for deep programs, but it's a barrier for first-timers and busy people who can't disappear for a week. These retreats score 7+ overall with minimum stays of 1-2 nights — meaning you can get a real taste without the calendar commitment.</p>`,
     filters: (r) => r.minimum_stay_nights <= 2 && r.wrd_score >= 7,
+    baseFilter: (r) => r.minimum_stay_nights <= 2,
     sortBy: (a, b) => b.wrd_score - a.wrd_score,
     maxRetreats: 25,
     category: "style",
@@ -251,6 +265,7 @@ export const GUIDES: GuideConfig[] = [
     metaDescription: "The highest-rated wellness retreats across Asia — India, Thailand, Bali, Sri Lanka, and beyond. Data-driven rankings from RetreatvVault.",
     intro: `<p>Asia invented most of what the Western wellness industry now sells. Ayurveda, yoga, Thai massage, Balinese healing, Traditional Chinese Medicine — this is where those traditions live and breathe. We filtered for retreats in Asia scoring 8+ overall. The pricing advantage is real: you'll find elite-level programming at half the cost of equivalent European or American retreats.</p>`,
     filters: (r) => r.region === "Asia" && r.wrd_score >= 8,
+    baseFilter: (r) => r.region === "Asia",
     sortBy: (a, b) => b.wrd_score - a.wrd_score,
     maxRetreats: 25,
     category: "style",
@@ -263,6 +278,7 @@ export const GUIDES: GuideConfig[] = [
     metaDescription: "Top-rated European wellness retreats — from Alpine medical clinics to Mediterranean spas. Scored across 15 categories by RetreatvVault.",
     intro: `<p>European wellness has a thousand-year head start. The continent's thermal bath tradition, fasting clinics (Buchinger, Mayr), and integrative medical spas are the real thing — not imported wellness trends repackaged for tourists. We filtered for retreats in Europe scoring 8+ overall. Expect higher prices than Asia but also higher medical rigor and infrastructure.</p>`,
     filters: (r) => r.region === "Europe" && r.wrd_score >= 8,
+    baseFilter: (r) => r.region === "Europe",
     sortBy: (a, b) => b.wrd_score - a.wrd_score,
     maxRetreats: 25,
     category: "style",
@@ -275,6 +291,7 @@ export const GUIDES: GuideConfig[] = [
     metaDescription: "The best wellness retreats in the United States, scored across 15 categories. From Arizona desert to California coast. No passport needed.",
     intro: `<p>You don't need to fly to Bali. The US has some of the highest-scoring retreats in our database — Canyon Ranch, Golden Door, Miraval, and dozens of lesser-known properties that deliver serious results. We filtered for USA retreats scoring 7.5+ overall. The advantage: direct flights, no visa, no jet lag eating into your recovery time.</p>`,
     filters: (r) => r.region === "USA" && r.wrd_score >= 7.5,
+    baseFilter: (r) => r.region === "USA",
     sortBy: (a, b) => b.wrd_score - a.wrd_score,
     maxRetreats: 30,
     category: "style",

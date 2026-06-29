@@ -7,7 +7,7 @@ import { EDITORIAL_GUIDES, getEditorialGuideBySlug } from "@/data/editorial-guid
 import { deriveLocationStats } from "@/lib/location-intelligence";
 import RetreatCard from "@/components/RetreatCard";
 
-export const revalidate = 86400;
+export const revalidate = 3600;
 
 export function generateStaticParams() {
   const matchmakerSlugs = GUIDES.map((g) => ({ slug: g.slug }));
@@ -67,9 +67,30 @@ import type { GuideConfig } from "@/data/guides";
 
 async function MatchmakerGuide({ guide }: { guide: GuideConfig }) {
   const allRetreats = await getAllRetreats();
-  let matching = allRetreats.filter(guide.filters);
-  if (guide.sortBy) matching.sort(guide.sortBy);
-  if (guide.maxRetreats) matching = matching.slice(0, guide.maxRetreats);
+  const rank = guide.sortBy ?? ((a, b) => b.wrd_score - a.wrd_score);
+  const max = guide.maxRetreats ?? 20;
+  const MIN = 6; // never render a sparse/empty guide
+
+  // 1) Strict "ideal" match.
+  let matching = allRetreats.filter(guide.filters).sort(rank);
+
+  // 2) If too few, relax to the guide's structural constraints (price/region/tag)
+  //    ranked by relevance — keeps the page on-topic without the score cutoffs.
+  if (matching.length < MIN && guide.baseFilter) {
+    const have = new Set(matching.map((r) => r.slug));
+    const relaxed = allRetreats.filter((r) => guide.baseFilter!(r) && !have.has(r.slug)).sort(rank);
+    matching = [...matching, ...relaxed];
+  }
+
+  // 3) Final safety net: backfill with top retreats by relevance so a guide is
+  //    never empty even if its underlying data is sparse.
+  if (matching.length < MIN) {
+    const have = new Set(matching.map((r) => r.slug));
+    const backfill = allRetreats.filter((r) => !have.has(r.slug)).sort(rank);
+    matching = [...matching, ...backfill];
+  }
+
+  matching = matching.slice(0, max);
 
   const stats = deriveLocationStats(matching);
   const related = getRelatedGuides(guide.relatedGuides);
