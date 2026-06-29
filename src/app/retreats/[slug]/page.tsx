@@ -121,8 +121,11 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
 
   const matchingGuides = GUIDES.filter((g) => g.filters(retreat));
 
-  const hasImage = retreat.hero_image_url?.startsWith("http");
-  const galleryImages = (retreat.gallery_images || []).filter((img: string) => img?.startsWith("http"));
+  // Slugs whose imagery is suppressed (wrong/bad source image).
+  const HIDDEN_IMAGE_SLUGS = new Set(["amour-center"]);
+  const imagesHidden = HIDDEN_IMAGE_SLUGS.has(slug);
+  const hasImage = !imagesHidden && retreat.hero_image_url?.startsWith("http");
+  const galleryImages = imagesHidden ? [] : (retreat.gallery_images || []).filter((img: string) => img?.startsWith("http"));
 
   const faqJsonLd = {
     "@context": "https://schema.org",
