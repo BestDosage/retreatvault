@@ -141,10 +141,9 @@ function hashSlug(slug: string): number {
   return Math.abs(h);
 }
 
-function pickFallback(retreat: WellnessRetreat): string {
-  const region = retreat.region || "Other";
-  const country = retreat.country || "";
-  const keys = [`${region}:${country}`, region, "Other"];
+function regionFallbackImage(region: string, country: string, slug: string): string {
+  const r = region || "Other";
+  const keys = [`${r}:${country || ""}`, r, "Other"];
   let pool: string[] = [];
   for (const k of keys) {
     if (FALLBACKS[k]) {
@@ -153,8 +152,33 @@ function pickFallback(retreat: WellnessRetreat): string {
     }
   }
   if (pool.length === 0) pool = FALLBACKS.Other;
-  const id = pool[hashSlug(retreat.slug) % pool.length];
+  const id = pool[hashSlug(slug) % pool.length];
   return `https://images.unsplash.com/${id}?w=1200&h=1500&fit=crop&q=75`;
+}
+
+function pickFallback(retreat: WellnessRetreat): string {
+  return regionFallbackImage(retreat.region || "Other", retreat.country || "", retreat.slug);
+}
+
+// Hosts whose images are free for commercial use (Unsplash / Pexels licenses),
+// plus local /public assets we own. Anything else (bookretreats.com,
+// retreat.guru, Google-hosted business photos, official resort sites, stock
+// agencies like Alamy/Getty) is treated as unsafe to hotlink and gets replaced.
+const SAFE_IMAGE_HOSTS = ["https://images.unsplash.com/", "https://images.pexels.com/"];
+
+export function isSafeImageUrl(url: string | null | undefined): boolean {
+  if (!url) return false;
+  if (url.startsWith("/")) return true; // local /public asset
+  return SAFE_IMAGE_HOSTS.some((h) => url.startsWith(h));
+}
+
+/**
+ * Return a copyright-safe image URL. If `rawUrl` is from a safe source (Unsplash,
+ * Pexels, or a local asset) it is kept; otherwise a free, location-keyed Unsplash
+ * fallback is returned so we never serve a hotlinked third-party image.
+ */
+export function safeImageUrl(rawUrl: string, region: string, country: string, slug: string): string {
+  return isSafeImageUrl(rawUrl) ? rawUrl : regionFallbackImage(region, country, slug);
 }
 
 /**

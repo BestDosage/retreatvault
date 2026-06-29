@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { supabase } from "@/lib/supabase";
 import { WellnessRetreat, RetreatScores, getScoreTier } from "@/lib/types";
+import { safeImageUrl, isSafeImageUrl } from "@/lib/retreat-images";
 
 // Fix broken hero images — keyed by slug
 const IMAGE_OVERRIDES: Record<string, string> = {
@@ -34,8 +35,11 @@ function mapRow(row: any): WellnessRetreat {
     price_max_per_night: row.price_max_per_night || 0,
     pricing_model: row.pricing_model || "bed_and_breakfast",
     minimum_stay_nights: row.minimum_stay_nights || 1,
-    hero_image_url: IMAGE_OVERRIDES[slug] || row.hero_image_url || "",
-    gallery_images: row.gallery_images || [],
+    // Copyright-safe imagery only: keep Unsplash/Pexels/local URLs, replace any
+    // hotlinked third-party source (bookretreats.com, retreat.guru, Google photos,
+    // stock agencies) with a free, location-keyed Unsplash fallback.
+    hero_image_url: safeImageUrl(IMAGE_OVERRIDES[slug] || row.hero_image_url || "", row.region, row.country, slug),
+    gallery_images: (row.gallery_images || []).filter((img: string) => isSafeImageUrl(img)),
     youtube_videos: [],
     instagram_handle: row.instagram_handle || "",
     scores: row.scores as RetreatScores,

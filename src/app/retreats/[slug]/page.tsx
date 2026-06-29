@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllRetreats, getRetreatBySlug, getRetreatAwards, getRetreatVideos, getSimilarRetreats, getEditorialReview, getRetreatReviews, deriveReviewThemes, getRetreatFaqs } from "@/lib/data";
+import { getRetreatImage } from "@/lib/retreat-images";
 import SimilarRetreats from "@/components/SimilarRetreats";
 import EditorialReview from "@/components/EditorialReview";
 import GuestSentiment from "@/components/GuestSentiment";
@@ -58,7 +59,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     openGraph: {
       title: `${retreat.name} — ${retreat.wrd_score}/10 Vault Score`,
       description,
-      images: retreat.hero_image_url ? [{ url: retreat.hero_image_url }] : [],
+      images: [{ url: getRetreatImage(retreat) }],
     },
   };
 }
@@ -121,11 +122,17 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
 
   const matchingGuides = GUIDES.filter((g) => g.filters(retreat));
 
-  // Slugs whose imagery is suppressed (wrong/bad source image).
-  const HIDDEN_IMAGE_SLUGS = new Set(["amour-center"]);
-  const imagesHidden = HIDDEN_IMAGE_SLUGS.has(slug);
-  const hasImage = !imagesHidden && retreat.hero_image_url?.startsWith("http");
-  const galleryImages = imagesHidden ? [] : (retreat.gallery_images || []).filter((img: string) => img?.startsWith("http"));
+  // Copyright-safe imagery only. getRetreatImage returns the retreat's own
+  // Unsplash photo, or a free, commercially licensed Unsplash fallback keyed to
+  // the location — never a hotlinked third-party (bookretreats.com / retreat.guru)
+  // image. Gallery is restricted to known-safe sources; scraped URLs are dropped.
+  const heroImage = getRetreatImage(retreat);
+  const hasImage = heroImage.startsWith("http");
+  const galleryImages = (retreat.gallery_images || []).filter(
+    (img: string) =>
+      img?.startsWith("https://images.unsplash.com/") ||
+      img?.startsWith("https://images.pexels.com/")
+  );
 
   const faqJsonLd = {
     "@context": "https://schema.org",
@@ -156,7 +163,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
     "@type": "Product",
     name: retreat.name,
     description: retreat.subtitle,
-    image: retreat.hero_image_url || undefined,
+    image: heroImage || undefined,
     brand: { "@type": "Brand", name: retreat.name },
     offers: {
       "@type": "AggregateOffer",
@@ -180,7 +187,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
     "@type": "HealthAndBeautyBusiness",
     name: retreat.name,
     description: retreat.subtitle,
-    image: retreat.hero_image_url || undefined,
+    image: heroImage || undefined,
     url: retreat.website_url,
     address: {
       "@type": "PostalAddress",
@@ -231,7 +238,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
       <section className="relative h-[70vh] min-h-[500px] overflow-hidden">
         {hasImage && (
           <Image
-            src={retreat.hero_image_url as string}
+            src={heroImage}
             alt={retreat.name}
             fill
             priority
@@ -655,7 +662,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
           <div className="relative overflow-hidden rounded-3xl border border-white/[0.04]">
             {hasImage && (
               <Image
-                src={retreat.hero_image_url as string}
+                src={heroImage}
                 alt=""
                 fill
                 loading="lazy"
