@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Cormorant_Garamond } from "next/font/google";
+import { Gloock, Hanken_Grotesk } from "next/font/google";
 import Image from "next/image";
 import "./globals.css";
 import CompareProvider from "@/components/CompareProvider";
@@ -8,19 +8,19 @@ import PressStrip from "@/components/PressStrip";
 import MobileNav from "@/components/MobileNav";
 import EmailCapture from "@/components/EmailCapture";
 
-const inter = Inter({
+const display = Gloock({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: "400",
   display: "swap",
-  variable: "--font-inter",
+  variable: "--font-display",
   adjustFontFallback: true,
 });
 
-const cormorant = Cormorant_Garamond({
+const sans = Hanken_Grotesk({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "700"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
-  variable: "--font-cormorant",
+  variable: "--font-sans",
   adjustFontFallback: true,
 });
 
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${cormorant.variable}`}>
+    <html lang="en" className={`${display.variable} ${sans.variable}`}>
       <head>
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="" />
       </head>

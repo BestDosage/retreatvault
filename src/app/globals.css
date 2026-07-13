@@ -1,6 +1,24 @@
 @import "tailwindcss";
 
 @theme {
+  --font-display: var(--font-display), "Georgia", serif;
+  --font-sans: var(--font-sans), system-ui, sans-serif;
+
+  /* Warm cream surfaces — OKLCH, hue 85 (warm) */
+  --color-cream-50: oklch(0.975 0.008 85);
+  --color-cream-100: oklch(0.955 0.010 85);
+  --color-cream-200: oklch(0.925 0.012 85);
+  /* Warm ink */
+  --color-ink-900: oklch(0.24 0.015 85);
+  --color-ink-700: oklch(0.36 0.014 85);
+  --color-ink-500: oklch(0.50 0.012 85);
+  /* Single accent: deep sage green */
+  --color-sage-700: oklch(0.42 0.075 155);
+  --color-sage-600: oklch(0.48 0.080 155);
+  --color-sage-100: oklch(0.93 0.025 155);
+  /* Score gold — badges only, never body text on cream */
+  --color-gold: oklch(0.70 0.115 85);
+
   --color-gold-50: #fdf8ed;
   --color-gold-100: #f9edcd;
   --color-gold-200: #f2d896;
@@ -24,8 +42,11 @@
   --color-dark-900: #0a0a0a;
   --color-dark-950: #050505;
 
-  --font-family-serif: var(--font-cormorant), Georgia, serif;
-  --font-family-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  /* Legacy aliases — old next/font vars (--font-cormorant, --font-inter) are
+     retired; anything still reading these custom props now resolves to the
+     new Gloock/Hanken Grotesk stack instead of silently losing font-family. */
+  --font-family-serif: var(--font-display), "Georgia", serif;
+  --font-family-sans: var(--font-sans), system-ui, sans-serif;
 }
 
 * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
@@ -96,6 +117,13 @@ body {
 .line-gold {
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(212,175,55,0.25), transparent);
+}
+
+/* ═══ PAPER GRAIN OVERLAY ═══ */
+.grain::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none;
+  opacity: 0.03; z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
 }
 
 /* ═══ IMAGE REVEAL ═══ */
