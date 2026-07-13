@@ -47,14 +47,14 @@ export function BestForChips({
           <a
             key={tag}
             href={`/retreats?tag=${encodeURIComponent(tag)}`}
-            className="rounded-full border border-gold-400/15 bg-gold-400/[0.06] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-gold-300 transition-all duration-300 hover:border-gold-400/30 hover:bg-gold-400/10"
+            className="rounded-full bg-sage-100 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-sage-700 transition-colors duration-150 ease-out hover:bg-sage-100/70"
           >
             {tag}
           </a>
         ) : (
           <span
             key={tag}
-            className="rounded-full border border-gold-400/15 bg-gold-400/[0.06] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-gold-300"
+            className="rounded-full bg-sage-100 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-sage-700"
           >
             {tag}
           </span>

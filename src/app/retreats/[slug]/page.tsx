@@ -606,12 +606,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
           )}
         </div>
 
-        {/* TEMP dark band — remaining sections belong to Task 6 (RealCost cost
-            calculator, CTA, Similar retreats) and to later inline conversions
-            (Analyst Notes, FAQ, Gallery, Videos, Best For, Awards, Guides, Email,
-            Explore). Kept legible on cream until their tasks convert them. */}
-        <div className="rounded-[2rem] bg-dark-950 p-5 sm:p-8 [&>*:last-child]:mb-0">
-        {/* ═══ REAL COST CALCULATOR (Task 6) ═══ */}
+        {/* ═══ REAL COST CALCULATOR ═══ */}
         <AnimateIn className="mb-20">
           <RealCostCalculator
             retreatName={retreat.name}
@@ -627,66 +622,67 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         </AnimateIn>
 
         {/* ═══ ANALYST NOTES ═══ */}
-        <div className="mb-20">
-          <AnimateIn>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Expert Review</p>
-            <h2 className="mt-3 font-serif text-3xl font-light text-white">Analyst Notes</h2>
-          </AnimateIn>
-          <StaggerContainer className="mt-8 grid gap-4 sm:grid-cols-2" staggerDelay={0.05}>
-            {sortedScores.map(([key, cat]) => cat.notes && (
-              <StaggerItem key={key}>
-                <div className="rounded-2xl border border-white/[0.03] bg-white/[0.015] p-6 transition-all duration-500 hover:border-gold-500/10">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[12px] font-medium text-dark-200">{CATEGORY_LABELS[key]}</span>
-                    <span className={`font-serif text-lg ${cat.score >= 9 ? "text-gold-300" : cat.score >= 8 ? "text-gold-500" : "text-dark-300"}`}>
-                      {cat.score.toFixed(1)}
-                    </span>
+        <AnimateIn className="mb-20">
+          <div className="border-t border-cream-200 pt-8">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Expert Review</p>
+            <h2 className="mt-2 font-display text-3xl text-ink-900">Analyst Notes</h2>
+            <StaggerContainer className="mt-8 grid gap-x-10 gap-y-0 sm:grid-cols-2" staggerDelay={0.05}>
+              {sortedScores.map(([key, cat]) => cat.notes && (
+                <StaggerItem key={key}>
+                  <div className="border-b border-cream-200 py-4">
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="text-[12px] font-medium text-ink-700">{CATEGORY_LABELS[key]}</span>
+                      <span className={`font-display text-lg tabular-nums ${cat.score >= 9 ? "text-sage-700" : cat.score >= 8 ? "text-sage-600" : "text-ink-500"}`}>
+                        {cat.score.toFixed(1)}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-[12px] leading-relaxed text-ink-500">{cat.notes}</p>
                   </div>
-                  <p className="mt-3 text-[12px] leading-relaxed text-dark-300">{cat.notes}</p>
-                </div>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
-        </div>
+                </StaggerItem>
+              ))}
+            </StaggerContainer>
+          </div>
+        </AnimateIn>
 
         {/* ═══ FAQ ═══ */}
-        <div className="mb-20">
-          <AnimateIn>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Common Questions</p>
-            <h2 className="mt-3 font-serif text-3xl font-light text-white">Frequently Asked</h2>
-          </AnimateIn>
-          <StaggerContainer className="mt-8 space-y-4" staggerDelay={0.06}>
-            {faqs.map((faq, i) => (
-              <StaggerItem key={i}>
-                <div className="rounded-2xl border border-white/[0.04] bg-white/[0.02] p-6 sm:p-8">
-                  <h3 className="font-serif text-[16px] font-medium text-white">{faq.question}</h3>
-                  <p className="mt-3 text-[13px] leading-relaxed text-dark-300">{faq.answer}</p>
-                </div>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
-        </div>
+        <AnimateIn className="mb-20">
+          <div className="border-t border-cream-200 pt-8">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Common Questions</p>
+            <h2 className="mt-2 font-display text-3xl text-ink-900">Frequently Asked</h2>
+            <StaggerContainer className="mt-6 divide-y divide-cream-200 border-t border-cream-200" staggerDelay={0.06}>
+              {faqs.map((faq, i) => (
+                <StaggerItem key={i}>
+                  <div className="py-5">
+                    <h3 className="font-display text-[17px] text-ink-900">{faq.question}</h3>
+                    <p className="mt-2 max-w-[70ch] text-[13px] leading-relaxed text-ink-700">{faq.answer}</p>
+                  </div>
+                </StaggerItem>
+              ))}
+            </StaggerContainer>
+          </div>
+        </AnimateIn>
 
         {/* ═══ GALLERY ═══ */}
         {galleryImages.length > 0 && (
           <AnimateIn className="mb-20">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Gallery</p>
-            <h2 className="mt-3 font-serif text-3xl font-light text-white">Visual Tour</h2>
-            <div className="mt-8 grid gap-3 sm:grid-cols-3">
-              {galleryImages.map((img: string, i: number) => (
-                <div key={i} className="group/g relative aspect-[4/3] overflow-hidden rounded-2xl">
-                  <Image
-                    src={img}
-                    alt={`${retreat.name} ${i + 1}`}
-                    fill
-                    loading="lazy"
-                    sizes="(max-width: 640px) 100vw, 33vw"
-                    quality={65}
-                    className="object-cover transition-transform duration-[1s] group-hover/g:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-dark-950/10 transition-opacity duration-500 group-hover/g:opacity-0" />
-                </div>
-              ))}
+            <div className="border-t border-cream-200 pt-8">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Gallery</p>
+              <h2 className="mt-2 font-display text-3xl text-ink-900">Visual Tour</h2>
+              <div className="mt-8 grid gap-3 sm:grid-cols-3">
+                {galleryImages.map((img: string, i: number) => (
+                  <div key={i} className="group/g relative aspect-[4/3] overflow-hidden rounded-2xl bg-cream-100">
+                    <Image
+                      src={img}
+                      alt={`${retreat.name} ${i + 1}`}
+                      fill
+                      loading="lazy"
+                      sizes="(max-width: 640px) 100vw, 33vw"
+                      quality={65}
+                      className="object-cover transition-transform duration-[1s] ease-out group-hover/g:scale-110"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </AnimateIn>
         )}
@@ -694,67 +690,75 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         {/* ═══ REAL GUEST VIDEOS ═══ */}
         {videos.length > 0 && (
           <AnimateIn className="mb-20">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Real Guest Videos</p>
-            <h2 className="mt-3 font-serif text-3xl font-light text-white">See It For Yourself</h2>
-            <p className="mt-2 text-[12px] text-dark-500">Independent reviews, vlogs, and walkthroughs from real visitors</p>
-            <div className={`mt-8 grid gap-4 ${videos.length > 1 ? "sm:grid-cols-2" : "max-w-3xl"}`}>
-              {videos.map((video) => (
-                <div key={video.video_id} className="overflow-hidden rounded-2xl border border-white/[0.04] transition-all duration-300 hover:border-gold-500/15">
-                  <div className="relative aspect-video">
-                    <YouTubeFacade videoId={video.video_id} title={video.title} />
+            <div className="border-t border-cream-200 pt-8">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Real Guest Videos</p>
+              <h2 className="mt-2 font-display text-3xl text-ink-900">See It For Yourself</h2>
+              <p className="mt-2 text-[12px] text-ink-500">Independent reviews, vlogs, and walkthroughs from real visitors</p>
+              <div className={`mt-8 grid gap-4 ${videos.length > 1 ? "sm:grid-cols-2" : "max-w-3xl"}`}>
+                {videos.map((video) => (
+                  <div key={video.video_id} className="overflow-hidden rounded-2xl bg-cream-100 ring-1 ring-cream-200">
+                    <div className="relative aspect-video">
+                      <YouTubeFacade videoId={video.video_id} title={video.title} />
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-[13px] font-medium text-ink-900">{video.title}</h3>
+                      <p className="mt-1 text-[11px] text-ink-500">{video.channel_name}</p>
+                    </div>
                   </div>
-                  <div className="bg-white/[0.02] p-4">
-                    <h3 className="text-[13px] font-medium text-white">{video.title}</h3>
-                    <p className="mt-1 text-[11px] text-dark-400">{video.channel_name}</p>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </AnimateIn>
         )}
 
         {/* ═══ BEST FOR + TAGS ═══ */}
         <AnimateIn className="mb-20">
-          {/* Best For tags */}
-          <div className="mb-8">
-            <h3 className="mb-4 text-[11px] font-semibold uppercase tracking-[0.25em] text-gold-500">Best For</h3>
-            <BestForChips retreat={retreat} />
-          </div>
-          <div className="grid gap-10 sm:grid-cols-3">
-            {[
-              { title: "Specialties", items: retreat.specialty_tags, color: "border-gold-400/10 bg-gold-400/5 text-gold-300" },
-              { title: "Dietary", items: retreat.dietary_options, color: "border-white/[0.06] bg-white/[0.02] text-dark-300" },
-              { title: "Programs", items: retreat.program_types, color: "border-white/[0.06] bg-white/[0.02] text-dark-300" },
-            ].map((section) => (
-              <div key={section.title}>
-                <h3 className="text-[11px] font-semibold uppercase tracking-[0.25em] text-gold-500">{section.title}</h3>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {section.items.map((item) => (
-                    <span key={item} className={`rounded-full border px-3 py-1.5 text-[10px] font-medium capitalize ${section.color}`}>
-                      {item.replace(/-/g, " ")}
-                    </span>
-                  ))}
+          <div className="border-t border-cream-200 pt-8">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Best For</p>
+            <div className="mt-4">
+              <BestForChips retreat={retreat} />
+            </div>
+            <div className="mt-10 grid gap-10 sm:grid-cols-3">
+              {[
+                { title: "Specialties", items: retreat.specialty_tags, highlight: true },
+                { title: "Dietary", items: retreat.dietary_options, highlight: false },
+                { title: "Programs", items: retreat.program_types, highlight: false },
+              ].map((section) => (
+                <div key={section.title}>
+                  <h3 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">{section.title}</h3>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {section.items.map((item) => (
+                      <span
+                        key={item}
+                        className={`rounded-full px-3 py-1.5 text-[10px] font-medium capitalize ${
+                          section.highlight ? "bg-sage-100 text-sage-700" : "bg-cream-100 text-ink-700 ring-1 ring-cream-200"
+                        }`}
+                      >
+                        {item.replace(/-/g, " ")}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </AnimateIn>
 
         {/* ═══ AWARDS ═══ */}
         {awards.length > 0 && (
           <AnimateIn className="mb-20">
-            <div className="rounded-3xl border border-gold-400/8 bg-gradient-to-br from-white/[0.02] to-transparent p-8 sm:p-10">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Recognition</p>
-              <h2 className="mt-3 font-serif text-3xl font-light text-white">Awards</h2>
-              <div className="mt-8 space-y-5">
+            <div className="border-t border-cream-200 pt-8">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Recognition</p>
+              <h2 className="mt-2 font-display text-3xl text-ink-900">Awards</h2>
+              <div className="mt-8">
                 {awards.map((award, i) => (
-                  <div key={i} className="flex items-center gap-5">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-gold-400/20 bg-gold-400/10">
-                      <span className="text-gold-400">{"\u2726"}</span>
+                  <div key={i} className="flex items-center gap-5 border-b border-cream-200 py-4">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-sage-100">
+                      <span aria-hidden className="text-sage-700">{"\u2726"}</span>
                     </div>
                     <div>
-                      <span className="text-[14px] font-medium text-white">{award.name}</span>
-                      <span className="ml-3 text-[12px] text-dark-400">{award.year} &mdash; {award.issuing_body}</span>
+                      <span className="text-[14px] font-medium text-ink-900">{award.name}</span>
+                      <span className="ml-3 text-[12px] text-ink-500">{award.year} &mdash; {award.issuing_body}</span>
                     </div>
                   </div>
                 ))}
@@ -766,54 +770,49 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         {/* ═══ FEATURED IN GUIDES ═══ */}
         {matchingGuides.length > 0 && (
           <AnimateIn className="mb-20">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Featured In</p>
-            <h2 className="mt-3 font-serif text-3xl font-light text-white">Retreat Guides</h2>
-            <p className="mt-2 text-[12px] text-dark-500">This retreat appears in {matchingGuides.length} curated {matchingGuides.length === 1 ? "guide" : "guides"}</p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              {matchingGuides.map((g) => (
-                <a
-                  key={g.slug}
-                  href={`/guides/${g.slug}`}
-                  className="rounded-full border border-gold-400/15 bg-gold-400/[0.05] px-4 py-2 text-[11px] font-medium text-gold-300 transition-all hover:border-gold-400/30 hover:bg-gold-400/[0.08]"
-                >
-                  {g.title}
-                </a>
-              ))}
+            <div className="border-t border-cream-200 pt-8">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Featured In</p>
+              <h2 className="mt-2 font-display text-3xl text-ink-900">Retreat Guides</h2>
+              <p className="mt-2 text-[12px] text-ink-500">This retreat appears in {matchingGuides.length} curated {matchingGuides.length === 1 ? "guide" : "guides"}</p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                {matchingGuides.map((g) => (
+                  <a
+                    key={g.slug}
+                    href={`/guides/${g.slug}`}
+                    className="rounded-full bg-sage-100 px-4 py-2 text-[11px] font-medium text-sage-700 transition-colors duration-150 ease-out hover:bg-sage-100/70"
+                  >
+                    {g.title}
+                  </a>
+                ))}
+              </div>
             </div>
           </AnimateIn>
         )}
 
-        {/* ═══ CTA ═══ */}
+        {/* ═══ CTA — primary conversion moment ═══ */}
         <AnimateIn className="mb-24">
-          <div className="relative overflow-hidden rounded-3xl border border-white/[0.04]">
-            {hasImage && (
-              <Image
-                src={heroImage}
-                alt=""
-                fill
-                loading="lazy"
-                sizes="100vw"
-                quality={65}
-                className="object-cover"
-              />
-            )}
-            <div className="absolute inset-0 bg-dark-950/80 backdrop-blur-sm" />
-            <div className="relative px-10 py-20 text-center sm:px-16 sm:py-28">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-gold-400">Begin Your Journey</p>
-              <h2 className="mt-4 font-serif text-3xl font-light text-white sm:text-4xl">
-                Experience {retreat.name}
-              </h2>
-              <p className="mx-auto mt-4 max-w-md text-[13px] text-dark-300">
-                Visit their official website for current availability and booking.
-              </p>
-              <div className="mt-8">
-                <a href={retreat.website_url} target="_blank" rel="noopener noreferrer" className="btn-luxury">
-                  Visit Official Site
-                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          <div className="rounded-[2rem] bg-cream-100 px-8 py-14 text-center ring-1 ring-cream-200 sm:px-16 sm:py-20">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-sage-700">Begin Your Journey</p>
+            <h2 className="mt-4 font-display text-3xl text-ink-900 sm:text-4xl">
+              Experience {retreat.name}
+            </h2>
+            <p className="mx-auto mt-4 max-w-md text-[13px] leading-relaxed text-ink-700">
+              Visit their official website for current availability and booking.
+            </p>
+            <div className="mt-8 flex justify-center">
+              <a
+                href={retreat.website_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-3 rounded-full bg-ink-900 py-3 pl-7 pr-3 text-sm font-medium text-cream-50 transition-transform duration-150 ease-out active:scale-[0.97]"
+              >
+                Visit Official Site
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10">
+                  <svg className="h-4 w-4 transition-transform duration-150 ease-out group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
-                </a>
-              </div>
+                </span>
+              </a>
             </div>
           </div>
         </AnimateIn>
@@ -833,51 +832,32 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
 
         {/* ═══ EXPLORE MORE ═══ */}
         <AnimateIn className="mb-24">
-          <div className="rounded-3xl border border-white/[0.04] bg-white/[0.015] p-8 sm:p-12">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Keep Exploring</p>
-            <h2 className="mt-3 font-serif text-3xl font-light text-white">Explore More</h2>
-            <div className="mt-8 grid gap-4 sm:grid-cols-3">
-              <Link
-                href={`/retreats/region/${retreat.region.toLowerCase()}`}
-                className="group/link flex items-center justify-between rounded-2xl border border-white/[0.04] bg-white/[0.02] p-6 transition-all duration-300 hover:border-gold-500/15 hover:bg-white/[0.04]"
-              >
-                <div>
-                  <p className="text-[13px] font-medium text-white">More {retreat.region} Retreats</p>
-                  <p className="mt-1 text-[11px] text-dark-400">Browse the full directory</p>
-                </div>
-                <svg className="h-4 w-4 text-dark-400 transition-all duration-300 group-hover/link:translate-x-0.5 group-hover/link:text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-              <Link
-                href="/compare"
-                className="group/link flex items-center justify-between rounded-2xl border border-white/[0.04] bg-white/[0.02] p-6 transition-all duration-300 hover:border-gold-500/15 hover:bg-white/[0.04]"
-              >
-                <div>
-                  <p className="text-[13px] font-medium text-white">Compare Retreats</p>
-                  <p className="mt-1 text-[11px] text-dark-400">Side-by-side analysis</p>
-                </div>
-                <svg className="h-4 w-4 text-dark-400 transition-all duration-300 group-hover/link:translate-x-0.5 group-hover/link:text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-              <Link
-                href="/quiz"
-                className="group/link flex items-center justify-between rounded-2xl border border-white/[0.04] bg-white/[0.02] p-6 transition-all duration-300 hover:border-gold-500/15 hover:bg-white/[0.04]"
-              >
-                <div>
-                  <p className="text-[13px] font-medium text-white">Find Your Perfect Retreat</p>
-                  <p className="mt-1 text-[11px] text-dark-400">Take the personalized quiz</p>
-                </div>
-                <svg className="h-4 w-4 text-dark-400 transition-all duration-300 group-hover/link:translate-x-0.5 group-hover/link:text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
+          <div className="border-t border-cream-200 pt-8">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Keep Exploring</p>
+            <h2 className="mt-2 font-display text-3xl text-ink-900">Explore More</h2>
+            <div className="mt-6 divide-y divide-cream-200 border-t border-cream-200">
+              {[
+                { href: `/retreats/region/${retreat.region.toLowerCase()}`, title: `More ${retreat.region} Retreats`, sub: "Browse the full directory" },
+                { href: "/compare", title: "Compare Retreats", sub: "Side-by-side analysis" },
+                { href: "/quiz", title: "Find Your Perfect Retreat", sub: "Take the personalized quiz" },
+              ].map((l) => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className="group flex items-center justify-between gap-4 py-4 transition-colors duration-200 ease-out"
+                >
+                  <div>
+                    <p className="text-sm font-medium text-ink-900 transition-colors duration-200 group-hover:text-sage-700">{l.title}</p>
+                    <p className="mt-0.5 text-xs text-ink-500">{l.sub}</p>
+                  </div>
+                  <svg className="h-4 w-4 shrink-0 text-ink-500 transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:text-sage-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              ))}
             </div>
           </div>
         </AnimateIn>
-        </div>
-        {/* END TEMP dark band */}
       </div>
     </div>
   );

@@ -23,10 +23,10 @@ export default function AddToCompareButton({ retreat }: Props) {
         e.stopPropagation();
         selected ? remove(retreat.id) : add(retreat);
       }}
-      className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.15em] transition-all duration-300 ${
+      className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.15em] transition-all duration-150 ease-out active:scale-[0.97] ${
         selected
-          ? "bg-gold-400 text-dark-950 shadow-[0_0_16px_rgba(212,175,55,0.2)]"
-          : "border border-white/[0.08] text-dark-300 hover:border-gold-400/30 hover:text-white"
+          ? "bg-ink-900 text-cream-50"
+          : "text-ink-700 ring-1 ring-ink-900/20 hover:text-ink-900 hover:ring-ink-900/40"
       }`}
     >
       {selected ? (
