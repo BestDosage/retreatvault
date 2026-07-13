@@ -35,9 +35,16 @@ function useTokens() {
 export default function RadarChart({ scores, name }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [animate, setAnimate] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
   const tokens = useTokens();
 
   useEffect(() => {
+    // Respect prefers-reduced-motion: values appear instantly, no sweep.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setReducedMotion(true);
+      setAnimate(true);
+      return;
+    }
     const el = ref.current;
     if (!el || typeof IntersectionObserver === "undefined") {
       setAnimate(true);
@@ -91,7 +98,7 @@ export default function RadarChart({ scores, name }: Props) {
   const options = {
     responsive: true,
     maintainAspectRatio: true,
-    animation: { duration: 1200, easing: "easeOutQuart" as const },
+    animation: reducedMotion ? (false as const) : { duration: 1200, easing: "easeOutQuart" as const },
     scales: {
       r: {
         min: 0,

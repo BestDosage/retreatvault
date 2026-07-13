@@ -520,27 +520,39 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
               <div className="mt-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
                 <div className="flex items-center gap-4">
                   <WrdScore score={retreat.wrd_score} />
-                  <TierBadge tier={retreat.score_tier} size="md" />
+                  <TierBadge tier={retreat.score_tier} size="sm" />
                 </div>
                 <Link href="/methodology" className="shrink-0 text-[11px] font-medium tracking-wide text-sage-700 underline-offset-4 transition-colors hover:text-sage-600 hover:underline">
                   How we score&nbsp;&rarr;
                 </Link>
               </div>
 
-              <h2 className="mt-9 font-display text-3xl text-ink-900">Score Breakdown</h2>
-              <p className="mt-2 text-[12px] text-ink-500">15 categories, weighted by impact on the wellness experience</p>
+              {scorePublic ? (
+                <>
+                  <h2 className="mt-9 font-display text-3xl text-ink-900">Score Breakdown</h2>
+                  <p className="mt-2 text-[12px] text-ink-500">15 categories, weighted by impact on the wellness experience</p>
 
-              <div className="mt-10 space-y-2.5">
-                {sortedScores.map(([key, cat]) => (
-                  <ScoreBar key={key} score={cat.score} label={CATEGORY_LABELS[key]} weight={SCORE_WEIGHTS[key]} />
-                ))}
-              </div>
+                  <div className="mt-10 space-y-2.5">
+                    {sortedScores.map(([key, cat]) => (
+                      <ScoreBar key={key} score={cat.score} label={CATEGORY_LABELS[key]} weight={SCORE_WEIGHTS[key]} />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                // Display gate: when the composite is "Listed", category numbers stay
+                // private too — no bars, no radar, just an honest designed state.
+                <p className="mt-9 text-sm italic text-ink-500">
+                  Full score breakdown available once this retreat completes verification.
+                </p>
+              )}
             </div>
           </div>
         </AnimateIn>
 
         {/* ═══ RADAR CHART + VAULT VS GUEST ═══ */}
         <div className="mb-20 grid gap-8 lg:grid-cols-2">
+          {/* Radar plots numeric category scores — gated with the breakdown. */}
+          {scorePublic && (
           <AnimateIn>
             <div className="rounded-[2rem] bg-cream-100 p-6 ring-1 ring-cream-200 sm:p-8">
               <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-sage-700">Visual Profile</p>
@@ -550,6 +562,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
               </div>
             </div>
           </AnimateIn>
+          )}
           {/* TEMP dark container — VaultVsGuest belongs to a later task; keeps it legible on cream. */}
           <AnimateIn delay={0.15} className="rounded-[2rem] bg-dark-950 p-2">
             <VaultVsGuest
