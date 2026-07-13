@@ -158,6 +158,20 @@ export const CATEGORY_LABELS: Record<keyof RetreatScores, string> = {
   addons: "Add-Ons & Options",
 };
 
+/**
+ * Display gate (BestDosage pattern). Retreats scoring below this threshold
+ * show their tier label ("Listed") instead of a numeric score, so a low number
+ * never advertises itself. Numbers are still stored and used for ranking — this
+ * governs presentation only. Keep this as the single source of truth; import it
+ * wherever a wrd_score number is rendered.
+ */
+export const MIN_PUBLIC_SCORE = 6.5;
+
+/** True when a score is high enough to display as a number (>= MIN_PUBLIC_SCORE). */
+export function isScorePublic(score: number): boolean {
+  return typeof score === "number" && !Number.isNaN(score) && score >= MIN_PUBLIC_SCORE;
+}
+
 export function getScoreTier(score: number): WellnessRetreat["score_tier"] {
   if (score >= 9.0) return "elite";
   if (score >= 8.0) return "exceptional";
