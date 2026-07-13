@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllRetreats, getRetreatBySlug, getRetreatAwards, getRetreatVideos, getSimilarRetreats, getEditorialReview, getRetreatReviews, deriveReviewThemes, getRetreatFaqs } from "@/lib/data";
-import { getRetreatImage, isStockFallback } from "@/lib/retreat-images";
+import { getRetreatImage, isVerifiedPropertyPhoto } from "@/lib/retreat-images";
 import YouTubeFacade from "@/components/YouTubeFacade";
 import SimilarRetreats from "@/components/SimilarRetreats";
 import EditorialReview from "@/components/EditorialReview";
@@ -128,10 +128,13 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
   // image. Gallery is restricted to known-safe sources; scraped URLs are dropped.
   const heroImage = getRetreatImage(retreat);
   const hasImage = heroImage.startsWith("http");
-  // Photo-reality: a location-keyed fallback is ambience, not the property. The
-  // hero renders an honest editorial split for fallbacks and a full-bleed image
-  // only when we hold a genuine photo of this retreat.
-  const isStock = isStockFallback(heroImage);
+  // Photo-reality: full-bleed is reserved for photos of the actual property
+  // (local assets / official-photos bucket). Every Unsplash/Pexels hero —
+  // curated or keyed fallback — is stock by definition and gets the honest
+  // editorial split with the "official photos pending" caption. Today that
+  // means nearly every page splits; full-bleed is the reward once official
+  // photo outreach lands. (Cards use the looser isStockFallback instead.)
+  const isVerifiedPhoto = isVerifiedPropertyPhoto(heroImage);
   const scorePublic = isScorePublic(retreat.wrd_score);
   const tierLabel = scorePublic ? getTierLabel(retreat.score_tier) : "Listed";
   const isTopTier = scorePublic && (retreat.score_tier === "elite" || retreat.score_tier === "exceptional");
@@ -263,9 +266,9 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
       />
       {/* ════════════════ HERO — editorial luxury ════════════════ */}
-      {/* Two states by photo-reality: a genuine photo goes full-bleed; a location
-          fallback gets an honest editorial split (muted duotone, "photos pending"). */}
-      {!isStock ? (
+      {/* Two states by photo-reality: a verified property photo goes full-bleed;
+          any stock imagery gets the honest editorial split (duotone, "photos pending"). */}
+      {isVerifiedPhoto ? (
         <section className="relative min-h-[68vh] overflow-hidden bg-cream-100 md:min-h-[80vh]">
           {hasImage && (
             <Image
@@ -285,7 +288,9 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
           <div className="absolute inset-x-0 bottom-0">
             <div className="mx-auto max-w-[1440px] px-6 pb-12 sm:px-10 md:pb-16 lg:px-16">
               <AnimateIn>
-                <nav className="mb-6 flex flex-wrap items-center gap-2 text-xs tracking-wide text-cream-100/80">
+                {/* Chips sit above the scrim's strong zone — each carries its own
+                    ink backdrop so they stay legible over bright imagery. */}
+                <nav className="mb-6 flex w-fit flex-wrap items-center gap-2 rounded-full bg-ink-900/45 px-4 py-1.5 text-xs tracking-wide text-cream-100/90 backdrop-blur-sm">
                   <a href="/retreats" className="transition-colors hover:text-cream-50">Directory</a>
                   <span aria-hidden className="text-cream-100/40">/</span>
                   <a href={`/retreats?region=${retreat.region}`} className="transition-colors hover:text-cream-50">{retreat.region}</a>
@@ -296,12 +301,12 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
 
               <AnimateIn delay={0.06}>
                 <div className="mb-5 flex flex-wrap items-center gap-2.5">
-                  <span className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] backdrop-blur-sm ${isTopTier ? "border-gold/50 bg-ink-900/25 text-cream-50" : "border-cream-100/30 bg-ink-900/25 text-cream-50"}`}>
+                  <span className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] backdrop-blur-sm ${isTopTier ? "border-gold/50 bg-ink-900/45 text-cream-50" : "border-cream-100/30 bg-ink-900/45 text-cream-50"}`}>
                     <span className={`h-1.5 w-1.5 rounded-full ${isTopTier ? "bg-gold" : "bg-sage-100"}`} />
                     {tierLabel}
                   </span>
                   {retreat.is_verified && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-cream-100/30 bg-ink-900/25 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-cream-50 backdrop-blur-sm">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-cream-100/30 bg-ink-900/45 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-cream-50 backdrop-blur-sm">
                       <span className="h-1 w-1 rounded-full bg-sage-100" />
                       Verified
                     </span>
@@ -385,8 +390,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
                   src={heroImage}
                   alt=""
                   fill
-                  priority
-                  fetchPriority="high"
+                  loading="eager"
                   sizes="(max-width: 768px) 100vw, 40vw"
                   quality={70}
                   className="object-cover"

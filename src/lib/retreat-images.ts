@@ -183,13 +183,45 @@ const UNSPLASH_PREFIX = "https://images.unsplash.com/";
  * True iff `url` is one of our own location-keyed Unsplash fallbacks — i.e. a URL
  * that `safeImageUrl()`/`regionFallbackImage()` would construct (a known fallback
  * photo id carrying the exact fallback query signature). A retreat's genuine
- * Unsplash hero (different id and/or different Unsplash params) returns false, so
- * the UI can honestly mark fallback imagery as ambience rather than the property.
+ * Unsplash hero (different id and/or different Unsplash params) returns false.
+ *
+ * Distinction from `isVerifiedPropertyPhoto`: this only flags OUR keyed
+ * fallbacks. Directory cards (Task 8) duotone-mute exactly these — a curated
+ * Unsplash hero stays untreated on cards. The detail-page hero uses the
+ * stricter `isVerifiedPropertyPhoto` gate instead, because at hero scale ANY
+ * stock photo (curated or keyed) would misrepresent the property.
  */
 export function isStockFallback(url: string | null | undefined): boolean {
   if (!url || !url.startsWith(UNSPLASH_PREFIX)) return false;
   const [id, query = ""] = url.slice(UNSPLASH_PREFIX.length).split("?");
   return FALLBACK_IDS.has(id) && query === FALLBACK_QUERY;
+}
+
+// Future home of retreat-owned photography: the project's Supabase storage
+// bucket `official-photos`. Derived from NEXT_PUBLIC_SUPABASE_URL (currently
+// https://lftbzlpxngmfxbzdumlb.supabase.co) so it tracks the project. Zero
+// images live there today — that is expected; the official-photo outreach
+// will populate it, and those URLs become the only ones allowed to render
+// as a full-bleed "this is the property" hero.
+const OFFICIAL_PHOTO_PREFIX = process.env.NEXT_PUBLIC_SUPABASE_URL
+  ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/official-photos/`
+  : "";
+
+/**
+ * True iff `url` is a photo of the actual property that WE control: a local
+ * /public asset (same-origin path) or our Supabase `official-photos` bucket.
+ *
+ * Every Unsplash/Pexels URL — including curated heroes that pass
+ * isSafeImageUrl — is by definition stock, not the property, and returns
+ * false. The detail-page hero renders full-bleed ONLY when this is true;
+ * everything else gets the honest editorial split ("official photos
+ * pending"). Contrast with `isStockFallback` above, which cards use to
+ * mute only our keyed fallbacks.
+ */
+export function isVerifiedPropertyPhoto(url: string | null | undefined): boolean {
+  if (!url) return false;
+  if (url.startsWith("/")) return true; // local /public asset we placed deliberately
+  return OFFICIAL_PHOTO_PREFIX !== "" && url.startsWith(OFFICIAL_PHOTO_PREFIX);
 }
 
 /**
@@ -210,6 +242,8 @@ export function safeImageUrl(rawUrl: string, region: string, country: string, sl
  */
 export function getRetreatImage(retreat: WellnessRetreat): string {
   const hero = retreat.hero_image_url || "";
+  // Retreat-owned photography (local asset / official-photos bucket) always wins.
+  if (isVerifiedPropertyPhoto(hero)) return hero;
   if (hero.startsWith("https://images.unsplash.com/")) return hero;
   return pickFallback(retreat);
 }
