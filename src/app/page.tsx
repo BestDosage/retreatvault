@@ -19,10 +19,11 @@ import PressStrip from "@/components/PressStrip";
 import EmailCapture from "@/components/EmailCapture";
 import type { WellnessRetreat } from "@/lib/types";
 
-// Ambient hero imagery — a calm natural scene, used as pure atmosphere.
-// IMPORTANT: this is stock (Unsplash); it is never captioned as any specific
-// retreat's property. Real property heroes live on the detail pages.
-const HERO_IMAGE = "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1400&h=1800&fit=crop&q=75";
+// Ambient hero imagery — a serene place-based resort scene (tropical pool at
+// dusk), used as pure atmosphere. IMPORTANT: this is stock (Unsplash); it is
+// never captioned as any specific retreat's property. Real property heroes
+// live on the detail pages.
+const HERO_IMAGE = "https://images.unsplash.com/photo-1540541338287-41700207dee6?w=1400&h=1800&fit=crop&q=75";
 
 // ═══ small arrow-circle CTA pill (matches detail-page primary CTA) ═══
 function ArrowCircle({ className = "" }: { className?: string }) {
@@ -303,8 +304,13 @@ export default async function HomePage() {
             {/* Large editorial feature */}
             {feature && (
               <AnimateIn className="h-full">
-                <Link href={`/retreats/${feature.slug}`} className="group block h-full">
-                  <div className="relative h-full min-h-[460px] overflow-hidden rounded-[1.75rem] bg-cream-100 ring-1 ring-cream-200 lg:min-h-[560px]">
+                {/* Image honesty: imagery is ambience only — name/location/score live
+                    in the cream caption body below, never on the photo itself. */}
+                <Link
+                  href={`/retreats/${feature.slug}`}
+                  className="group flex h-full flex-col overflow-hidden rounded-[1.75rem] bg-cream-100 ring-1 ring-cream-200 transition-all duration-300 ease-out hover:ring-sage-600/30"
+                >
+                  <div className="relative min-h-[300px] flex-1 overflow-hidden sm:min-h-[360px]">
                     <Image
                       src={getRetreatImage(feature)}
                       alt=""
@@ -313,38 +319,43 @@ export default async function HomePage() {
                       sizes="(max-width: 1024px) 100vw, 55vw"
                       quality={70}
                       className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.04]"
+                      style={{ filter: "sepia(0.15) saturate(0.7)" }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-ink-900/70 via-ink-900/10 to-transparent" />
                     <div className="absolute left-5 top-5">
                       <TierBadge tier={feature.score_tier} size="sm" />
                     </div>
-                    <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-cream-100/85">
-                        {[feature.city, feature.country].filter(Boolean).join(", ")}
+                    <span className="absolute bottom-4 right-4 rounded-full bg-ink-900/40 px-3 py-1 text-[10px] tracking-wide text-cream-50/80 backdrop-blur-sm">
+                      Representative imagery
+                    </span>
+                  </div>
+
+                  {/* Editorial caption body — cream surface */}
+                  <div className="p-6 sm:p-8">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-sage-700">
+                      {[feature.city, feature.country].filter(Boolean).join(", ")}
+                    </p>
+                    <h3 className="mt-2 max-w-lg font-display text-3xl leading-tight text-ink-900 sm:text-4xl">
+                      {feature.name}
+                    </h3>
+                    {feature.subtitle && (
+                      <p className="mt-3 max-w-md text-[13px] leading-relaxed text-ink-700 line-clamp-2">
+                        {feature.subtitle}
                       </p>
-                      <h3 className="mt-2 max-w-lg font-display text-3xl leading-tight text-cream-50 sm:text-4xl">
-                        {feature.name}
-                      </h3>
-                      {feature.subtitle && (
-                        <p className="mt-3 max-w-md text-[13px] leading-relaxed text-cream-100/80 line-clamp-2">
-                          {feature.subtitle}
-                        </p>
-                      )}
-                      <div className="mt-5 flex items-center gap-4">
-                        <span className="font-display text-3xl tabular-nums text-cream-50">
-                          {isScorePublic(feature.wrd_score) ? feature.wrd_score.toFixed(1) : "Listed"}
+                    )}
+                    <div className="mt-5 flex items-center gap-4 border-t border-cream-200 pt-5">
+                      <span className="font-display text-3xl tabular-nums text-ink-900">
+                        {isScorePublic(feature.wrd_score) ? feature.wrd_score.toFixed(1) : "Listed"}
+                      </span>
+                      {isScorePublic(feature.wrd_score) && (
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-500">
+                          Vault score / 10
                         </span>
-                        {isScorePublic(feature.wrd_score) && (
-                          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cream-100/70">
-                            Vault score / 10
-                          </span>
-                        )}
-                        {feature.price_min_per_night > 0 && (
-                          <span className="ml-auto text-[13px] tabular-nums text-cream-100/85">
-                            from ${feature.price_min_per_night.toLocaleString()}/night
-                          </span>
-                        )}
-                      </div>
+                      )}
+                      {feature.price_min_per_night > 0 && (
+                        <span className="ml-auto text-[13px] tabular-nums text-ink-700">
+                          from ${feature.price_min_per_night.toLocaleString()}/night
+                        </span>
+                      )}
                     </div>
                   </div>
                 </Link>
