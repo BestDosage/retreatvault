@@ -359,7 +359,9 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         </AnimateIn>
 
         {/* ═══ SPARKLINE + IDEAL GUEST ═══ */}
+        {/* Trajectory panel renders numeric scores — hide it entirely below the display gate. */}
         <div className="mb-20 grid gap-6 sm:grid-cols-2">
+          {isScorePublic(retreat.wrd_score) && (
           <AnimateIn>
             <ScoreSparkline history={scoreHistory} categoryHighlights={(() => {
               const trend = scoreHistory[scoreHistory.length - 1].score - scoreHistory[0].score;
@@ -379,13 +381,16 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
               return highlights;
             })()} />
           </AnimateIn>
+          )}
           <AnimateIn delay={0.1}>
             <IdealGuestCard profile={idealGuest} />
           </AnimateIn>
         </div>
 
         {/* ═══ EDITORIAL REVIEW ═══ */}
-        {editorialReview && (
+        {/* Stored AI prose bakes the numeric score into HTML — skip below the gate
+            (regenerating the prose is the real fix if a sub-6.5 retreat gets a review). */}
+        {editorialReview && isScorePublic(retreat.wrd_score) && (
           <AnimateIn className="mb-20">
             <EditorialReview
               retreatName={retreat.name}
