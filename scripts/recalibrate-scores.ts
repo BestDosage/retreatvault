@@ -279,6 +279,10 @@ async function main() {
   const fullDataOnly = computed.filter((c) => c.present === CATEGORIES.length);
   const fullDataInversions = countInversions(fullDataOnly);
   const missingDataRows = computed.filter((c) => c.present < CATEGORIES.length).length;
+  // These 31 missing-data rows are the one sanctioned exception to "never reorder":
+  // old stored scores silently zero-penalized missing categories, so Step 2's
+  // missing-data exclusion (renormalize over present categories only) legitimately
+  // moves their rank relative to full-data peers — that's a bug fix, not drift.
   console.log(`\nRank order:`);
   console.log(`  curve inversions (sort by raw -> published non-decreasing): ${curveInversions}  [must be 0]`);
   console.log(`  true inversions among the ${fullDataOnly.length} full-data retreats: ${fullDataInversions}  [target 0]`);

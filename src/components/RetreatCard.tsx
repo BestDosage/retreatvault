@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { WellnessRetreat } from "@/lib/types";
+import { WellnessRetreat, isScorePublic } from "@/lib/types";
 import { getRetreatImage } from "@/lib/retreat-images";
 import TierBadge from "./TierBadge";
 import AddToCompareButton from "./AddToCompareButton";
@@ -44,7 +44,7 @@ export default function RetreatCard({ retreat }: { retreat: WellnessRetreat }) {
         <div className="absolute left-4 top-4"><TierBadge tier={retreat.score_tier} size="sm" /></div>
         <div className="absolute right-4 top-4">
           <div className="flex h-11 w-11 flex-col items-center justify-center rounded-full border border-white/15 bg-dark-950/50 backdrop-blur-sm">
-            <span className="font-serif text-[13px] font-medium text-white">{retreat.wrd_score.toFixed(1)}</span>
+            <span className="font-serif text-[13px] font-medium text-white">{isScorePublic(retreat.wrd_score) ? retreat.wrd_score.toFixed(1) : "Listed"}</span>
             <span className="text-[5px] uppercase tracking-[0.15em] text-gold-400">RV</span>
           </div>
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { WellnessRetreat } from "@/lib/types";
+import { WellnessRetreat, isScorePublic } from "@/lib/types";
 import { motion } from "framer-motion";
 import TierBadge from "./TierBadge";
 
@@ -44,7 +44,7 @@ export default function HorizontalScroll({ retreats }: { retreats: WellnessRetre
               {/* Score */}
               <div className="absolute right-5 top-5 z-10">
                 <div className="flex h-12 w-12 flex-col items-center justify-center rounded-full border border-white/20 bg-dark-950/60 backdrop-blur-sm">
-                  <span className="font-serif text-sm font-medium text-white">{retreat.wrd_score.toFixed(1)}</span>
+                  <span className="font-serif text-sm font-medium text-white">{isScorePublic(retreat.wrd_score) ? retreat.wrd_score.toFixed(1) : "Listed"}</span>
                   <span className="text-[6px] uppercase tracking-widest text-gold-400">RV</span>
                 </div>
               </div>

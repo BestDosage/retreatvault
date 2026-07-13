@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { isScorePublic } from "@/lib/types";
 
 interface StickyMobileBarProps {
   retreatName: string;
@@ -27,7 +28,7 @@ export default function StickyMobileBar({ retreatName, websiteUrl, score, priceM
         <div className="min-w-0 flex-1 mr-3">
           <p className="truncate text-[13px] font-medium text-white">{retreatName}</p>
           <div className="flex items-center gap-3 mt-0.5">
-            <span className="text-[11px] font-semibold text-gold-400">{score}/10</span>
+            <span className="text-[11px] font-semibold text-gold-400">{isScorePublic(score) ? `${score}/10` : "Listed"}</span>
             {priceMin > 0 && (
               <span className="text-[11px] text-dark-400">
                 ${priceMin.toLocaleString()}&ndash;${priceMax.toLocaleString()}/night

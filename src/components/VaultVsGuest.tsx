@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { isScorePublic } from "@/lib/types";
 
 interface Props {
   vaultScore: number;
@@ -43,7 +44,7 @@ export default function VaultVsGuest({
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="mx-auto flex h-20 w-20 flex-col items-center justify-center rounded-full border-2 border-gold-400/40 bg-dark-950/60"
           >
-            <span className="font-serif text-2xl font-light text-white">{vaultScore.toFixed(1)}</span>
+            <span className="font-serif text-2xl font-light text-white">{isScorePublic(vaultScore) ? vaultScore.toFixed(1) : "Listed"}</span>
             <span className="text-[7px] font-semibold uppercase tracking-[0.2em] text-gold-400">Vault</span>
           </motion.div>
           <p className="mt-3 text-[10px] text-dark-400">Analytical Score</p>

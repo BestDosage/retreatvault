@@ -1,3 +1,5 @@
+import { isScorePublic } from "@/lib/types";
+
 export default function WrdScore({ score, size = "md" }: { score: number; size?: "sm" | "md" | "lg" | "xl" }) {
   const isTop = score >= 8.0;
 
@@ -22,7 +24,7 @@ export default function WrdScore({ score, size = "md" }: { score: number; size?:
 
   return (
     <div className={`flex flex-col items-center justify-center rounded-full border ${isTop ? "border-gold-400/40" : "border-white/10"} bg-dark-950/60 backdrop-blur-md ${sizes[size]}`}>
-      <span className={`font-serif font-light leading-none text-white ${text[size]}`}>{score.toFixed(1)}</span>
+      <span className={`font-serif font-light leading-none text-white ${text[size]}`}>{isScorePublic(score) ? score.toFixed(1) : "Listed"}</span>
       <span className={`font-semibold uppercase tracking-[0.2em] text-gold-400 ${label[size]}`}>RV</span>
     </div>
   );

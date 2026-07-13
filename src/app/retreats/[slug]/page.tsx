@@ -53,18 +53,20 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const description = generateMetaDescription(retreat);
 
+  const publicScore = isScorePublic(retreat.wrd_score);
+
   return {
-    title: `${retreat.name} Review — Rated ${retreat.wrd_score}/10 (${retreat.score_tier === "elite" ? "Elite" : retreat.score_tier === "exceptional" ? "Exceptional" : "Recommended"})`,
+    title: `${retreat.name} Review — ${publicScore ? `Rated ${retreat.wrd_score}/10` : "Listed"} (${retreat.score_tier === "elite" ? "Elite" : retreat.score_tier === "exceptional" ? "Exceptional" : "Recommended"})`,
     description,
     alternates: { canonical: `/retreats/${slug}` },
     openGraph: {
-      title: `${retreat.name} — ${retreat.wrd_score}/10 Vault Score`,
+      title: `${retreat.name} — ${publicScore ? `${retreat.wrd_score}/10 Vault Score` : "Listed"}`,
       description,
       images: [{ url: getRetreatImage(retreat) }],
     },
   };
 }
-import { CATEGORY_LABELS, SCORE_WEIGHTS, RetreatScores } from "@/lib/types";
+import { CATEGORY_LABELS, SCORE_WEIGHTS, RetreatScores, isScorePublic } from "@/lib/types";
 import TierBadge from "@/components/TierBadge";
 import WrdScore from "@/components/WrdScore";
 import ScoreBar from "@/components/ScoreBar";

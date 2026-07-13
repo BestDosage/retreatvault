@@ -1,4 +1,4 @@
-import { WellnessRetreat } from "@/lib/types";
+import { WellnessRetreat, isScorePublic } from "@/lib/types";
 import TierBadge from "./TierBadge";
 import { slugifyRegion } from "@/lib/data";
 
@@ -56,7 +56,7 @@ export default function SimilarRetreats({
                 </div>
                 <div className="absolute right-3 top-3 flex h-9 w-9 flex-col items-center justify-center rounded-full border border-white/15 bg-dark-950/50 backdrop-blur-sm">
                   <span className="font-serif text-[11px] font-medium text-white">
-                    {r.wrd_score.toFixed(1)}
+                    {isScorePublic(r.wrd_score) ? r.wrd_score.toFixed(1) : "Listed"}
                   </span>
                 </div>
               </div>

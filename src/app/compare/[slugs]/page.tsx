@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getAllRetreats } from "@/lib/data";
-import { CATEGORY_LABELS, SCORE_WEIGHTS, RetreatScores, WellnessRetreat } from "@/lib/types";
+import { CATEGORY_LABELS, SCORE_WEIGHTS, RetreatScores, WellnessRetreat, isScorePublic } from "@/lib/types";
 import AnimateIn, { StaggerContainer, StaggerItem } from "@/components/AnimateIn";
 import TierBadge from "@/components/TierBadge";
 import CompareScoreBars from "@/components/CompareScoreBars";
@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slugs: st
   if (!a || !b) return {};
   return {
     title: `${a.name} vs ${b.name} \u2014 RetreatVault Comparison 2026`,
-    description: `Head-to-head comparison of ${a.name} and ${b.name} across 15 wellness categories. Vault Scores: ${a.wrd_score.toFixed(1)} vs ${b.wrd_score.toFixed(1)}.`,
+    description: `Head-to-head comparison of ${a.name} and ${b.name} across 15 wellness categories. Vault Scores: ${isScorePublic(a.wrd_score) ? a.wrd_score.toFixed(1) : "Listed"} vs ${isScorePublic(b.wrd_score) ? b.wrd_score.toFixed(1) : "Listed"}.`,
     alternates: { canonical: `/compare/${slugs}` },
   };
 }
@@ -90,7 +90,7 @@ export default async function HeadToHeadPage({ params }: { params: Promise<{ slu
                   <p className="mt-1 text-[12px] text-dark-400">{r.city}, {r.country}</p>
                   <div className="mt-4 flex items-center gap-3">
                     <div className="flex h-14 w-14 flex-col items-center justify-center rounded-full border-2 border-gold-400/30 bg-dark-950/60">
-                      <span className="font-serif text-xl font-light text-white">{r.wrd_score.toFixed(1)}</span>
+                      <span className="font-serif text-xl font-light text-white">{isScorePublic(r.wrd_score) ? r.wrd_score.toFixed(1) : "Listed"}</span>
                       <span className="text-[6px] uppercase tracking-wider text-gold-400">Vault</span>
                     </div>
                     <div>

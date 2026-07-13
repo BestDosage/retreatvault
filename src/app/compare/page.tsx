@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 import { getAllRetreats } from "@/lib/data";
-import { CATEGORY_LABELS, SCORE_WEIGHTS, RetreatScores, WellnessRetreat } from "@/lib/types";
+import { CATEGORY_LABELS, SCORE_WEIGHTS, RetreatScores, WellnessRetreat, isScorePublic } from "@/lib/types";
 import AnimateIn from "@/components/AnimateIn";
 import TierBadge from "@/components/TierBadge";
 import CompareScoreBars from "@/components/CompareScoreBars";
@@ -122,7 +122,7 @@ export default async function ComparePage({
                     {/* Score + Price */}
                     <div className="mt-2 flex items-center justify-center gap-2">
                       <div className="flex h-9 w-9 flex-col items-center justify-center rounded-full border border-gold-400/30 bg-dark-950/60">
-                        <span className="font-serif text-[12px] text-white">{r.wrd_score.toFixed(1)}</span>
+                        <span className="font-serif text-[12px] text-white">{isScorePublic(r.wrd_score) ? r.wrd_score.toFixed(1) : "Listed"}</span>
                         <span className="text-[4px] uppercase tracking-wider text-gold-400">RV</span>
                       </div>
                       <span className="text-[11px] text-dark-300">${r.price_min_per_night.toLocaleString()}/night</span>
@@ -140,7 +140,7 @@ export default async function ComparePage({
                 {selected.map((r) => (
                   <div key={r.id} className={`${colWidth} flex-shrink-0 text-center`}>
                     <div className="text-[10px] uppercase tracking-wider text-dark-500">Overall RV Score</div>
-                    <div className="mt-1 font-serif text-2xl font-light text-gold-300">{r.wrd_score.toFixed(1)}</div>
+                    <div className="mt-1 font-serif text-2xl font-light text-gold-300">{isScorePublic(r.wrd_score) ? r.wrd_score.toFixed(1) : "Listed"}</div>
                   </div>
                 ))}
               </div>

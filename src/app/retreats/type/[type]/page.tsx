@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getAllRetreats, slugifyRegion, slugifyCountry } from "@/lib/data";
-import { WellnessRetreat } from "@/lib/types";
+import { WellnessRetreat, isScorePublic } from "@/lib/types";
 import RetreatCard from "@/components/RetreatCard";
 
 export const revalidate = 3600;
@@ -543,7 +543,7 @@ export default async function RetreatTypePage({ params }: { params: Promise<Para
                         </span>
                         <div className="flex items-center justify-between md:contents">
                           <span className="font-serif text-[14px] text-gold-400 md:w-20 md:text-right">
-                            {r.wrd_score.toFixed(1)}
+                            {isScorePublic(r.wrd_score) ? r.wrd_score.toFixed(1) : "Listed"}
                           </span>
                           <span className="text-[13px] text-dark-200 md:w-48 md:text-right">
                             ${r.price_min_per_night.toLocaleString()}

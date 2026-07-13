@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { WellnessRetreat } from "@/lib/types";
+import { WellnessRetreat, isScorePublic } from "@/lib/types";
 import { getRetreatImage } from "@/lib/retreat-images";
 import TierBadge from "./TierBadge";
 
@@ -34,7 +34,7 @@ export default function SimilarRetreatCard({ retreat }: { retreat: WellnessRetre
         {/* Score pill */}
         <div className="absolute right-3 top-3">
           <div className="flex h-10 w-10 flex-col items-center justify-center rounded-full border border-white/15 bg-dark-950/50 backdrop-blur-sm">
-            <span className="font-serif text-[12px] font-medium text-white">{retreat.wrd_score.toFixed(1)}</span>
+            <span className="font-serif text-[12px] font-medium text-white">{isScorePublic(retreat.wrd_score) ? retreat.wrd_score.toFixed(1) : "Listed"}</span>
             <span className="text-[5px] uppercase tracking-[0.15em] text-gold-400">RV</span>
           </div>
         </div>

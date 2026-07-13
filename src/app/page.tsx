@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 import Image from "next/image";
 import nextDynamic from "next/dynamic";
 import { getFeaturedRetreats, getRegionCounts, getTopRetreatPerRegion } from "@/lib/data";
+import { isScorePublic } from "@/lib/types";
 import AnimateIn, { StaggerContainer, StaggerItem, Counter, TextReveal, Marquee } from "@/components/AnimateIn";
 import TierBadge from "@/components/TierBadge";
 import PressStrip from "@/components/PressStrip";
@@ -412,7 +413,7 @@ export default async function HomePage() {
         <Marquee speed={45} className="text-dark-500">
           {retreats.slice(0, 10).map((r) => (
             <span key={r.id} className="mx-10 inline-flex items-center gap-3 text-[11px] uppercase tracking-[0.15em]">
-              <span className="text-gold-500">{r.wrd_score.toFixed(1)}</span>
+              <span className="text-gold-500">{isScorePublic(r.wrd_score) ? r.wrd_score.toFixed(1) : "Listed"}</span>
               <span className="text-dark-300">{r.name}</span>
               <span className="text-dark-700">&bull;</span>
             </span>

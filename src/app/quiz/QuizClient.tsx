@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { isScorePublic } from "@/lib/types";
 
 // ═══════════════════════════════════════════════════════════
 // TYPES
@@ -286,7 +287,11 @@ function matchRetreats(answers: QuizAnswer[], retreats: RetreatData[]): MatchedR
 
       // Ensure at least 1 reason
       if (reasons.length === 0) {
-        reasons.push(`RV Score: ${r.wrd_score.toFixed(1)} — rigorously rated`);
+        reasons.push(
+          isScorePublic(r.wrd_score)
+            ? `RV Score: ${r.wrd_score.toFixed(1)} — rigorously rated`
+            : "Listed — rigorously rated"
+        );
       }
 
       return { ...r, matchScore: score, matchPercent: 0, matchReasons: reasons.slice(0, 3) };
@@ -414,7 +419,7 @@ export default function QuizClient({ retreats }: { retreats: RetreatData[] }) {
                         <div className="flex items-center gap-3">
                           <h2 className="font-serif text-xl font-light text-white group-hover:text-gold-300 sm:text-2xl">{r.name}</h2>
                           <div className="flex h-8 w-8 flex-col items-center justify-center rounded-full border border-gold-400/30 bg-dark-950/60">
-                            <span className="font-serif text-[11px] text-white">{r.wrd_score.toFixed(1)}</span>
+                            <span className="font-serif text-[11px] text-white">{isScorePublic(r.wrd_score) ? r.wrd_score.toFixed(1) : "Listed"}</span>
                             <span className="text-[4px] uppercase tracking-wider text-gold-400">RV</span>
                           </div>
                         </div>
