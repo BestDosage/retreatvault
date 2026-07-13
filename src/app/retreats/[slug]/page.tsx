@@ -448,15 +448,11 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
           ))}
         </StaggerContainer>
 
-        {/* TEMP dark band — the sections inside belong to later tasks (5/6) and are
-            still white-on-dark. This container keeps them legible on the new cream
-            page until those tasks convert them; remove the wrapper then. */}
-        <div className="mb-20 rounded-[2rem] bg-dark-950 p-5 sm:p-8 [&>*:last-child]:mb-0">
         {/* ═══ EDITORIAL SUMMARY ═══ */}
         <AnimateIn className="mb-20">
-          <div className="rounded-3xl border border-white/[0.04] bg-white/[0.02] px-8 py-10 sm:px-12 sm:py-12">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Editorial Summary</p>
-            <p className="mt-5 font-serif text-[17px] font-light leading-[1.85] text-dark-200 sm:text-[18px]">
+          <div className="border-t border-cream-200 pt-8">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Editorial Summary</p>
+            <p className="mt-5 max-w-[65ch] font-display text-2xl leading-snug text-ink-900 md:text-[28px]">
               {editorialSummary}
             </p>
           </div>
@@ -464,7 +460,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
 
         {/* ═══ SPARKLINE + IDEAL GUEST ═══ */}
         {/* Trajectory panel renders numeric scores — hide it entirely below the display gate. */}
-        <div className="mb-20 grid gap-6 sm:grid-cols-2">
+        <div className="mb-20 space-y-14">
           {isScorePublic(retreat.wrd_score) && (
           <AnimateIn>
             <ScoreSparkline history={scoreHistory} categoryHighlights={(() => {
@@ -507,8 +503,6 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
             />
           </AnimateIn>
         )}
-        </div>
-        {/* END TEMP dark band */}
 
         {/* ═══ SCORE BREAKDOWN — lab-report panel (double-bezel enclosure) ═══ */}
         <AnimateIn className="mb-20">
@@ -563,8 +557,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
             </div>
           </AnimateIn>
           )}
-          {/* TEMP dark container — VaultVsGuest belongs to a later task; keeps it legible on cream. */}
-          <AnimateIn delay={0.15} className="rounded-[2rem] bg-dark-950 p-2">
+          <AnimateIn delay={0.15}>
             <VaultVsGuest
               vaultScore={retreat.wrd_score}
               googleRating={retreat.google_rating}
@@ -575,32 +568,50 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
           </AnimateIn>
         </div>
 
-        {/* TEMP dark band — everything below belongs to later tasks (5/6) and is
-            still white-on-dark. This container keeps the page legible on cream
-            until those sections are converted; remove the wrapper then. */}
-        <div className="rounded-[2rem] bg-dark-950 p-5 sm:p-8 [&>*:last-child]:mb-0">
-        {/* ═══ PROPRIETARY INTELLIGENCE ═══ */}
-        <div className="mb-20 grid gap-6 lg:grid-cols-2">
+        {/* ═══ PROPRIETARY INTELLIGENCE + ROI + 72-HOUR + GUEST SENTIMENT ═══ */}
+        {/* Continuous cream — rule-separated editorial sections (Task 5). Panels
+            stack full-width (heading-left / content-right on md+); no card grid. */}
+        <div className="mb-20 space-y-14">
           <AnimateIn>
             <LongevityPanel data={longevity} />
           </AnimateIn>
-          <AnimateIn delay={0.1}>
+          <AnimateIn>
             <SleepSciencePanel data={sleepScience} />
           </AnimateIn>
-          <AnimateIn delay={0.15}>
+          <AnimateIn>
             <DigitalDetoxPanel data={detox} />
           </AnimateIn>
-          <AnimateIn delay={0.2}>
+          <AnimateIn>
             <SeasonalChart months={seasonal} />
           </AnimateIn>
+          <AnimateIn>
+            <RoiCalculator data={roi} />
+          </AnimateIn>
+          <AnimateIn>
+            <SeventyTwoHourCard effect={effect72} />
+          </AnimateIn>
+          {/* Guest Sentiment moved up into the cream zone (was below Analyst/FAQ). */}
+          {(retreat.google_review_count > 0 || guestReviews.length > 0) && (
+            <AnimateIn>
+              <GuestSentiment
+                retreatName={retreat.name}
+                googleRating={retreat.google_rating}
+                googleCount={retreat.google_review_count}
+                tripadvisorRating={retreat.tripadvisor_rating}
+                tripadvisorCount={retreat.tripadvisor_review_count}
+                reviews={guestReviews}
+                themes={reviewThemes}
+              />
+            </AnimateIn>
+          )}
         </div>
 
-        {/* ═══ ROI CALCULATOR ═══ */}
-        <AnimateIn className="mb-20">
-          <RoiCalculator data={roi} />
-        </AnimateIn>
-
-        {/* ═══ REAL COST CALCULATOR ═══ */}
+        {/* TEMP dark band — remaining sections belong to Task 6 (RealCost cost
+            calculator, CTA, Similar retreats) and to later inline conversions
+            (Analyst Notes, FAQ, Gallery, Videos, Best For, Awards, Guides, Email,
+            Explore). Kept legible on cream until their tasks convert them. */}
+        <div className="rounded-[2rem] bg-dark-950 p-5 sm:p-8 [&>*:last-child]:mb-0">
+        {/* ═══ REAL COST CALCULATOR (Task 6) ═══ */}
         <AnimateIn className="mb-20">
           <RealCostCalculator
             retreatName={retreat.name}
@@ -613,11 +624,6 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
             airportDistanceKm={retreat.airport_distance_km}
             nearestAirport={retreat.nearest_airport}
           />
-        </AnimateIn>
-
-        {/* ═══ THE 72-HOUR EFFECT ═══ */}
-        <AnimateIn className="mb-20">
-          <SeventyTwoHourCard effect={effect72} />
         </AnimateIn>
 
         {/* ═══ ANALYST NOTES ═══ */}
@@ -660,21 +666,6 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
             ))}
           </StaggerContainer>
         </div>
-
-        {/* ═══ GUEST SENTIMENT ═══ */}
-        {(retreat.google_review_count > 0 || guestReviews.length > 0) && (
-          <AnimateIn className="mb-20">
-            <GuestSentiment
-              retreatName={retreat.name}
-              googleRating={retreat.google_rating}
-              googleCount={retreat.google_review_count}
-              tripadvisorRating={retreat.tripadvisor_rating}
-              tripadvisorCount={retreat.tripadvisor_review_count}
-              reviews={guestReviews}
-              themes={reviewThemes}
-            />
-          </AnimateIn>
-        )}
 
         {/* ═══ GALLERY ═══ */}
         {galleryImages.length > 0 && (
