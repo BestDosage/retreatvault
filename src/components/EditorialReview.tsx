@@ -21,6 +21,8 @@ export default function EditorialReview({
 }: EditorialReviewProps) {
   return (
     <div className="border-t border-cream-200 pt-8">
+      {/* Visually-hidden heading keeps the section in the document outline. */}
+      <h2 className="sr-only">The Vault Review</h2>
       {/* Eyebrow tag + byline */}
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">The Vault Review</p>

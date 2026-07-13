@@ -273,7 +273,11 @@ export function IdealGuestCard({ profile }: { profile: IdealGuestProfile }) {
 // ═══════════════════════════════════════════════
 export function SeasonalChart({ months }: { months: MonthData[] }) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true });
+  const inView = useInView(ref, { once: true });
+  // Respect prefers-reduced-motion: values appear instantly, no bar-grow sweep
+  // (same pattern as RadarChart). useReducedMotion tracks the media query.
+  const reduce = useReducedMotion();
+  const showValues = inView || reduce;
 
   // Resolve on-palette chart colors from the CSS token custom properties
   // (canvas paint can't use Tailwind classes), matching RadarChart's approach.
@@ -310,14 +314,14 @@ export function SeasonalChart({ months }: { months: MonthData[] }) {
     datasets: [
       {
         label: "Weather",
-        data: isInView ? months.map((m) => m.weather) : months.map(() => 0),
+        data: showValues ? months.map((m) => m.weather) : months.map(() => 0),
         backgroundColor: colors.strong,
         borderRadius: 3,
         barPercentage: 0.7,
       },
       {
         label: "Value",
-        data: isInView ? months.map((m) => m.pricing) : months.map(() => 0),
+        data: showValues ? months.map((m) => m.pricing) : months.map(() => 0),
         backgroundColor: colors.soft,
         borderRadius: 3,
         barPercentage: 0.7,
@@ -328,7 +332,8 @@ export function SeasonalChart({ months }: { months: MonthData[] }) {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    animation: { duration: 900, easing: "easeOutQuart" as const },
+    // No bar-grow sweep under prefers-reduced-motion — final values render instantly.
+    animation: reduce ? (false as const) : { duration: 900, easing: "easeOutQuart" as const },
     scales: {
       x: { grid: { display: false }, ticks: { color: colors.tick, font: { size: 10 } } },
       y: { display: false, max: 12 },
