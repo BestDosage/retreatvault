@@ -68,6 +68,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 import { CATEGORY_LABELS, SCORE_WEIGHTS, RetreatScores, isScorePublic, getTierLabel } from "@/lib/types";
 import ScoreBar from "@/components/ScoreBar";
+import WrdScore from "@/components/WrdScore";
+import TierBadge from "@/components/TierBadge";
 import AnimateIn, { StaggerContainer, StaggerItem } from "@/components/AnimateIn";
 import dynamic from "next/dynamic";
 const RadarChart = dynamic(() => import("@/components/RadarChart"), { ssr: false });
@@ -241,7 +243,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
   };
 
   return (
-    <div className="min-h-screen pb-16 md:pb-0">
+    <div className="min-h-screen bg-cream-50 pb-16 md:pb-0">
       <StickyMobileBar
         retreatName={retreat.name}
         websiteUrl={retreat.website_url || null}
@@ -426,7 +428,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
       <div className="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-16">
 
         {/* ═══ KEY STATS ═══ */}
-        <StaggerContainer className="-mt-1 mb-20 grid grid-cols-2 gap-4 sm:grid-cols-4" staggerDelay={0.08}>
+        <StaggerContainer className="mt-12 mb-20 grid grid-cols-2 gap-4 sm:grid-cols-4" staggerDelay={0.08}>
           {[
             retreat.price_min_per_night > 0 ? { label: "Price Range", value: `$${retreat.price_min_per_night.toLocaleString()}\u2013$${retreat.price_max_per_night.toLocaleString()}`, sub: "per night" } : null,
             retreat.google_rating > 0 ? { label: "Google Rating", value: retreat.google_rating.toString(), sub: `${retreat.google_review_count} reviews`, star: true } : null,
@@ -434,18 +436,22 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
             retreat.max_guests > 0 ? { label: "Property", value: retreat.property_size.charAt(0).toUpperCase() + retreat.property_size.slice(1), sub: `Max ${retreat.max_guests} guests` } : null,
           ].filter((s): s is NonNullable<typeof s> => s !== null).map((stat) => (
             <StaggerItem key={stat.label}>
-              <div className="rounded-2xl border border-white/[0.04] bg-white/[0.02] p-6">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-dark-500">{stat.label}</div>
+              <div className="rounded-2xl bg-cream-100 p-6 ring-1 ring-cream-200">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-ink-500">{stat.label}</div>
                 <div className="mt-2 flex items-center gap-1.5">
-                  {stat.star && <svg className="h-4 w-4 text-gold-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>}
-                  <span className="font-serif text-2xl font-light text-white">{stat.value}</span>
+                  {stat.star && <svg className="h-4 w-4 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>}
+                  <span className="font-display text-2xl tabular-nums text-ink-900">{stat.value}</span>
                 </div>
-                <div className="mt-1 text-[11px] capitalize text-dark-400">{stat.sub}</div>
+                <div className="mt-1 text-[11px] capitalize text-ink-500">{stat.sub}</div>
               </div>
             </StaggerItem>
           ))}
         </StaggerContainer>
 
+        {/* TEMP dark band — the sections inside belong to later tasks (5/6) and are
+            still white-on-dark. This container keeps them legible on the new cream
+            page until those tasks convert them; remove the wrapper then. */}
+        <div className="mb-20 rounded-[2rem] bg-dark-950 p-5 sm:p-8 [&>*:last-child]:mb-0">
         {/* ═══ EDITORIAL SUMMARY ═══ */}
         <AnimateIn className="mb-20">
           <div className="rounded-3xl border border-white/[0.04] bg-white/[0.02] px-8 py-10 sm:px-12 sm:py-12">
@@ -501,22 +507,34 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
             />
           </AnimateIn>
         )}
+        </div>
+        {/* END TEMP dark band */}
 
-        {/* ═══ SCORE BREAKDOWN ═══ */}
+        {/* ═══ SCORE BREAKDOWN — lab-report panel (double-bezel enclosure) ═══ */}
         <AnimateIn className="mb-20">
-          <div className="rounded-3xl border border-white/[0.04] bg-white/[0.015] p-8 sm:p-12">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Analysis</p>
-            <h2 className="mt-3 font-serif text-3xl font-light text-white">Score Breakdown</h2>
-            <div className="mt-2 flex items-center gap-3">
-              <p className="text-[12px] text-dark-400">15 categories, weighted by impact on the wellness experience</p>
-              <Link href="/methodology" className="shrink-0 text-[11px] font-medium text-gold-400 transition-colors hover:text-gold-300">
-                How we score&nbsp;&rarr;
-              </Link>
-            </div>
-            <div className="mt-10 space-y-2">
-              {sortedScores.map(([key, cat]) => (
-                <ScoreBar key={key} score={cat.score} label={CATEGORY_LABELS[key]} weight={SCORE_WEIGHTS[key]} />
-              ))}
+          <div className="rounded-[2rem] bg-ink-900/[0.04] p-1.5 ring-1 ring-ink-900/5">
+            <div className="rounded-[calc(2rem-0.375rem)] bg-cream-50 p-8 md:p-10">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-sage-700">Analysis</p>
+
+              {/* Headline number + tier pill + methodology link */}
+              <div className="mt-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
+                <div className="flex items-center gap-4">
+                  <WrdScore score={retreat.wrd_score} />
+                  <TierBadge tier={retreat.score_tier} size="md" />
+                </div>
+                <Link href="/methodology" className="shrink-0 text-[11px] font-medium tracking-wide text-sage-700 underline-offset-4 transition-colors hover:text-sage-600 hover:underline">
+                  How we score&nbsp;&rarr;
+                </Link>
+              </div>
+
+              <h2 className="mt-9 font-display text-3xl text-ink-900">Score Breakdown</h2>
+              <p className="mt-2 text-[12px] text-ink-500">15 categories, weighted by impact on the wellness experience</p>
+
+              <div className="mt-10 space-y-2.5">
+                {sortedScores.map(([key, cat]) => (
+                  <ScoreBar key={key} score={cat.score} label={CATEGORY_LABELS[key]} weight={SCORE_WEIGHTS[key]} />
+                ))}
+              </div>
             </div>
           </div>
         </AnimateIn>
@@ -524,15 +542,16 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         {/* ═══ RADAR CHART + VAULT VS GUEST ═══ */}
         <div className="mb-20 grid gap-8 lg:grid-cols-2">
           <AnimateIn>
-            <div className="rounded-3xl border border-white/[0.04] bg-white/[0.015] p-6 sm:p-8">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Visual Profile</p>
-              <h3 className="mt-2 font-serif text-xl font-light text-white">Category Radar</h3>
+            <div className="rounded-[2rem] bg-cream-100 p-6 ring-1 ring-cream-200 sm:p-8">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-sage-700">Visual Profile</p>
+              <h3 className="mt-2 font-display text-xl text-ink-900">Category Radar</h3>
               <div className="mt-4">
                 <RadarChart scores={retreat.scores} name={retreat.name} />
               </div>
             </div>
           </AnimateIn>
-          <AnimateIn delay={0.15}>
+          {/* TEMP dark container — VaultVsGuest belongs to a later task; keeps it legible on cream. */}
+          <AnimateIn delay={0.15} className="rounded-[2rem] bg-dark-950 p-2">
             <VaultVsGuest
               vaultScore={retreat.wrd_score}
               googleRating={retreat.google_rating}
@@ -543,6 +562,10 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
           </AnimateIn>
         </div>
 
+        {/* TEMP dark band — everything below belongs to later tasks (5/6) and is
+            still white-on-dark. This container keeps the page legible on cream
+            until those sections are converted; remove the wrapper then. */}
+        <div className="rounded-[2rem] bg-dark-950 p-5 sm:p-8 [&>*:last-child]:mb-0">
         {/* ═══ PROPRIETARY INTELLIGENCE ═══ */}
         <div className="mb-20 grid gap-6 lg:grid-cols-2">
           <AnimateIn>
@@ -849,6 +872,8 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
             </div>
           </div>
         </AnimateIn>
+        </div>
+        {/* END TEMP dark band */}
       </div>
     </div>
   );
