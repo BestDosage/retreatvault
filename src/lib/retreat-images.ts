@@ -172,6 +172,26 @@ export function isSafeImageUrl(url: string | null | undefined): boolean {
   return SAFE_IMAGE_HOSTS.some((h) => url.startsWith(h));
 }
 
+// Every location-keyed Unsplash photo id we ever hand out as a fallback, plus
+// the exact query signature regionFallbackImage() stamps on them. Kept in sync
+// with FALLBACKS above — if a fallback is added there, it flows into this set.
+const FALLBACK_IDS: ReadonlySet<string> = new Set(Object.values(FALLBACKS).flat());
+const FALLBACK_QUERY = "w=1200&h=1500&fit=crop&q=75";
+const UNSPLASH_PREFIX = "https://images.unsplash.com/";
+
+/**
+ * True iff `url` is one of our own location-keyed Unsplash fallbacks — i.e. a URL
+ * that `safeImageUrl()`/`regionFallbackImage()` would construct (a known fallback
+ * photo id carrying the exact fallback query signature). A retreat's genuine
+ * Unsplash hero (different id and/or different Unsplash params) returns false, so
+ * the UI can honestly mark fallback imagery as ambience rather than the property.
+ */
+export function isStockFallback(url: string | null | undefined): boolean {
+  if (!url || !url.startsWith(UNSPLASH_PREFIX)) return false;
+  const [id, query = ""] = url.slice(UNSPLASH_PREFIX.length).split("?");
+  return FALLBACK_IDS.has(id) && query === FALLBACK_QUERY;
+}
+
 /**
  * Return a copyright-safe image URL. If `rawUrl` is from a safe source (Unsplash,
  * Pexels, or a local asset) it is kept; otherwise a free, location-keyed Unsplash

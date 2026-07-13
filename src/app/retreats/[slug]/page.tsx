@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllRetreats, getRetreatBySlug, getRetreatAwards, getRetreatVideos, getSimilarRetreats, getEditorialReview, getRetreatReviews, deriveReviewThemes, getRetreatFaqs } from "@/lib/data";
-import { getRetreatImage } from "@/lib/retreat-images";
+import { getRetreatImage, isStockFallback } from "@/lib/retreat-images";
 import YouTubeFacade from "@/components/YouTubeFacade";
 import SimilarRetreats from "@/components/SimilarRetreats";
 import EditorialReview from "@/components/EditorialReview";
@@ -66,9 +66,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     },
   };
 }
-import { CATEGORY_LABELS, SCORE_WEIGHTS, RetreatScores, isScorePublic } from "@/lib/types";
-import TierBadge from "@/components/TierBadge";
-import WrdScore from "@/components/WrdScore";
+import { CATEGORY_LABELS, SCORE_WEIGHTS, RetreatScores, isScorePublic, getTierLabel } from "@/lib/types";
 import ScoreBar from "@/components/ScoreBar";
 import AnimateIn, { StaggerContainer, StaggerItem } from "@/components/AnimateIn";
 import dynamic from "next/dynamic";
@@ -81,11 +79,11 @@ import EmailCapture from "@/components/EmailCapture";
 import {
   LongevityPanel, DigitalDetoxPanel, RoiCalculator,
   SleepSciencePanel, IdealGuestCard, SeasonalChart,
-  ScoreSparkline, SeventyTwoHourCard, HormoneHealthBadge,
+  ScoreSparkline, SeventyTwoHourCard,
 } from "@/components/IntelligencePanels";
 import {
   deriveLongevityIndex, deriveDigitalDetoxScore, deriveRoiData,
-  deriveSleepScience, deriveHormoneHealthFlag, deriveIdealGuestProfile,
+  deriveSleepScience, deriveIdealGuestProfile,
   deriveSeasonalData, deriveScoreHistory, derive72HourEffect,
 } from "@/lib/retreat-intelligence";
 
@@ -112,7 +110,6 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
   const detox = deriveDigitalDetoxScore(retreat);
   const roi = deriveRoiData(retreat);
   const sleepScience = deriveSleepScience(retreat);
-  const hasHormoneHealth = deriveHormoneHealthFlag(retreat);
   const idealGuest = deriveIdealGuestProfile(retreat);
   const seasonal = deriveSeasonalData(retreat);
   const scoreHistory = deriveScoreHistory(retreat);
@@ -131,6 +128,34 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
   // image. Gallery is restricted to known-safe sources; scraped URLs are dropped.
   const heroImage = getRetreatImage(retreat);
   const hasImage = heroImage.startsWith("http");
+  // Photo-reality: a location-keyed fallback is ambience, not the property. The
+  // hero renders an honest editorial split for fallbacks and a full-bleed image
+  // only when we hold a genuine photo of this retreat.
+  const isStock = isStockFallback(heroImage);
+  const scorePublic = isScorePublic(retreat.wrd_score);
+  const tierLabel = scorePublic ? getTierLabel(retreat.score_tier) : "Listed";
+  const isTopTier = scorePublic && (retreat.score_tier === "elite" || retreat.score_tier === "exceptional");
+  const locationLine = [retreat.city, retreat.country].filter(Boolean).join(", ");
+  const propertyType = (retreat.property_type && retreat.property_type.length
+    ? retreat.property_type
+    : [retreat.property_size]
+  )
+    .filter(Boolean)
+    .map((t) => t.charAt(0).toUpperCase() + t.slice(1))
+    .join(", ");
+  const priceBand =
+    retreat.price_min_per_night > 0
+      ? `$${retreat.price_min_per_night.toLocaleString()}–$${retreat.price_max_per_night.toLocaleString()} / night`
+      : "Price on request";
+  const airportLine = retreat.nearest_airport
+    ? `${retreat.nearest_airport}${retreat.airport_distance_km ? ` (${Math.round(retreat.airport_distance_km)} km)` : ""}`
+    : "";
+  const identityItems = [
+    { label: "Location", value: locationLine },
+    { label: "Property", value: propertyType },
+    { label: "Rate", value: priceBand },
+    { label: "Nearest airport", value: airportLine },
+  ].filter((i) => i.value);
   const galleryImages = (retreat.gallery_images || []).filter(
     (img: string) =>
       img?.startsWith("https://images.unsplash.com/") ||
@@ -237,92 +262,161 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
       />
-      {/* ════════════════ HERO ════════════════ */}
-      <section className="relative h-[70vh] min-h-[500px] overflow-hidden">
-        {hasImage && (
-          <Image
-            src={heroImage}
-            alt={retreat.name}
-            fill
-            priority
-            fetchPriority="high"
-            sizes="100vw"
-            quality={70}
-            className="object-cover"
-          />
-        )}
-        <div className="absolute inset-0 bg-dark-950/50" />
-        <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/30 to-dark-950/20" />
-        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-dark-950 to-transparent" />
+      {/* ════════════════ HERO — editorial luxury ════════════════ */}
+      {/* Two states by photo-reality: a genuine photo goes full-bleed; a location
+          fallback gets an honest editorial split (muted duotone, "photos pending"). */}
+      {!isStock ? (
+        <section className="relative min-h-[68vh] overflow-hidden bg-cream-100 md:min-h-[80vh]">
+          {hasImage && (
+            <Image
+              src={heroImage}
+              alt={retreat.name}
+              fill
+              priority
+              fetchPriority="high"
+              sizes="100vw"
+              quality={70}
+              className="object-cover"
+            />
+          )}
+          {/* Bottom scrim for legibility — warm ink, fading up to clear sky. */}
+          <div className="absolute inset-0 bg-gradient-to-t from-ink-900/60 via-ink-900/10 to-transparent" />
 
-        {/* Content pinned to bottom */}
-        <div className="absolute bottom-0 left-0 right-0 z-10">
-          <div className="mx-auto max-w-[1440px] px-6 pb-16 sm:px-10 lg:px-16">
-            <AnimateIn delay={0.2}>
-              <nav className="mb-8 flex items-center gap-2 text-xs text-dark-300">
-                <a href="/retreats" className="transition-colors hover:text-gold-400">Directory</a>
-                <span className="text-dark-600">/</span>
-                <a href={`/retreats?region=${retreat.region}`} className="transition-colors hover:text-gold-400">{retreat.region}</a>
-                <span className="text-dark-600">/</span>
-                <span className="text-white">{retreat.name}</span>
-              </nav>
-            </AnimateIn>
+          <div className="absolute inset-x-0 bottom-0">
+            <div className="mx-auto max-w-[1440px] px-6 pb-12 sm:px-10 md:pb-16 lg:px-16">
+              <AnimateIn>
+                <nav className="mb-6 flex flex-wrap items-center gap-2 text-xs tracking-wide text-cream-100/80">
+                  <a href="/retreats" className="transition-colors hover:text-cream-50">Directory</a>
+                  <span aria-hidden className="text-cream-100/40">/</span>
+                  <a href={`/retreats?region=${retreat.region}`} className="transition-colors hover:text-cream-50">{retreat.region}</a>
+                  <span aria-hidden className="text-cream-100/40">/</span>
+                  <span className="text-cream-50">{retreat.name}</span>
+                </nav>
+              </AnimateIn>
 
-            <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-              <div>
-                <AnimateIn delay={0.3}>
-                  <div className="mb-4 flex items-center gap-3">
-                    <TierBadge tier={retreat.score_tier} size="md" />
-                    {retreat.is_verified && (
-                      <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[9px] font-semibold uppercase tracking-[0.15em] text-emerald-400">
-                        <span className="h-1 w-1 rounded-full bg-emerald-400" />
-                        Verified
-                      </span>
-                    )}
-                    {hasHormoneHealth && <HormoneHealthBadge />}
-                  </div>
-                </AnimateIn>
-                <AnimateIn delay={0.35}>
-                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gold-400/80">
-                    {retreat.city}, {retreat.country}
-                  </p>
-                </AnimateIn>
-                <AnimateIn delay={0.4}>
-                  <h1 className="mt-3 font-serif text-4xl font-light text-white sm:text-5xl lg:text-6xl">
-                    {retreat.name}
-                  </h1>
-                </AnimateIn>
-                <AnimateIn delay={0.5}>
-                  <p className="mt-4 max-w-xl text-[15px] font-light leading-relaxed text-dark-200">
+              <AnimateIn delay={0.06}>
+                <div className="mb-5 flex flex-wrap items-center gap-2.5">
+                  <span className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] backdrop-blur-sm ${isTopTier ? "border-gold/50 bg-ink-900/25 text-cream-50" : "border-cream-100/30 bg-ink-900/25 text-cream-50"}`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${isTopTier ? "bg-gold" : "bg-sage-100"}`} />
+                    {tierLabel}
+                  </span>
+                  {retreat.is_verified && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-cream-100/30 bg-ink-900/25 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-cream-50 backdrop-blur-sm">
+                      <span className="h-1 w-1 rounded-full bg-sage-100" />
+                      Verified
+                    </span>
+                  )}
+                </div>
+              </AnimateIn>
+
+              <AnimateIn delay={0.1}>
+                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cream-100/85">
+                  {locationLine}
+                </p>
+              </AnimateIn>
+              <AnimateIn delay={0.14}>
+                <h1 className="mt-3 max-w-4xl font-display text-5xl leading-[1.02] tracking-tight text-cream-50 md:text-7xl">
+                  {retreat.name}
+                </h1>
+              </AnimateIn>
+              {retreat.subtitle && (
+                <AnimateIn delay={0.2}>
+                  <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-cream-100/85">
                     {retreat.subtitle}
                   </p>
                 </AnimateIn>
-              </div>
-
-              <div className="flex flex-col items-end gap-4">
-                <AnimateIn delay={0.5} direction="left">
-                  <WrdScore score={retreat.wrd_score} size="xl" />
-                </AnimateIn>
-                {retreat.website_url && (
-                  <AnimateIn delay={0.6} direction="left">
-                    <a
-                      href={retreat.website_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn-luxury btn-luxury-md"
-                    >
-                      Visit Website
-                      <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                      </svg>
-                    </a>
-                  </AnimateIn>
-                )}
-              </div>
+              )}
             </div>
           </div>
+        </section>
+      ) : (
+        <section className="bg-cream-50 text-ink-900">
+          <div className="mx-auto grid max-w-[1440px] md:grid-cols-[3fr_2fr]">
+            {/* Left 60% — the honest identity panel */}
+            <div className="flex flex-col justify-center px-6 py-14 sm:px-10 md:py-24 lg:px-16">
+              <AnimateIn>
+                <nav className="mb-7 flex flex-wrap items-center gap-2 text-xs tracking-wide text-ink-500">
+                  <a href="/retreats" className="transition-colors hover:text-ink-900">Directory</a>
+                  <span aria-hidden className="text-cream-200">/</span>
+                  <a href={`/retreats?region=${retreat.region}`} className="transition-colors hover:text-ink-900">{retreat.region}</a>
+                  <span aria-hidden className="text-cream-200">/</span>
+                  <span className="text-ink-700">{retreat.name}</span>
+                </nav>
+              </AnimateIn>
+
+              <AnimateIn delay={0.06}>
+                <div className="mb-5 flex flex-wrap items-center gap-2.5">
+                  <span className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] ${isTopTier ? "border-gold/40 bg-gold/10 text-ink-900" : "border-sage-700/25 bg-sage-100 text-sage-700"}`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${isTopTier ? "bg-gold" : "bg-sage-600"}`} />
+                    {tierLabel}
+                  </span>
+                  {retreat.is_verified && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-sage-700/25 bg-sage-100 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-sage-700">
+                      <span className="h-1 w-1 rounded-full bg-sage-600" />
+                      Verified
+                    </span>
+                  )}
+                </div>
+              </AnimateIn>
+
+              <AnimateIn delay={0.1}>
+                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sage-700">
+                  {locationLine}
+                </p>
+              </AnimateIn>
+              <AnimateIn delay={0.14}>
+                <h1 className="mt-3 font-display text-4xl leading-[1.04] tracking-tight text-ink-900 sm:text-5xl lg:text-6xl">
+                  {retreat.name}
+                </h1>
+              </AnimateIn>
+              {retreat.subtitle && (
+                <AnimateIn delay={0.2}>
+                  <p className="mt-5 max-w-md text-[15px] leading-relaxed text-ink-700">
+                    {retreat.subtitle}
+                  </p>
+                </AnimateIn>
+              )}
+            </div>
+
+            {/* Right 40% — location imagery, muted duotone, honestly captioned */}
+            <div className="relative min-h-[42vh] md:min-h-[70vh]">
+              {hasImage && (
+                <Image
+                  src={heroImage}
+                  alt=""
+                  fill
+                  priority
+                  fetchPriority="high"
+                  sizes="(max-width: 768px) 100vw, 40vw"
+                  quality={70}
+                  className="object-cover"
+                  style={{ filter: "sepia(0.25) saturate(0.55)" }}
+                />
+              )}
+              <figcaption className="absolute bottom-3 left-3 rounded-full bg-cream-50/85 px-3 py-1 text-xs text-ink-500 backdrop-blur-sm">
+                Location imagery — official photos pending
+              </figcaption>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ═══ IDENTITY STRIP ═══ */}
+      <div className="bg-cream-50">
+        <div className="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-16">
+          <dl className="flex flex-wrap items-center gap-x-4 gap-y-2 border-y border-cream-200 py-4 text-sm text-ink-700">
+            {identityItems.map((item, i) => (
+              <div key={item.label} className="flex items-center gap-4">
+                {i > 0 && <span aria-hidden className="h-1 w-1 shrink-0 rounded-full bg-ink-500/40" />}
+                <div className="flex items-baseline gap-2">
+                  <dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-500">{item.label}</dt>
+                  <dd className={item.label === "Rate" ? "tabular-nums" : ""}>{item.value}</dd>
+                </div>
+              </div>
+            ))}
+          </dl>
         </div>
-      </section>
+      </div>
 
       {/* ════════════════ CONTENT ════════════════ */}
       <div className="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-16">
