@@ -91,6 +91,7 @@ async function _fetchAllRetreats(): Promise<WellnessRetreat[]> {
     .from("retreats")
     .select("*")
     .neq("slug", "test")
+    .neq("slug", "cape-kalevala")
     .gt("wrd_score", 0)
     .order("wrd_score", { ascending: false })
     .order("slug", { ascending: true })
@@ -293,6 +294,7 @@ export async function queryRetreatsForDirectory(
       .from("retreats")
       .select("*", { count: "planned" })
       .neq("slug", "test")
+      .neq("slug", "cape-kalevala")
       .gt("wrd_score", 0);
     if (region && region !== "All") q = q.eq("region", region);
     if (tag && tag !== "all") q = applyBestForFilter(q, tag);

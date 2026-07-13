@@ -47,6 +47,7 @@ async function getDistinctCountries(): Promise<string[]> {
       .from("retreats")
       .select("country")
       .neq("slug", "test")
+      .neq("slug", "cape-kalevala")
       .gt("wrd_score", 0)
       .range(offset, offset + PAGE - 1);
     if (!data || data.length === 0) break;
@@ -63,6 +64,7 @@ async function getRetreatCount(): Promise<number> {
     .from("retreats")
     .select("id", { count: "exact", head: true })
     .neq("slug", "test")
+    .neq("slug", "cape-kalevala")
     .gt("wrd_score", 0);
   return count ?? 0;
 }
@@ -73,6 +75,7 @@ async function getRetreatSlugsPage(offset: number, limit: number): Promise<{ slu
     .from("retreats")
     .select("slug, updated_at")
     .neq("slug", "test")
+    .neq("slug", "cape-kalevala")
     .gt("wrd_score", 0)
     .order("slug")
     .range(offset, offset + limit - 1);
@@ -90,6 +93,7 @@ async function getDistinctRegions(): Promise<string[]> {
       .from("retreats")
       .select("region")
       .neq("slug", "test")
+      .neq("slug", "cape-kalevala")
       .gt("wrd_score", 0)
       .range(offset, offset + PAGE - 1);
     if (!data || data.length === 0) break;

@@ -4,6 +4,15 @@ const nextConfig = {
   // queries during static generation. Default is 60s; cold Supabase reads
   // occasionally exceed it and fail the whole build. 180s absorbs that flake.
   staticPageGenerationTimeout: 180,
+  async redirects() {
+    return [
+      {
+        source: "/retreats/cape-kalevala",
+        destination: "/",
+        permanent: true,
+      },
+    ];
+  },
   images: {
     unoptimized: true,
   },
