@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
+import { getAllCities } from "@/lib/data";
 import { blogPosts } from "@/data/blog-posts";
 import { GUIDES } from "@/data/guides";
 import { EDITORIAL_GUIDES } from "@/data/editorial-guides";
@@ -109,33 +110,25 @@ function slugify(s: string): string {
 }
 
 /**
- * Distinct city slugs with >= 3 retreats — the exact set the /retreats/city/[city]
- * landing pages render. That gate is getAllCities(getAllRetreats()) in lib/data, and
- * getAllRetreats() reads retreats ordered by wrd_score (bounded by the project's
- * PostgREST db-max-rows cap). We mirror that same ordered fetch here so the sitemap and
- * the actual pages agree: every URL listed resolves, none 404. Slugs that reduce to ""
- * (non-latin scripts) are dropped so we never emit a broken /retreats/city/ URL.
+ * Distinct city slugs that get a landing page — the exact set the
+ * /retreats/city/[city] pages render. The qualification logic (>= 3 retreats,
+ * slugify, empty-slug filter) lives ONLY in getAllCities() in lib/data; this
+ * helper just feeds it rows fetched the same way getAllRetreats() fetches them
+ * (score-ordered, bounded by the project's PostgREST db-max-rows cap, via the
+ * direct client to bypass unstable_cache's 2MB limit), so the sitemap and the
+ * live pages always agree: every URL listed resolves, none 404.
  */
 async function getCitySlugsWith3Plus(): Promise<string[]> {
   const { data } = await db()
     .from("retreats")
-    .select("city")
+    .select("city, country, region")
     .neq("slug", "test")
     .neq("slug", "cape-kalevala")
     .gt("wrd_score", 0)
     .order("wrd_score", { ascending: false })
     .order("slug", { ascending: true })
     .range(0, 49999);
-  const counts = new Map<string, number>();
-  for (const r of data || []) {
-    if (!r.city || r.city.trim().length < 2) continue;
-    const slug = slugify(r.city);
-    if (!slug) continue;
-    counts.set(slug, (counts.get(slug) || 0) + 1);
-  }
-  return Array.from(counts.entries())
-    .filter(([, n]) => n >= 3)
-    .map(([slug]) => slug);
+  return getAllCities(data || []).map((c) => c.slug);
 }
 
 const RETREATS_PER_SITEMAP = 1000;

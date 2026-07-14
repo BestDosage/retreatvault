@@ -500,11 +500,21 @@ export function slugifyCity(city: string): string {
   return city.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-export function getAllCities(retreats: WellnessRetreat[]): { city: string; slug: string; country: string; region: string; count: number }[] {
+/**
+ * Single source of truth for which cities get a landing page:
+ * ≥ 3 retreats, non-blank city name, and a non-empty slug (non-latin
+ * names slugify to "" and must never produce a /retreats/city/ URL).
+ * Accepts any rows carrying city/country/region so lightweight fetches
+ * (e.g. sitemap.ts) can reuse the exact same gate as the pages.
+ */
+export function getAllCities(
+  retreats: Pick<WellnessRetreat, "city" | "country" | "region">[]
+): { city: string; slug: string; country: string; region: string; count: number }[] {
   const cityMap = new Map<string, { city: string; country: string; region: string; count: number }>();
   retreats.forEach((r) => {
-    if (!r.city || r.city.length < 2) return;
+    if (!r.city || r.city.trim().length < 2) return;
     const slug = slugifyCity(r.city);
+    if (!slug) return; // non-latin names slugify to "" — no valid URL
     const existing = cityMap.get(slug);
     if (existing) {
       existing.count += 1;

@@ -229,8 +229,9 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
   );
 
   // Cities in this country with >=3 retreats — link to their city landing pages.
+  // Qualification (threshold, slugify, empty-slug filter) lives in getAllCities.
   const cityPages = getAllCities(allRetreats).filter(
-    (c) => slugifyCountry(c.country) === countrySlug && c.slug.length > 0
+    (c) => slugifyCountry(c.country) === countrySlug
   );
 
   // Group retreats by city

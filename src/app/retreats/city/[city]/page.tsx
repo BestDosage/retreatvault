@@ -21,8 +21,8 @@ type Params = { city: string };
 // Every other city (>=3 retreats) renders on-demand via dynamicParams + ISR.
 export async function generateStaticParams(): Promise<Params[]> {
   const retreats = await getAllRetreats();
+  // Qualification (>= 3 retreats, slugify, empty-slug filter) lives in getAllCities.
   return getAllCities(retreats)
-    .filter((c) => c.slug.length > 0) // drop non-latin names that slugify to ""
     .slice(0, 50)
     .map((c) => ({ city: c.slug }));
 }
