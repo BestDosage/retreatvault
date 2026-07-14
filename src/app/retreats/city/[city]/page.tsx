@@ -16,8 +16,16 @@ export const dynamicParams = true;
 
 type Params = { city: string };
 
-// No generateStaticParams — render all city pages on-demand via ISR
-// This avoids Supabase timeout during build and OOM on Vercel
+// Pre-render only the TOP 50 cities by retreat count at build time (OOM guard —
+// static-generating all 271 qualifying cities previously choked the Vercel build).
+// Every other city (>=3 retreats) renders on-demand via dynamicParams + ISR.
+export async function generateStaticParams(): Promise<Params[]> {
+  const retreats = await getAllRetreats();
+  return getAllCities(retreats)
+    .filter((c) => c.slug.length > 0) // drop non-latin names that slugify to ""
+    .slice(0, 50)
+    .map((c) => ({ city: c.slug }));
+}
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { city: citySlug } = await params;
@@ -68,6 +76,34 @@ function BreadcrumbJsonLd({
   );
 }
 
+// ItemList of the city's retreats — data sourced from Supabase rows, not user input.
+function RetreatItemListJsonLd({
+  cityName,
+  retreats,
+}: {
+  cityName: string;
+  retreats: { slug: string; name: string }[];
+}) {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: `Wellness Retreats in ${cityName}`,
+    numberOfItems: retreats.length,
+    itemListElement: retreats.map((r, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: `https://www.retreatvault.com/retreats/${r.slug}`,
+      name: r.name,
+    })),
+  };
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
 export default async function CityPage({ params }: { params: Promise<Params> }) {
   const { city: citySlug } = await params;
   const allRetreats = await getAllRetreats();
@@ -100,6 +136,10 @@ export default async function CityPage({ params }: { params: Promise<Params> }) 
         countryName={countryName}
         regionSlug={regionSlug}
         regionName={regionName}
+      />
+      <RetreatItemListJsonLd
+        cityName={cityName}
+        retreats={cityRetreats.map((r) => ({ slug: r.slug, name: r.name }))}
       />
 
       <main className="min-h-screen bg-cream-50">

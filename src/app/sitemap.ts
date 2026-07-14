@@ -108,6 +108,36 @@ function slugify(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
+/**
+ * Distinct city slugs with >= 3 retreats — the exact set the /retreats/city/[city]
+ * landing pages render. That gate is getAllCities(getAllRetreats()) in lib/data, and
+ * getAllRetreats() reads retreats ordered by wrd_score (bounded by the project's
+ * PostgREST db-max-rows cap). We mirror that same ordered fetch here so the sitemap and
+ * the actual pages agree: every URL listed resolves, none 404. Slugs that reduce to ""
+ * (non-latin scripts) are dropped so we never emit a broken /retreats/city/ URL.
+ */
+async function getCitySlugsWith3Plus(): Promise<string[]> {
+  const { data } = await db()
+    .from("retreats")
+    .select("city")
+    .neq("slug", "test")
+    .neq("slug", "cape-kalevala")
+    .gt("wrd_score", 0)
+    .order("wrd_score", { ascending: false })
+    .order("slug", { ascending: true })
+    .range(0, 49999);
+  const counts = new Map<string, number>();
+  for (const r of data || []) {
+    if (!r.city || r.city.trim().length < 2) continue;
+    const slug = slugify(r.city);
+    if (!slug) continue;
+    counts.set(slug, (counts.get(slug) || 0) + 1);
+  }
+  return Array.from(counts.entries())
+    .filter(([, n]) => n >= 3)
+    .map(([slug]) => slug);
+}
+
 const RETREATS_PER_SITEMAP = 1000;
 const RETREAT_SITEMAPS = 10; // ~9,400 retreats / 1,000 per sitemap
 
@@ -156,6 +186,14 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
       priority: 0.8,
     }));
 
+    const citySlugs = await getCitySlugsWith3Plus();
+    const cityPages: MetadataRoute.Sitemap = citySlugs.map((slug) => ({
+      url: `${BASE_URL}/retreats/city/${slug}`,
+      lastModified: new Date("2026-04-15"),
+      changeFrequency: "weekly" as const,
+      priority: 0.75,
+    }));
+
     const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
       url: `${BASE_URL}/blog/${post.slug}`,
       lastModified: new Date(post.updated_date),
@@ -181,7 +219,7 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
       priority: 0.8,
     }));
 
-    return [...staticPages, ...typePages, ...regionPages, ...countryPages, ...blogPages, ...guideIndexPage, ...guidePages, ...editorialGuidePages];
+    return [...staticPages, ...typePages, ...regionPages, ...countryPages, ...cityPages, ...blogPages, ...guideIndexPage, ...guidePages, ...editorialGuidePages];
   }
 
   // Sub-sitemaps 1+: retreat chunks of ~1000

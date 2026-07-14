@@ -4,6 +4,7 @@ import {
   getAllRetreats,
   getAllCountries,
   getCountriesInRegion,
+  getAllCities,
   slugifyRegion,
   slugifyCountry,
 } from "@/lib/data";
@@ -227,6 +228,11 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
     (c) => c.slug !== countrySlug
   );
 
+  // Cities in this country with >=3 retreats — link to their city landing pages.
+  const cityPages = getAllCities(allRetreats).filter(
+    (c) => slugifyCountry(c.country) === countrySlug && c.slug.length > 0
+  );
+
   // Group retreats by city
   const byCity = new Map<string, WellnessRetreat[]>();
   countryRetreats.forEach((r) => {
@@ -404,6 +410,34 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
                     </div>
                   </div>
                 ))}
+            </div>
+          </section>
+        )}
+
+        {/* Explore by city — links to city landing pages (cities with 3+ retreats) */}
+        {cityPages.length > 0 && (
+          <section className="border-t border-cream-200 px-6 py-16 md:px-12 lg:px-20">
+            <div className="mx-auto max-w-7xl">
+              <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-sage-700">Explore by City</p>
+              <h2 className="mt-3 font-display text-2xl font-light text-ink-900">
+                Wellness Retreats by City in {countryName}
+              </h2>
+              <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                {cityPages.map((c) => (
+                  <a
+                    key={c.slug}
+                    href={`/retreats/city/${c.slug}`}
+                    className="group flex items-center justify-between rounded-xl border border-cream-200 bg-cream-100 px-5 py-4 transition-all hover:border-sage-700/30 hover:bg-cream-50"
+                  >
+                    <span className="font-display text-[15px] text-ink-900 group-hover:text-sage-700 transition-colors">
+                      {c.city}
+                    </span>
+                    <span className="ml-3 text-[12px] text-ink-500">
+                      {c.count}
+                    </span>
+                  </a>
+                ))}
+              </div>
             </div>
           </section>
         )}
