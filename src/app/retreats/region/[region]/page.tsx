@@ -92,27 +92,27 @@ export default async function RegionPage({ params }: { params: Promise<Params> }
     <>
       <BreadcrumbJsonLd region={region} displayName={displayName} />
 
-      <main className="min-h-screen bg-dark-950">
+      <main className="min-h-screen bg-cream-50">
         {/* Hero */}
-        <section className="border-b border-white/[0.06] px-6 pb-16 pt-32 md:px-12 lg:px-20">
+        <section className="border-b border-cream-200 px-6 pb-16 pt-32 md:px-12 lg:px-20">
           <div className="mx-auto max-w-7xl">
             {/* Breadcrumb */}
-            <nav className="mb-8 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-dark-400">
-              <a href="/" className="transition-colors hover:text-gold-400">Home</a>
-              <span className="text-dark-700">/</span>
-              <a href="/retreats" className="transition-colors hover:text-gold-400">Retreats</a>
-              <span className="text-dark-700">/</span>
-              <span className="text-dark-300">{displayName}</span>
+            <nav className="mb-8 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-ink-500">
+              <a href="/" className="transition-colors hover:text-sage-700">Home</a>
+              <span className="text-cream-200">/</span>
+              <a href="/retreats" className="transition-colors hover:text-sage-700">Retreats</a>
+              <span className="text-cream-200">/</span>
+              <span className="text-ink-700">{displayName}</span>
             </nav>
 
-            <h1 className="font-serif text-4xl font-light text-white md:text-5xl lg:text-6xl">
+            <h1 className="font-display text-4xl font-light text-ink-900 md:text-5xl lg:text-6xl">
               Wellness Retreats in {displayName}
             </h1>
-            <p className="mt-4 text-lg text-dark-400">
+            <p className="mt-4 text-lg text-ink-500">
               {regionRetreats.length} retreats across {countries.length} {countries.length === 1 ? "country" : "countries"}
             </p>
             {intro && (
-              <p className="mt-6 max-w-3xl text-[15px] leading-relaxed text-dark-300">
+              <p className="mt-6 max-w-3xl text-[15px] leading-relaxed text-ink-700">
                 {intro}
               </p>
             )}
@@ -120,10 +120,10 @@ export default async function RegionPage({ params }: { params: Promise<Params> }
         </section>
 
         {/* Location intelligence */}
-        <section className="border-b border-white/[0.06] px-6 py-16 md:px-12 lg:px-20">
+        <section className="border-b border-cream-200 px-6 py-16 md:px-12 lg:px-20">
           <div className="mx-auto max-w-7xl">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Market Intelligence</p>
-            <h2 className="mt-3 font-serif text-2xl font-light text-white">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-sage-700">Market Intelligence</p>
+            <h2 className="mt-3 font-display text-2xl font-light text-ink-900">
               {displayName} at a Glance
             </h2>
             <div className="mt-8">
@@ -133,9 +133,9 @@ export default async function RegionPage({ params }: { params: Promise<Params> }
         </section>
 
         {/* Countries in this region */}
-        <section className="border-b border-white/[0.06] px-6 py-16 md:px-12 lg:px-20">
+        <section className="border-b border-cream-200 px-6 py-16 md:px-12 lg:px-20">
           <div className="mx-auto max-w-7xl">
-            <h2 className="font-serif text-2xl font-light text-white">
+            <h2 className="font-display text-2xl font-light text-ink-900">
               Countries in {displayName}
             </h2>
             <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
@@ -143,12 +143,12 @@ export default async function RegionPage({ params }: { params: Promise<Params> }
                 <a
                   key={c.slug}
                   href={`/retreats/country/${c.slug}`}
-                  className="group flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] px-5 py-4 transition-all hover:border-gold-400/30 hover:bg-white/[0.04]"
+                  className="group flex items-center justify-between rounded-xl border border-cream-200 bg-cream-100 px-5 py-4 transition-all hover:border-sage-700/30 hover:bg-cream-50"
                 >
-                  <span className="font-serif text-[15px] text-white group-hover:text-gold-400 transition-colors">
+                  <span className="font-display text-[15px] text-ink-900 group-hover:text-sage-700 transition-colors">
                     {c.country}
                   </span>
-                  <span className="ml-3 text-[12px] text-dark-400">
+                  <span className="ml-3 text-[12px] text-ink-500">
                     {c.count}
                   </span>
                 </a>
@@ -158,12 +158,12 @@ export default async function RegionPage({ params }: { params: Promise<Params> }
         </section>
 
         {/* Top 12 retreat cards */}
-        <section className="border-b border-white/[0.06] px-6 py-16 md:px-12 lg:px-20">
+        <section className="border-b border-cream-200 px-6 py-16 md:px-12 lg:px-20">
           <div className="mx-auto max-w-7xl">
-            <h2 className="font-serif text-2xl font-light text-white">
+            <h2 className="font-display text-2xl font-light text-ink-900">
               Top Retreats in {displayName}
             </h2>
-            <p className="mt-2 text-[13px] text-dark-300">
+            <p className="mt-2 text-[13px] text-ink-700">
               Ranked by Retreat Vault score
             </p>
             <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -177,10 +177,10 @@ export default async function RegionPage({ params }: { params: Promise<Params> }
         {/* Complete directory — compact list grouped by country */}
         <section className="px-6 py-16 md:px-12 lg:px-20">
           <div className="mx-auto max-w-7xl">
-            <h2 className="font-serif text-2xl font-light text-white">
+            <h2 className="font-display text-2xl font-light text-ink-900">
               Complete {displayName} Directory
             </h2>
-            <p className="mt-2 text-[13px] text-dark-300">
+            <p className="mt-2 text-[13px] text-ink-700">
               Every retreat in {displayName}, organized by country
             </p>
 
@@ -189,15 +189,15 @@ export default async function RegionPage({ params }: { params: Promise<Params> }
               .map(([country, retreats]) => (
                 <div key={country} className="mt-10">
                   <div className="flex items-center gap-4">
-                    <h3 className="font-serif text-lg text-gold-400">
+                    <h3 className="font-display text-lg text-sage-700">
                       <a
                         href={`/retreats/country/${slugifyCountry(country)}`}
-                        className="hover:text-gold-300 transition-colors"
+                        className="hover:text-sage-600 transition-colors"
                       >
                         {country}
                       </a>
                     </h3>
-                    <span className="text-[11px] text-dark-400">
+                    <span className="text-[11px] text-ink-500">
                       {retreats.length} {retreats.length === 1 ? "retreat" : "retreats"}
                     </span>
                   </div>
@@ -207,26 +207,26 @@ export default async function RegionPage({ params }: { params: Promise<Params> }
                       <a
                         key={r.slug}
                         href={`/retreats/${r.slug}`}
-                        className="group flex flex-col gap-1 rounded-xl border border-white/[0.04] bg-white/[0.02] p-4 transition-all hover:border-gold-400/20 hover:bg-white/[0.04] md:flex-row md:items-center md:gap-6 md:rounded-none md:border-0 md:border-b md:bg-transparent md:px-0 md:py-3"
+                        className="group flex flex-col gap-1 rounded-xl border border-cream-200 bg-cream-100 p-4 transition-all hover:border-sage-700/20 hover:bg-cream-50 md:flex-row md:items-center md:gap-6 md:rounded-none md:border-0 md:border-b md:bg-transparent md:px-0 md:py-3"
                       >
-                        <span className="text-[14px] font-medium text-white group-hover:text-gold-400 transition-colors md:flex-1">
+                        <span className="text-[14px] font-medium text-ink-900 group-hover:text-sage-700 transition-colors md:flex-1">
                           {r.name}
                         </span>
-                        <span className="text-[13px] text-dark-300 md:w-40">
+                        <span className="text-[13px] text-ink-700 md:w-40">
                           {r.city}
                         </span>
                         <div className="flex items-center justify-between md:contents">
-                          <span className="font-serif text-[14px] text-gold-400 md:w-20 md:text-right">
+                          <span className="font-display text-[14px] text-sage-700 md:w-20 md:text-right">
                             {isScorePublic(r.wrd_score) ? r.wrd_score.toFixed(1) : "Listed"}
                           </span>
-                          <span className="text-[13px] text-dark-200 md:w-48 md:text-right">
+                          <span className="text-[13px] text-ink-700 md:w-48 md:text-right">
                             ${r.price_min_per_night.toLocaleString()}
                             {r.price_min_per_night !== r.price_max_per_night && (
-                              <span className="text-dark-400">
+                              <span className="text-ink-500">
                                 &ndash;${r.price_max_per_night.toLocaleString()}
                               </span>
                             )}
-                            <span className="ml-1 text-[11px] text-dark-400">/night</span>
+                            <span className="ml-1 text-[11px] text-ink-500">/night</span>
                           </span>
                         </div>
                       </a>

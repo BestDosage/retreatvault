@@ -114,31 +114,31 @@ async function MatchmakerGuide({ guide }: { guide: GuideConfig }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
 
-      <main className="min-h-screen bg-dark-950">
+      <main className="min-h-screen bg-cream-50">
         {/* Hero */}
-        <section className="border-b border-white/[0.06] px-6 pb-16 pt-32 md:px-12 lg:px-20">
+        <section className="border-b border-cream-200 px-6 pb-16 pt-32 md:px-12 lg:px-20">
           <div className="mx-auto max-w-4xl">
-            <nav className="mb-8 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-dark-400">
-              <a href="/" className="transition-colors hover:text-gold-400">Home</a>
-              <span className="text-dark-700">/</span>
-              <a href="/guides" className="transition-colors hover:text-gold-400">Guides</a>
-              <span className="text-dark-700">/</span>
-              <span className="text-dark-300">{guide.title}</span>
+            <nav className="mb-8 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-ink-500">
+              <a href="/" className="transition-colors hover:text-sage-700">Home</a>
+              <span className="text-cream-200">/</span>
+              <a href="/guides" className="transition-colors hover:text-sage-700">Guides</a>
+              <span className="text-cream-200">/</span>
+              <span className="text-ink-700">{guide.title}</span>
             </nav>
 
-            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-sage-700">
               Retreat Matchmaker
             </p>
-            <h1 className="mt-4 font-serif text-4xl font-light text-white md:text-5xl lg:text-6xl">
+            <h1 className="mt-4 font-display text-4xl font-light text-ink-900 md:text-5xl lg:text-6xl">
               {guide.title}
             </h1>
-            <p className="mt-4 text-lg text-dark-400">
+            <p className="mt-4 text-lg text-ink-500">
               {guide.subtitle}
             </p>
 
             {/* Editorial intro — trusted static content from src/data/guides.ts, not user input */}
             <div
-              className="mt-8 max-w-none text-[15px] leading-[1.85] text-dark-300 [&>p]:mb-4 [&>p:first-child]:text-dark-200"
+              className="mt-8 max-w-none text-[15px] leading-[1.85] text-ink-700 [&>p]:mb-4 [&>p:first-child]:text-ink-700"
               // Trusted static content from src/data/guides.ts — no user input
               dangerouslySetInnerHTML={{ __html: guide.intro }}
             />
@@ -146,25 +146,25 @@ async function MatchmakerGuide({ guide }: { guide: GuideConfig }) {
         </section>
 
         {/* Quick stats */}
-        <section className="border-b border-white/[0.06] px-6 py-12 md:px-12 lg:px-20">
+        <section className="border-b border-cream-200 px-6 py-12 md:px-12 lg:px-20">
           <div className="mx-auto max-w-7xl">
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <div className="rounded-2xl border border-white/[0.04] bg-white/[0.02] p-5">
-                <div className="text-[9px] font-semibold uppercase tracking-[0.25em] text-dark-500">Retreats Found</div>
-                <div className="mt-2 font-serif text-2xl font-light text-white">{matching.length}</div>
+              <div className="rounded-2xl border border-cream-200 bg-cream-100 p-5">
+                <div className="text-[9px] font-semibold uppercase tracking-[0.25em] text-ink-500">Retreats Found</div>
+                <div className="mt-2 font-display text-2xl font-light text-ink-900">{matching.length}</div>
               </div>
-              <div className="rounded-2xl border border-white/[0.04] bg-white/[0.02] p-5">
-                <div className="text-[9px] font-semibold uppercase tracking-[0.25em] text-dark-500">Avg Score</div>
-                <div className="mt-2 font-serif text-2xl font-light text-gold-300">{stats.avgScore}/10</div>
+              <div className="rounded-2xl border border-cream-200 bg-cream-100 p-5">
+                <div className="text-[9px] font-semibold uppercase tracking-[0.25em] text-ink-500">Avg Score</div>
+                <div className="mt-2 font-display text-2xl font-light text-sage-600">{stats.avgScore}/10</div>
               </div>
-              <div className="rounded-2xl border border-white/[0.04] bg-white/[0.02] p-5">
-                <div className="text-[9px] font-semibold uppercase tracking-[0.25em] text-dark-500">Price Range</div>
-                <div className="mt-2 font-serif text-2xl font-light text-white">${stats.avgPriceMin}–${stats.avgPriceMax}</div>
-                <div className="mt-0.5 text-[10px] text-dark-500">avg per night</div>
+              <div className="rounded-2xl border border-cream-200 bg-cream-100 p-5">
+                <div className="text-[9px] font-semibold uppercase tracking-[0.25em] text-ink-500">Price Range</div>
+                <div className="mt-2 font-display text-2xl font-light text-ink-900">${stats.avgPriceMin}–${stats.avgPriceMax}</div>
+                <div className="mt-0.5 text-[10px] text-ink-500">avg per night</div>
               </div>
-              <div className="rounded-2xl border border-white/[0.04] bg-white/[0.02] p-5">
-                <div className="text-[9px] font-semibold uppercase tracking-[0.25em] text-dark-500">Top Specialty</div>
-                <div className="mt-2 font-serif text-xl font-light capitalize text-white">
+              <div className="rounded-2xl border border-cream-200 bg-cream-100 p-5">
+                <div className="text-[9px] font-semibold uppercase tracking-[0.25em] text-ink-500">Top Specialty</div>
+                <div className="mt-2 font-display text-xl font-light capitalize text-ink-900">
                   {stats.topSpecialties[0]?.tag || "General"}
                 </div>
               </div>
@@ -179,7 +179,7 @@ async function MatchmakerGuide({ guide }: { guide: GuideConfig }) {
               {matching.map((retreat, i) => (
                 <div key={retreat.slug} className="relative">
                   {i < 3 && (
-                    <div className="absolute -top-3 left-4 z-10 rounded-full bg-gold-400 px-3 py-1 text-[9px] font-bold uppercase tracking-wider text-dark-950">
+                    <div className="absolute -top-3 left-4 z-10 rounded-full bg-ink-900 px-3 py-1 text-[9px] font-bold uppercase tracking-wider text-cream-50">
                       #{i + 1} Pick
                     </div>
                   )}
@@ -190,8 +190,8 @@ async function MatchmakerGuide({ guide }: { guide: GuideConfig }) {
 
             {matching.length === 0 && (
               <div className="py-20 text-center">
-                <p className="font-serif text-2xl text-dark-400">No retreats match these criteria yet</p>
-                <a href="/retreats" className="mt-4 inline-block text-[11px] uppercase tracking-wider text-gold-400 hover:text-gold-300">
+                <p className="font-display text-2xl text-ink-500">No retreats match these criteria yet</p>
+                <a href="/retreats" className="mt-4 inline-block text-[11px] uppercase tracking-wider text-sage-700 hover:text-sage-600">
                   Browse all retreats
                 </a>
               </div>
@@ -201,24 +201,24 @@ async function MatchmakerGuide({ guide }: { guide: GuideConfig }) {
 
         {/* Related guides */}
         {related.length > 0 && (
-          <section className="border-t border-white/[0.06] px-6 py-16 md:px-12 lg:px-20">
+          <section className="border-t border-cream-200 px-6 py-16 md:px-12 lg:px-20">
             <div className="mx-auto max-w-7xl">
-              <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Related Guides</p>
-              <h2 className="mt-3 font-serif text-2xl font-light text-white">Keep Exploring</h2>
+              <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-sage-700">Related Guides</p>
+              <h2 className="mt-3 font-display text-2xl font-light text-ink-900">Keep Exploring</h2>
               <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {related.map((g) => (
                   <Link
                     key={g.slug}
                     href={`/guides/${g.slug}`}
-                    className="group flex flex-col rounded-2xl border border-white/[0.04] bg-white/[0.02] p-6 transition-all duration-300 hover:border-gold-500/15 hover:bg-white/[0.04]"
+                    className="group flex flex-col rounded-2xl border border-cream-200 bg-cream-100 p-6 transition-all duration-300 hover:border-sage-700/15 hover:bg-cream-50"
                   >
-                    <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-gold-500/60">
+                    <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-sage-700/60">
                       {g.category}
                     </span>
-                    <span className="mt-2 font-serif text-[16px] font-medium text-white group-hover:text-gold-300 transition-colors">
+                    <span className="mt-2 font-display text-[16px] font-medium text-ink-900 group-hover:text-sage-600 transition-colors">
                       {g.title}
                     </span>
-                    <span className="mt-2 text-[12px] text-dark-400">
+                    <span className="mt-2 text-[12px] text-ink-500">
                       {g.subtitle}
                     </span>
                   </Link>
@@ -294,35 +294,35 @@ function EditorialGuide({ guide }: { guide: EditorialGuideConfig }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
 
-      <main className="min-h-screen bg-dark-950">
+      <main className="min-h-screen bg-cream-50">
         {/* Hero */}
-        <section className="border-b border-white/[0.06] px-6 pb-16 pt-32 md:px-12 lg:px-20">
+        <section className="border-b border-cream-200 px-6 pb-16 pt-32 md:px-12 lg:px-20">
           <div className="mx-auto max-w-3xl">
-            <nav className="mb-8 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-dark-400">
-              <a href="/" className="transition-colors hover:text-gold-400">Home</a>
-              <span className="text-dark-700">/</span>
-              <a href="/guides" className="transition-colors hover:text-gold-400">Guides</a>
-              <span className="text-dark-700">/</span>
-              <span className="text-dark-300">{guide.title}</span>
+            <nav className="mb-8 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-ink-500">
+              <a href="/" className="transition-colors hover:text-sage-700">Home</a>
+              <span className="text-cream-200">/</span>
+              <a href="/guides" className="transition-colors hover:text-sage-700">Guides</a>
+              <span className="text-cream-200">/</span>
+              <span className="text-ink-700">{guide.title}</span>
             </nav>
 
-            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-sage-700">
               {guide.categoryLabel}
             </p>
-            <h1 className="mt-4 font-serif text-4xl font-light text-white md:text-5xl lg:text-6xl">
+            <h1 className="mt-4 font-display text-4xl font-light text-ink-900 md:text-5xl lg:text-6xl">
               {guide.title}
             </h1>
-            <p className="mt-4 text-lg text-dark-400">
+            <p className="mt-4 text-lg text-ink-500">
               {guide.subtitle}
             </p>
 
             {/* Author & meta */}
-            <div className="mt-8 flex items-center gap-4 border-t border-white/[0.06] pt-6">
+            <div className="mt-8 flex items-center gap-4 border-t border-cream-200 pt-6">
               <div>
-                <p className="text-[13px] font-medium text-dark-200">{guide.author}</p>
-                <p className="text-[11px] text-dark-500">{guide.authorTitle}</p>
+                <p className="text-[13px] font-medium text-ink-700">{guide.author}</p>
+                <p className="text-[11px] text-ink-500">{guide.authorTitle}</p>
               </div>
-              <div className="ml-auto flex items-center gap-4 text-[11px] text-dark-500">
+              <div className="ml-auto flex items-center gap-4 text-[11px] text-ink-500">
                 <span>{guide.readTimeMinutes} min read</span>
                 <span>Updated {guide.updatedDate}</span>
               </div>
@@ -331,20 +331,20 @@ function EditorialGuide({ guide }: { guide: EditorialGuideConfig }) {
         </section>
 
         {/* Table of Contents */}
-        <section className="border-b border-white/[0.06] px-6 py-10 md:px-12 lg:px-20">
+        <section className="border-b border-cream-200 px-6 py-10 md:px-12 lg:px-20">
           <div className="mx-auto max-w-3xl">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.25em] text-dark-500">In This Guide</p>
+            <p className="text-[9px] font-semibold uppercase tracking-[0.25em] text-ink-500">In This Guide</p>
             <nav className="mt-4 flex flex-col gap-2">
               {guide.sections.map((section) => (
                 <a
                   key={section.id}
                   href={`#${section.id}`}
-                  className="text-[14px] text-dark-300 transition-colors hover:text-gold-400"
+                  className="text-[14px] text-ink-700 transition-colors hover:text-sage-700"
                 >
                   {section.heading}
                 </a>
               ))}
-              <a href="#faq" className="text-[14px] text-dark-300 transition-colors hover:text-gold-400">
+              <a href="#faq" className="text-[14px] text-ink-700 transition-colors hover:text-sage-700">
                 Frequently Asked Questions
               </a>
             </nav>
@@ -355,7 +355,7 @@ function EditorialGuide({ guide }: { guide: EditorialGuideConfig }) {
         <section className="px-6 pt-16 md:px-12 lg:px-20">
           <div className="mx-auto max-w-3xl">
             <div
-              className="max-w-none text-[15px] leading-[1.85] text-dark-300 [&>p]:mb-4 [&>p:first-child]:text-lg [&>p:first-child]:text-dark-200"
+              className="max-w-none text-[15px] leading-[1.85] text-ink-700 [&>p]:mb-4 [&>p:first-child]:text-lg [&>p:first-child]:text-ink-700"
               // Trusted static intro content from editorial-guides.ts
               dangerouslySetInnerHTML={{ __html: guide.intro }}
             />
@@ -366,25 +366,25 @@ function EditorialGuide({ guide }: { guide: EditorialGuideConfig }) {
         {guide.sections.map((section) => (
           <section key={section.id} id={section.id} className="px-6 py-12 md:px-12 lg:px-20">
             <div className="mx-auto max-w-3xl">
-              <h2 className="mb-8 font-serif text-3xl font-light text-white md:text-4xl">
+              <h2 className="mb-8 font-display text-3xl font-light text-ink-900 md:text-4xl">
                 {section.heading}
               </h2>
               {/* Trusted static section content from editorial-guides.ts */}
               <div
-                className="editorial-content max-w-none text-[15px] leading-[1.85] text-dark-300
+                className="editorial-content max-w-none text-[15px] leading-[1.85] text-ink-700
                   [&>p]:mb-4
-                  [&>h3]:mb-3 [&>h3]:mt-8 [&>h3]:font-serif [&>h3]:text-xl [&>h3]:font-medium [&>h3]:text-dark-100
-                  [&>h4]:mb-2 [&>h4]:mt-6 [&>h4]:text-[14px] [&>h4]:font-semibold [&>h4]:uppercase [&>h4]:tracking-wider [&>h4]:text-gold-500
+                  [&>h3]:mb-3 [&>h3]:mt-8 [&>h3]:font-display [&>h3]:text-xl [&>h3]:font-medium [&>h3]:text-ink-900
+                  [&>h4]:mb-2 [&>h4]:mt-6 [&>h4]:text-[14px] [&>h4]:font-semibold [&>h4]:uppercase [&>h4]:tracking-wider [&>h4]:text-sage-700
                   [&>ul]:mb-4 [&>ul]:ml-5 [&>ul]:list-disc [&>ul]:space-y-2
                   [&>ol]:mb-4 [&>ol]:ml-5 [&>ol]:list-decimal [&>ol]:space-y-2
-                  [&_li]:text-dark-300
-                  [&_strong]:text-dark-100 [&_strong]:font-medium
-                  [&_a]:text-gold-400 [&_a]:underline [&_a]:decoration-gold-400/30 [&_a]:underline-offset-2 [&_a]:transition-colors hover:[&_a]:text-gold-300
+                  [&_li]:text-ink-700
+                  [&_strong]:text-ink-900 [&_strong]:font-medium
+                  [&_a]:text-sage-700 [&_a]:underline [&_a]:decoration-sage-700/30 [&_a]:underline-offset-2 [&_a]:transition-colors hover:[&_a]:text-sage-600
                   [&>table]:mb-6 [&>table]:w-full [&>table]:border-collapse
-                  [&_thead]:border-b [&_thead]:border-white/[0.08]
-                  [&_th]:px-4 [&_th]:py-3 [&_th]:text-left [&_th]:text-[11px] [&_th]:font-semibold [&_th]:uppercase [&_th]:tracking-wider [&_th]:text-dark-400
-                  [&_td]:border-b [&_td]:border-white/[0.04] [&_td]:px-4 [&_td]:py-3 [&_td]:text-[14px] [&_td]:text-dark-300
-                  [&_em]:text-dark-400 [&_em]:italic"
+                  [&_thead]:border-b [&_thead]:border-cream-200
+                  [&_th]:px-4 [&_th]:py-3 [&_th]:text-left [&_th]:text-[11px] [&_th]:font-semibold [&_th]:uppercase [&_th]:tracking-wider [&_th]:text-ink-500
+                  [&_td]:border-b [&_td]:border-cream-200 [&_td]:px-4 [&_td]:py-3 [&_td]:text-[14px] [&_td]:text-ink-700
+                  [&_em]:text-ink-500 [&_em]:italic"
                 dangerouslySetInnerHTML={{ __html: section.content }}
               />
             </div>
@@ -392,20 +392,20 @@ function EditorialGuide({ guide }: { guide: EditorialGuideConfig }) {
         ))}
 
         {/* FAQ */}
-        <section id="faq" className="border-t border-white/[0.06] px-6 py-16 md:px-12 lg:px-20">
+        <section id="faq" className="border-t border-cream-200 px-6 py-16 md:px-12 lg:px-20">
           <div className="mx-auto max-w-3xl">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">FAQ</p>
-            <h2 className="mt-3 font-serif text-3xl font-light text-white md:text-4xl">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-sage-700">FAQ</p>
+            <h2 className="mt-3 font-display text-3xl font-light text-ink-900 md:text-4xl">
               Frequently Asked Questions
             </h2>
             <div className="mt-10 space-y-8">
               {guide.faqs.map((faq, i) => (
-                <div key={i} className="border-b border-white/[0.04] pb-8 last:border-0">
-                  <h3 className="font-serif text-lg font-medium text-dark-100">
+                <div key={i} className="border-b border-cream-200 pb-8 last:border-0">
+                  <h3 className="font-display text-lg font-medium text-ink-900">
                     {faq.question}
                   </h3>
                   <div
-                    className="mt-3 text-[14px] leading-[1.8] text-dark-400 [&>p]:mb-2 [&_a]:text-gold-400 [&_a]:underline [&_a]:decoration-gold-400/30 [&_a]:underline-offset-2"
+                    className="mt-3 text-[14px] leading-[1.8] text-ink-500 [&>p]:mb-2 [&_a]:text-sage-700 [&_a]:underline [&_a]:decoration-sage-700/30 [&_a]:underline-offset-2"
                     // Trusted static FAQ content from editorial-guides.ts
                     dangerouslySetInnerHTML={{ __html: faq.answer }}
                   />
@@ -416,14 +416,14 @@ function EditorialGuide({ guide }: { guide: EditorialGuideConfig }) {
         </section>
 
         {/* Internal links / CTAs */}
-        <section className="border-t border-white/[0.06] px-6 py-12 md:px-12 lg:px-20">
+        <section className="border-t border-cream-200 px-6 py-12 md:px-12 lg:px-20">
           <div className="mx-auto max-w-3xl">
             <div className="flex flex-wrap gap-3">
               {guide.internalLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="rounded-full border border-white/[0.08] px-5 py-2.5 text-[11px] font-medium uppercase tracking-wider text-dark-300 transition-all duration-300 hover:border-gold-500/30 hover:text-gold-400"
+                  className="rounded-full border border-cream-200 px-5 py-2.5 text-[11px] font-medium uppercase tracking-wider text-ink-700 transition-all duration-300 hover:border-sage-700/30 hover:text-sage-700"
                 >
                   {link.label}
                 </Link>
@@ -434,10 +434,10 @@ function EditorialGuide({ guide }: { guide: EditorialGuideConfig }) {
 
         {/* Related guides */}
         {guide.relatedGuides.length > 0 && (
-          <section className="border-t border-white/[0.06] px-6 py-16 md:px-12 lg:px-20">
+          <section className="border-t border-cream-200 px-6 py-16 md:px-12 lg:px-20">
             <div className="mx-auto max-w-7xl">
-              <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Related Guides</p>
-              <h2 className="mt-3 font-serif text-2xl font-light text-white">Keep Reading</h2>
+              <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-sage-700">Related Guides</p>
+              <h2 className="mt-3 font-display text-2xl font-light text-ink-900">Keep Reading</h2>
               <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {guide.relatedGuides.map((relSlug) => {
                   const relMatchmaker = GUIDES.find((g) => g.slug === relSlug);
@@ -448,15 +448,15 @@ function EditorialGuide({ guide }: { guide: EditorialGuideConfig }) {
                     <Link
                       key={relSlug}
                       href={`/guides/${relSlug}`}
-                      className="group flex flex-col rounded-2xl border border-white/[0.04] bg-white/[0.02] p-6 transition-all duration-300 hover:border-gold-500/15 hover:bg-white/[0.04]"
+                      className="group flex flex-col rounded-2xl border border-cream-200 bg-cream-100 p-6 transition-all duration-300 hover:border-sage-700/15 hover:bg-cream-50"
                     >
-                      <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-gold-500/60">
+                      <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-sage-700/60">
                         {"categoryLabel" in rel ? rel.categoryLabel : rel.category}
                       </span>
-                      <span className="mt-2 font-serif text-[16px] font-medium text-white group-hover:text-gold-300 transition-colors">
+                      <span className="mt-2 font-display text-[16px] font-medium text-ink-900 group-hover:text-sage-600 transition-colors">
                         {rel.title}
                       </span>
-                      <span className="mt-2 text-[12px] text-dark-400">
+                      <span className="mt-2 text-[12px] text-ink-500">
                         {rel.subtitle}
                       </span>
                     </Link>
@@ -468,13 +468,13 @@ function EditorialGuide({ guide }: { guide: EditorialGuideConfig }) {
         )}
 
         {/* Tags */}
-        <section className="border-t border-white/[0.06] px-6 py-8 md:px-12 lg:px-20">
+        <section className="border-t border-cream-200 px-6 py-8 md:px-12 lg:px-20">
           <div className="mx-auto max-w-3xl">
             <div className="flex flex-wrap gap-2">
               {guide.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full bg-white/[0.03] px-3 py-1 text-[10px] text-dark-500"
+                  className="rounded-full bg-cream-100 px-3 py-1 text-[10px] text-ink-500"
                 >
                   {tag}
                 </span>
