@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useCallback, ReactNode } from "react";
 
-interface CompareItem {
+export interface CompareItem {
   id: string;
   slug: string;
   name: string;

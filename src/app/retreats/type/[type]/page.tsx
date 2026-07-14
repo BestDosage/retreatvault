@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getAllRetreats, slugifyRegion, slugifyCountry } from "@/lib/data";
-import { WellnessRetreat } from "@/lib/types";
+import { WellnessRetreat, isScorePublic } from "@/lib/types";
 import RetreatCard from "@/components/RetreatCard";
 
 export const revalidate = 3600;
@@ -398,69 +398,69 @@ export default async function RetreatTypePage({ params }: { params: Promise<Para
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
       />
 
-      <main className="min-h-screen bg-dark-950">
+      <main className="min-h-screen bg-cream-50">
         {/* ═══ HERO ═══ */}
-        <section className="border-b border-white/[0.06] px-6 pb-16 pt-32 md:px-12 lg:px-20">
+        <section className="border-b border-cream-200 px-6 pb-16 pt-32 md:px-12 lg:px-20">
           <div className="mx-auto max-w-7xl">
             {/* Breadcrumb */}
-            <nav className="mb-8 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-dark-400">
-              <a href="/" className="transition-colors hover:text-gold-400">Home</a>
-              <span className="text-dark-700">/</span>
-              <a href="/retreats" className="transition-colors hover:text-gold-400">Retreats</a>
-              <span className="text-dark-700">/</span>
-              <span className="text-dark-300">{config.display}</span>
+            <nav className="mb-8 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-ink-500">
+              <a href="/" className="transition-colors hover:text-sage-700">Home</a>
+              <span className="text-cream-200">/</span>
+              <a href="/retreats" className="transition-colors hover:text-sage-700">Retreats</a>
+              <span className="text-cream-200">/</span>
+              <span className="text-ink-700">{config.display}</span>
             </nav>
 
-            <h1 className="font-serif text-4xl font-light text-white md:text-5xl lg:text-6xl">
+            <h1 className="font-display text-4xl font-light text-ink-900 md:text-5xl lg:text-6xl">
               {config.h1}
             </h1>
-            <p className="mt-4 text-lg text-dark-400">
+            <p className="mt-4 text-lg text-ink-500">
               {typeRetreats.length} {typeRetreats.length === 1 ? "retreat" : "retreats"} across{" "}
               {countryCount} {countryCount === 1 ? "country" : "countries"}
             </p>
-            <p className="mt-6 max-w-3xl text-[15px] leading-relaxed text-dark-300">
+            <p className="mt-6 max-w-3xl text-[15px] leading-relaxed text-ink-700">
               {config.intro}
             </p>
           </div>
         </section>
 
         {/* ═══ QUICK STATS ═══ */}
-        <section className="border-b border-white/[0.06] px-6 py-16 md:px-12 lg:px-20">
+        <section className="border-b border-cream-200 px-6 py-16 md:px-12 lg:px-20">
           <div className="mx-auto max-w-7xl">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-sage-700">
               {config.display} Retreat Overview
             </p>
-            <h2 className="mt-3 font-serif text-2xl font-light text-white">
+            <h2 className="mt-3 font-display text-2xl font-light text-ink-900">
               {config.display} Retreats at a Glance
             </h2>
             <div className="mt-8 grid grid-cols-2 gap-6 sm:grid-cols-4">
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-dark-400">Total Retreats</p>
-                <p className="mt-2 font-serif text-3xl text-white">{typeRetreats.length}</p>
+              <div className="rounded-xl border border-cream-200 bg-cream-100 p-6">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-500">Total Retreats</p>
+                <p className="mt-2 font-display text-3xl text-ink-900">{typeRetreats.length}</p>
               </div>
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-dark-400">Avg. Score</p>
-                <p className="mt-2 font-serif text-3xl text-gold-400">{avgScore.toFixed(1)}</p>
+              <div className="rounded-xl border border-cream-200 bg-cream-100 p-6">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-500">Avg. Score</p>
+                <p className="mt-2 font-display text-3xl text-sage-700">{avgScore.toFixed(1)}</p>
               </div>
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-dark-400">Avg. Price</p>
-                <p className="mt-2 font-serif text-3xl text-white">${Math.round(avgPrice).toLocaleString()}<span className="text-lg text-dark-400">/night</span></p>
+              <div className="rounded-xl border border-cream-200 bg-cream-100 p-6">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-500">Avg. Price</p>
+                <p className="mt-2 font-display text-3xl text-ink-900">${Math.round(avgPrice).toLocaleString()}<span className="text-lg text-ink-500">/night</span></p>
               </div>
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-dark-400">Countries</p>
-                <p className="mt-2 font-serif text-3xl text-white">{countryCount}</p>
+              <div className="rounded-xl border border-cream-200 bg-cream-100 p-6">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-500">Countries</p>
+                <p className="mt-2 font-display text-3xl text-ink-900">{countryCount}</p>
               </div>
             </div>
           </div>
         </section>
 
         {/* ═══ TOP RETREATS (CARDS) ═══ */}
-        <section className="border-b border-white/[0.06] px-6 py-16 md:px-12 lg:px-20">
+        <section className="border-b border-cream-200 px-6 py-16 md:px-12 lg:px-20">
           <div className="mx-auto max-w-7xl">
-            <h2 className="font-serif text-2xl font-light text-white">
+            <h2 className="font-display text-2xl font-light text-ink-900">
               Top {config.display} Retreats
             </h2>
-            <p className="mt-2 text-[13px] text-dark-300">
+            <p className="mt-2 text-[13px] text-ink-700">
               Ranked by RetreatVault score
             </p>
             <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -473,9 +473,9 @@ export default async function RetreatTypePage({ params }: { params: Promise<Para
 
         {/* ═══ BROWSE BY REGION ═══ */}
         {byRegion.size > 1 && (
-          <section className="border-b border-white/[0.06] px-6 py-16 md:px-12 lg:px-20">
+          <section className="border-b border-cream-200 px-6 py-16 md:px-12 lg:px-20">
             <div className="mx-auto max-w-7xl">
-              <h2 className="font-serif text-2xl font-light text-white">
+              <h2 className="font-display text-2xl font-light text-ink-900">
                 {config.display} Retreats by Region
               </h2>
               <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
@@ -485,12 +485,12 @@ export default async function RetreatTypePage({ params }: { params: Promise<Para
                     <a
                       key={region}
                       href={`/retreats/region/${slugifyRegion(region)}`}
-                      className="group flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] px-5 py-4 transition-all hover:border-gold-400/30 hover:bg-white/[0.04]"
+                      className="group flex items-center justify-between rounded-xl border border-cream-200 bg-cream-100 px-5 py-4 transition-all hover:border-sage-700/30 hover:bg-cream-50"
                     >
-                      <span className="font-serif text-[15px] text-white group-hover:text-gold-400 transition-colors">
+                      <span className="font-display text-[15px] text-ink-900 group-hover:text-sage-700 transition-colors">
                         {region}
                       </span>
-                      <span className="ml-3 text-[12px] text-dark-400">
+                      <span className="ml-3 text-[12px] text-ink-500">
                         {retreats.length}
                       </span>
                     </a>
@@ -503,10 +503,10 @@ export default async function RetreatTypePage({ params }: { params: Promise<Para
         {/* ═══ FULL DIRECTORY BY COUNTRY ═══ */}
         <section className="px-6 py-16 md:px-12 lg:px-20">
           <div className="mx-auto max-w-7xl">
-            <h2 className="font-serif text-2xl font-light text-white">
+            <h2 className="font-display text-2xl font-light text-ink-900">
               Complete {config.display} Retreat Directory
             </h2>
-            <p className="mt-2 text-[13px] text-dark-300">
+            <p className="mt-2 text-[13px] text-ink-700">
               Every {config.display.toLowerCase()} retreat, organized by country
             </p>
 
@@ -515,15 +515,15 @@ export default async function RetreatTypePage({ params }: { params: Promise<Para
               .map(([country, retreats]) => (
                 <div key={country} className="mt-10">
                   <div className="flex items-center gap-4">
-                    <h3 className="font-serif text-lg text-gold-400">
+                    <h3 className="font-display text-lg text-sage-700">
                       <a
                         href={`/retreats/country/${slugifyCountry(country)}`}
-                        className="hover:text-gold-300 transition-colors"
+                        className="hover:text-sage-600 transition-colors"
                       >
                         {country}
                       </a>
                     </h3>
-                    <span className="text-[11px] text-dark-400">
+                    <span className="text-[11px] text-ink-500">
                       {retreats.length} {retreats.length === 1 ? "retreat" : "retreats"}
                     </span>
                   </div>
@@ -533,26 +533,26 @@ export default async function RetreatTypePage({ params }: { params: Promise<Para
                       <a
                         key={r.slug}
                         href={`/retreats/${r.slug}`}
-                        className="group flex flex-col gap-1 rounded-xl border border-white/[0.04] bg-white/[0.02] p-4 transition-all hover:border-gold-400/20 hover:bg-white/[0.04] md:flex-row md:items-center md:gap-6 md:rounded-none md:border-0 md:border-b md:bg-transparent md:px-0 md:py-3"
+                        className="group flex flex-col gap-1 rounded-xl border border-cream-200 bg-cream-100 p-4 transition-all hover:border-sage-700/20 hover:bg-cream-50 md:flex-row md:items-center md:gap-6 md:rounded-none md:border-0 md:border-b md:bg-transparent md:px-0 md:py-3"
                       >
-                        <span className="text-[14px] font-medium text-white group-hover:text-gold-400 transition-colors md:flex-1">
+                        <span className="text-[14px] font-medium text-ink-900 group-hover:text-sage-700 transition-colors md:flex-1">
                           {r.name}
                         </span>
-                        <span className="text-[13px] text-dark-300 md:w-40">
+                        <span className="text-[13px] text-ink-700 md:w-40">
                           {r.city}
                         </span>
                         <div className="flex items-center justify-between md:contents">
-                          <span className="font-serif text-[14px] text-gold-400 md:w-20 md:text-right">
-                            {r.wrd_score.toFixed(1)}
+                          <span className="font-display text-[14px] text-sage-700 md:w-20 md:text-right">
+                            {isScorePublic(r.wrd_score) ? r.wrd_score.toFixed(1) : "Listed"}
                           </span>
-                          <span className="text-[13px] text-dark-200 md:w-48 md:text-right">
+                          <span className="text-[13px] text-ink-700 md:w-48 md:text-right">
                             ${r.price_min_per_night.toLocaleString()}
                             {r.price_min_per_night !== r.price_max_per_night && (
-                              <span className="text-dark-400">
+                              <span className="text-ink-500">
                                 &ndash;${r.price_max_per_night.toLocaleString()}
                               </span>
                             )}
-                            <span className="ml-1 text-[11px] text-dark-400">/night</span>
+                            <span className="ml-1 text-[11px] text-ink-500">/night</span>
                           </span>
                         </div>
                       </a>
@@ -564,16 +564,16 @@ export default async function RetreatTypePage({ params }: { params: Promise<Para
         </section>
 
         {/* ═══ FAQ ═══ */}
-        <section className="border-t border-white/[0.06] px-6 py-16 md:px-12 lg:px-20">
+        <section className="border-t border-cream-200 px-6 py-16 md:px-12 lg:px-20">
           <div className="mx-auto max-w-7xl">
-            <h2 className="font-serif text-2xl font-light text-white">
+            <h2 className="font-display text-2xl font-light text-ink-900">
               {config.display} Retreat FAQ
             </h2>
             <div className="mt-10 space-y-6">
               {config.faqs.map((faq, i) => (
-                <div key={i} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8">
-                  <h3 className="font-serif text-lg text-white">{faq.question}</h3>
-                  <p className="mt-3 text-[14px] leading-relaxed text-dark-300">{faq.answer}</p>
+                <div key={i} className="rounded-xl border border-cream-200 bg-cream-100 p-6 md:p-8">
+                  <h3 className="font-display text-lg text-ink-900">{faq.question}</h3>
+                  <p className="mt-3 text-[14px] leading-relaxed text-ink-700">{faq.answer}</p>
                 </div>
               ))}
             </div>
@@ -581,45 +581,45 @@ export default async function RetreatTypePage({ params }: { params: Promise<Para
         </section>
 
         {/* ═══ INTERNAL LINKS ═══ */}
-        <section className="border-t border-white/[0.06] px-6 py-16 md:px-12 lg:px-20">
+        <section className="border-t border-cream-200 px-6 py-16 md:px-12 lg:px-20">
           <div className="mx-auto max-w-7xl">
-            <h2 className="font-serif text-2xl font-light text-white">
+            <h2 className="font-display text-2xl font-light text-ink-900">
               Explore More
             </h2>
             <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <a
                 href="/retreats"
-                className="group rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 transition-all hover:border-gold-400/30 hover:bg-white/[0.04]"
+                className="group rounded-xl border border-cream-200 bg-cream-100 p-6 transition-all hover:border-sage-700/30 hover:bg-cream-50"
               >
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-500">Directory</p>
-                <p className="mt-2 font-serif text-lg text-white group-hover:text-gold-400 transition-colors">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Directory</p>
+                <p className="mt-2 font-display text-lg text-ink-900 group-hover:text-sage-700 transition-colors">
                   Full Retreat Directory
                 </p>
-                <p className="mt-1 text-[13px] text-dark-400">
+                <p className="mt-1 text-[13px] text-ink-500">
                   Browse all 9,400+ retreats with filters
                 </p>
               </a>
               <a
                 href="/guides"
-                className="group rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 transition-all hover:border-gold-400/30 hover:bg-white/[0.04]"
+                className="group rounded-xl border border-cream-200 bg-cream-100 p-6 transition-all hover:border-sage-700/30 hover:bg-cream-50"
               >
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-500">Guides</p>
-                <p className="mt-2 font-serif text-lg text-white group-hover:text-gold-400 transition-colors">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Guides</p>
+                <p className="mt-2 font-display text-lg text-ink-900 group-hover:text-sage-700 transition-colors">
                   Wellness Retreat Guides
                 </p>
-                <p className="mt-1 text-[13px] text-dark-400">
+                <p className="mt-1 text-[13px] text-ink-500">
                   Guides by goal, budget, and style
                 </p>
               </a>
               <a
                 href="/quiz"
-                className="group rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 transition-all hover:border-gold-400/30 hover:bg-white/[0.04]"
+                className="group rounded-xl border border-cream-200 bg-cream-100 p-6 transition-all hover:border-sage-700/30 hover:bg-cream-50"
               >
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-500">Quiz</p>
-                <p className="mt-2 font-serif text-lg text-white group-hover:text-gold-400 transition-colors">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Quiz</p>
+                <p className="mt-2 font-display text-lg text-ink-900 group-hover:text-sage-700 transition-colors">
                   Find Your Perfect Retreat
                 </p>
-                <p className="mt-1 text-[13px] text-dark-400">
+                <p className="mt-1 text-[13px] text-ink-500">
                   Answer 5 questions, get matched instantly
                 </p>
               </a>
@@ -627,7 +627,7 @@ export default async function RetreatTypePage({ params }: { params: Promise<Para
 
             {/* Cross-links to other type pages */}
             <div className="mt-12">
-              <h3 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-500">
+              <h3 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">
                 Browse by Type
               </h3>
               <div className="mt-4 flex flex-wrap gap-3">
@@ -637,7 +637,7 @@ export default async function RetreatTypePage({ params }: { params: Promise<Para
                     <a
                       key={s}
                       href={`/retreats/type/${s}`}
-                      className="rounded-full border border-white/[0.08] px-4 py-2 text-[12px] text-dark-300 transition-all hover:border-gold-400/30 hover:text-gold-400"
+                      className="rounded-full border border-cream-200 px-4 py-2 text-[12px] text-ink-700 transition-all hover:border-sage-700/30 hover:text-sage-700"
                     >
                       {c.display} Retreats
                     </a>

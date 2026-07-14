@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
+import { getAllCities } from "@/lib/data";
 import { blogPosts } from "@/data/blog-posts";
 import { GUIDES } from "@/data/guides";
 import { EDITORIAL_GUIDES } from "@/data/editorial-guides";
@@ -108,6 +109,28 @@ function slugify(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
+/**
+ * Distinct city slugs that get a landing page — the exact set the
+ * /retreats/city/[city] pages render. The qualification logic (>= 3 retreats,
+ * slugify, empty-slug filter) lives ONLY in getAllCities() in lib/data; this
+ * helper just feeds it rows fetched the same way getAllRetreats() fetches them
+ * (score-ordered, bounded by the project's PostgREST db-max-rows cap, via the
+ * direct client to bypass unstable_cache's 2MB limit), so the sitemap and the
+ * live pages always agree: every URL listed resolves, none 404.
+ */
+async function getCitySlugsWith3Plus(): Promise<string[]> {
+  const { data } = await db()
+    .from("retreats")
+    .select("city, country, region")
+    .neq("slug", "test")
+    .neq("slug", "cape-kalevala")
+    .gt("wrd_score", 0)
+    .order("wrd_score", { ascending: false })
+    .order("slug", { ascending: true })
+    .range(0, 49999);
+  return getAllCities(data || []).map((c) => c.slug);
+}
+
 const RETREATS_PER_SITEMAP = 1000;
 const RETREAT_SITEMAPS = 10; // ~9,400 retreats / 1,000 per sitemap
 
@@ -156,6 +179,14 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
       priority: 0.8,
     }));
 
+    const citySlugs = await getCitySlugsWith3Plus();
+    const cityPages: MetadataRoute.Sitemap = citySlugs.map((slug) => ({
+      url: `${BASE_URL}/retreats/city/${slug}`,
+      lastModified: new Date("2026-04-15"),
+      changeFrequency: "weekly" as const,
+      priority: 0.75,
+    }));
+
     const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
       url: `${BASE_URL}/blog/${post.slug}`,
       lastModified: new Date(post.updated_date),
@@ -181,7 +212,7 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
       priority: 0.8,
     }));
 
-    return [...staticPages, ...typePages, ...regionPages, ...countryPages, ...blogPages, ...guideIndexPage, ...guidePages, ...editorialGuidePages];
+    return [...staticPages, ...typePages, ...regionPages, ...countryPages, ...cityPages, ...blogPages, ...guideIndexPage, ...guidePages, ...editorialGuidePages];
   }
 
   // Sub-sitemaps 1+: retreat chunks of ~1000

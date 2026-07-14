@@ -1,31 +1,25 @@
 import { WellnessRetreat, getTierLabel } from "@/lib/types";
 
+// Text-only token pills. Light fills read cleanly on both the cream editorial
+// surfaces and the (temporary) dark card surfaces still awaiting conversion.
+// Gold = Elite, sage = Exceptional; lower tiers get quiet neutral pills. No icons.
 const tierStyles: Record<WellnessRetreat["score_tier"], string> = {
-  elite: "bg-gold-400/15 text-gold-300 border-gold-400/30",
-  exceptional: "bg-white/5 text-dark-100 border-white/10",
-  highly_recommended: "bg-white/[0.03] text-dark-200 border-white/[0.06]",
-  good: "bg-white/[0.02] text-dark-300 border-white/[0.04]",
-  listed: "bg-transparent text-dark-400 border-white/[0.03]",
-};
-
-const tierIcons: Record<WellnessRetreat["score_tier"], string> = {
-  elite: "\u2726",
-  exceptional: "\u2605",
-  highly_recommended: "",
-  good: "",
-  listed: "",
+  elite: "bg-gold text-ink-900",
+  exceptional: "bg-sage-100 text-sage-700",
+  highly_recommended: "bg-cream-200 text-ink-700",
+  good: "bg-cream-200 text-ink-500",
+  listed: "bg-cream-100 text-ink-500",
 };
 
 export default function TierBadge({ tier, size = "sm" }: { tier: WellnessRetreat["score_tier"]; size?: "sm" | "md" | "lg" }) {
   const sizeClasses = {
-    sm: "px-2.5 py-1 text-[8px]",
-    md: "px-3.5 py-1.5 text-[9px]",
-    lg: "px-5 py-2 text-[10px]",
+    sm: "px-3 py-1 text-[10px]",
+    md: "px-3.5 py-1.5 text-[11px]",
+    lg: "px-5 py-2 text-[12px]",
   };
 
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full border font-semibold uppercase tracking-[0.2em] ${tierStyles[tier]} ${sizeClasses[size]}`}>
-      {tierIcons[tier] && <span className="text-[0.9em]">{tierIcons[tier]}</span>}
+    <span className={`inline-flex items-center rounded-full font-semibold uppercase tracking-[0.2em] ${tierStyles[tier]} ${sizeClasses[size]}`}>
       {getTierLabel(tier)}
     </span>
   );

@@ -59,9 +59,9 @@ export default function EmailCapture({
 
   if (status === "success") {
     return (
-      <div className={variant === "footer" ? "" : "rounded-2xl border border-gold-400/20 bg-gold-400/[0.03] p-8 text-center"}>
-        <p className="text-[9px] font-semibold uppercase tracking-[0.4em] text-gold-500">You&rsquo;re in</p>
-        <p className="mt-2 font-serif text-lg font-light text-white">Check your inbox for the first Vault Report.</p>
+      <div className={variant === "footer" ? "" : "rounded-2xl bg-sage-100 p-8 text-center"}>
+        <p className="text-[9px] font-semibold uppercase tracking-[0.4em] text-sage-700">You&rsquo;re in</p>
+        <p className="mt-2 font-display text-lg text-ink-900">Check your inbox for the first Vault Report.</p>
       </div>
     );
   }
@@ -89,17 +89,17 @@ export default function EmailCapture({
   }
 
   return (
-    <div className={variant === "inline" ? "" : "rounded-2xl border border-white/[0.06] bg-white/[0.02] p-8 text-center"}>
-      <p className="text-[9px] font-semibold uppercase tracking-[0.4em] text-gold-500">Free Weekly Intel</p>
-      <h3 className="mt-3 font-serif text-xl font-light text-white">{headline}</h3>
-      <p className="mx-auto mt-2 max-w-md text-[13px] font-light leading-relaxed text-dark-300">{subtext}</p>
+    <div className={variant === "inline" ? "" : "rounded-[2rem] bg-cream-100 p-8 text-center ring-1 ring-cream-200 sm:p-10"}>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-sage-700">Free Weekly Intel</p>
+      <h3 className="mt-3 font-display text-2xl text-ink-900">{headline}</h3>
+      <p className="mx-auto mt-3 max-w-md text-[13px] leading-relaxed text-ink-700">{subtext}</p>
       <form onSubmit={handleSubmit} className="mx-auto mt-6 max-w-sm space-y-3">
         {showName && (
           <input
             name="firstName"
             type="text"
             placeholder="First name"
-            className="w-full rounded-xl border border-white/[0.08] bg-dark-900 px-4 py-3 text-[13px] text-white placeholder-dark-500 outline-none transition-colors focus:border-gold-400/30"
+            className="w-full rounded-xl border border-cream-200 bg-cream-50 px-4 py-3 text-[13px] text-ink-900 placeholder-ink-500 outline-none transition-colors focus:border-sage-600"
           />
         )}
         <input
@@ -107,18 +107,23 @@ export default function EmailCapture({
           type="email"
           required
           placeholder="Email address"
-          className="w-full rounded-xl border border-white/[0.08] bg-dark-900 px-4 py-3 text-[13px] text-white placeholder-dark-500 outline-none transition-colors focus:border-gold-400/30"
+          className="w-full rounded-xl border border-cream-200 bg-cream-50 px-4 py-3 text-[13px] text-ink-900 placeholder-ink-500 outline-none transition-colors focus:border-sage-600"
         />
         <button
           type="submit"
           disabled={status === "loading"}
-          className="btn-luxury btn-luxury-md btn-luxury-full disabled:opacity-50"
+          className="group flex w-full items-center justify-center gap-2.5 rounded-full bg-ink-900 py-3 pl-6 pr-4 text-sm font-medium text-cream-50 transition-transform duration-150 ease-out active:scale-[0.97] disabled:opacity-50"
         >
           {status === "loading" ? "Subscribing..." : "Get the Vault Report"}
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10">
+            <svg className="h-4 w-4 transition-transform duration-150 ease-out group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </span>
         </button>
       </form>
       {status === "error" && <p className="mt-2 text-[11px] text-red-400">{errorMsg}</p>}
-      <p className="mt-3 text-[10px] text-dark-600">No spam. Unsubscribe anytime.</p>
+      <p className="mt-3 text-[10px] text-ink-500">No spam. Unsubscribe anytime.</p>
     </div>
   );
 }

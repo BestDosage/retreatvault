@@ -1,29 +1,22 @@
-export default function WrdScore({ score, size = "md" }: { score: number; size?: "sm" | "md" | "lg" | "xl" }) {
-  const isTop = score >= 8.0;
+import { isScorePublic } from "@/lib/types";
 
-  const sizes = {
-    sm: "h-12 w-12",
-    md: "h-16 w-16",
-    lg: "h-20 w-20",
-    xl: "h-28 w-28",
-  };
-  const text = {
-    sm: "text-sm",
-    md: "text-lg",
-    lg: "text-2xl",
-    xl: "text-4xl",
-  };
-  const label = {
-    sm: "text-[5px]",
-    md: "text-[7px]",
-    lg: "text-[8px]",
-    xl: "text-[10px]",
-  };
+// Lab-report headline number for the score panel. Below the display gate the
+// number is suppressed to "Listed" (never a low number advertising itself).
+export default function WrdScore({ score }: { score: number; size?: "sm" | "md" | "lg" | "xl" }) {
+  const scorePublic = isScorePublic(score);
+
+  if (!scorePublic) {
+    return (
+      <span className="font-display text-4xl leading-none tracking-tight text-ink-900">Listed</span>
+    );
+  }
 
   return (
-    <div className={`flex flex-col items-center justify-center rounded-full border ${isTop ? "border-gold-400/40" : "border-white/10"} bg-dark-950/60 backdrop-blur-md ${sizes[size]}`}>
-      <span className={`font-serif font-light leading-none text-white ${text[size]}`}>{score.toFixed(1)}</span>
-      <span className={`font-semibold uppercase tracking-[0.2em] text-gold-400 ${label[size]}`}>RV</span>
+    <div className="flex items-baseline gap-1.5">
+      <span className="font-display text-6xl leading-none tracking-tight tabular-nums text-ink-900">
+        {score.toFixed(1)}
+      </span>
+      <span className="text-xl text-ink-500">/ 10</span>
     </div>
   );
 }

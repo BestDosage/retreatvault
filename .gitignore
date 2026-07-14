@@ -10,3 +10,4 @@ data/*.csv
 data/*.log
 src/data/existing-slugs.json
 data/generation-log*.txt
+.superpowers/

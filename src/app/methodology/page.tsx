@@ -152,6 +152,15 @@ export default function MethodologyPage() {
               with weights calibrated to what matters most to informed wellness travelers. Categories like Nutrition
               and Medical carry more weight than Add-Ons because peer-reviewed research shows they drive outcomes.
             </p>
+            <p className="mt-4 text-[13px] leading-relaxed text-dark-400">
+              When a category can&rsquo;t be verified for a given retreat, we exclude it from that retreat&rsquo;s
+              average and redistribute its weight across the categories we <em>can</em> confirm &mdash; a property is
+              never penalized for data we simply don&rsquo;t have. The resulting scores are then calibrated across the
+              full directory so a number means the same thing on every listing, and so the RV Score reflects where a
+              retreat stands among its peers rather than an isolated tally. To keep the scale honest, we only publish a
+              numeric RV Score at or above {`6.5`}; below that we show the tier label &ldquo;Listed&rdquo; rather than a
+              precise figure, because the underlying data isn&rsquo;t yet complete enough to stand behind a specific number.
+            </p>
           </div>
         </AnimateIn>
 

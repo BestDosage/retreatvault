@@ -1,26 +1,26 @@
 import type { Metadata } from "next";
-import { Inter, Cormorant_Garamond } from "next/font/google";
+import { Gloock, Hanken_Grotesk } from "next/font/google";
 import Image from "next/image";
 import "./globals.css";
 import CompareProvider from "@/components/CompareProvider";
 import CompareBar from "@/components/CompareBar";
 import PressStrip from "@/components/PressStrip";
-import MobileNav from "@/components/MobileNav";
+import SiteNav from "@/components/SiteNav";
 import EmailCapture from "@/components/EmailCapture";
 
-const inter = Inter({
+const display = Gloock({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: "400",
   display: "swap",
-  variable: "--font-inter",
+  variable: "--font-display",
   adjustFontFallback: true,
 });
 
-const cormorant = Cormorant_Garamond({
+const sans = Hanken_Grotesk({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "700"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
-  variable: "--font-cormorant",
+  variable: "--font-sans",
   adjustFontFallback: true,
 });
 
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     template: "%s | RetreatVault",
   },
   description:
-    "Compare 120+ wellness retreats rated across 15 categories. Unbiased scores for spa resorts, medical clinics, yoga retreats & detox centers worldwide. Find your perfect retreat.",
+    "Compare 9,400+ wellness retreats rated across 15 categories. Unbiased scores for spa resorts, medical clinics, yoga retreats & detox centers worldwide. Find your perfect retreat.",
   metadataBase: new URL("https://www.retreatvault.com"),
   openGraph: {
     type: "website",
@@ -50,13 +50,13 @@ export const metadata: Metadata = {
     images: ["/logo.png"],
   },
   other: {
-    "theme-color": "#050505",
+    "theme-color": "#f7f4ec",
   },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${cormorant.variable}`}>
+    <html lang="en" className={`${display.variable} ${sans.variable}`}>
       <head>
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="" />
       </head>
@@ -64,54 +64,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <CompareProvider>
 
         {/* ═══ NAV ═══ */}
-        <nav className="fixed top-0 z-50 w-full">
-          <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-5 sm:px-10 lg:px-16">
-            {/* Logo */}
-            <a href="/" className="group flex items-center -my-8">
-              <Image
-                src="/logo-transparent.png"
-                alt="RetreatVault"
-                width={224}
-                height={112}
-                priority
-                className="h-28 w-auto"
-              />
-            </a>
-
-            {/* Links */}
-            <div className="flex items-center gap-8">
-              <a href="/retreats" className="hidden text-[11px] font-medium uppercase tracking-[0.2em] text-dark-300 transition-colors duration-500 hover:text-white sm:block">
-                Directory
-              </a>
-              <a href="/retreats?region=USA" className="hidden text-[11px] font-medium uppercase tracking-[0.2em] text-dark-400 transition-colors duration-500 hover:text-white md:block">
-                USA
-              </a>
-              <a href="/retreats?region=Europe" className="hidden text-[11px] font-medium uppercase tracking-[0.2em] text-dark-400 transition-colors duration-500 hover:text-white md:block">
-                Europe
-              </a>
-              <a href="/retreats?region=Asia" className="hidden text-[11px] font-medium uppercase tracking-[0.2em] text-dark-400 transition-colors duration-500 hover:text-white lg:block">
-                Asia
-              </a>
-              <a href="/blog" className="hidden text-[11px] font-medium uppercase tracking-[0.2em] text-dark-400 transition-colors duration-500 hover:text-white lg:block">
-                Journal
-              </a>
-              <a href="/quiz" className="hidden sm:inline-flex btn-luxury btn-luxury-sm">
-                Take the Quiz
-              </a>
-              <MobileNav />
-            </div>
-          </div>
-          {/* Fade line */}
-          <div className="line-gold" />
-        </nav>
+        <SiteNav />
 
         <main>{children}</main>
         <CompareBar />
 
         {/* ═══ FOOTER ═══ */}
-        <footer className="border-t border-white/[0.04] bg-dark-950">
+        <footer className="border-t border-cream-50/10 bg-ink-900">
           <div className="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-16">
-            <div className="line-gold" />
+            <div className="border-t border-cream-50/10" />
             {/* Logo + Description + Subscribe (horizontal bar on desktop) */}
             <div className="py-16 text-center md:text-left">
               <div className="flex justify-center md:justify-start">
@@ -124,69 +85,69 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   className="h-36 w-auto"
                 />
               </div>
-              <p className="mx-auto mt-6 max-w-md text-[13px] leading-relaxed text-dark-400 md:mx-0">
+              <p className="mx-auto mt-6 max-w-md text-[13px] leading-relaxed text-cream-200/60 md:mx-0">
                 The world&rsquo;s most rigorous wellness retreat rating system.
                 15 weighted categories. Zero bias. Built by an analytical chemist
                 who demands precision from every score.
               </p>
               <div className="mt-8">
-                <p className="mb-3 text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Weekly Vault Report</p>
+                <p className="mb-3 font-display text-[9px] font-semibold uppercase tracking-[0.3em] text-cream-50">Weekly Vault Report</p>
                 <div className="mx-auto max-w-sm md:mx-0 md:max-w-lg">
                   <EmailCapture source="footer" variant="footer" />
                 </div>
               </div>
             </div>
 
-            <div className="line-gold" />
+            <div className="border-t border-cream-50/10" />
 
             {/* Footer link columns — unified row */}
             <div className="grid grid-cols-1 gap-10 py-14 text-center sm:grid-cols-3 sm:text-left">
               <div>
-                <h4 className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Regions</h4>
+                <h4 className="font-display text-[9px] font-semibold uppercase tracking-[0.3em] text-cream-50">Regions</h4>
                 <div className="mt-5 flex flex-col gap-3">
                   {["USA", "Europe", "Canada", "Mexico", "Asia"].map((r) => (
-                    <a key={r} href={`/retreats?region=${r}`} className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">
+                    <a key={r} href={`/retreats?region=${r}`} className="text-[13px] text-cream-200/60 transition-colors duration-500 hover:text-cream-50">
                       {r}
                     </a>
                   ))}
                 </div>
               </div>
               <div>
-                <h4 className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Retreat Types</h4>
+                <h4 className="font-display text-[9px] font-semibold uppercase tracking-[0.3em] text-cream-50">Retreat Types</h4>
                 <div className="mt-5 flex flex-col gap-3">
-                  <a href="/retreats/type/yoga" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Yoga</a>
-                  <a href="/retreats/type/meditation" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Meditation</a>
-                  <a href="/retreats/type/detox" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Detox</a>
-                  <a href="/retreats/type/luxury" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Luxury</a>
-                  <a href="/retreats/type/wellness" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Wellness</a>
-                  <a href="/destinations" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">All Destinations</a>
+                  <a href="/retreats/type/yoga" className="text-[13px] text-cream-200/60 transition-colors duration-500 hover:text-cream-50">Yoga</a>
+                  <a href="/retreats/type/meditation" className="text-[13px] text-cream-200/60 transition-colors duration-500 hover:text-cream-50">Meditation</a>
+                  <a href="/retreats/type/detox" className="text-[13px] text-cream-200/60 transition-colors duration-500 hover:text-cream-50">Detox</a>
+                  <a href="/retreats/type/luxury" className="text-[13px] text-cream-200/60 transition-colors duration-500 hover:text-cream-50">Luxury</a>
+                  <a href="/retreats/type/wellness" className="text-[13px] text-cream-200/60 transition-colors duration-500 hover:text-cream-50">Wellness</a>
+                  <a href="/destinations" className="text-[13px] text-cream-200/60 transition-colors duration-500 hover:text-cream-50">All Destinations</a>
                 </div>
               </div>
               <div>
-                <h4 className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Company</h4>
+                <h4 className="font-display text-[9px] font-semibold uppercase tracking-[0.3em] text-cream-50">Company</h4>
                 <div className="mt-5 flex flex-col gap-3">
-                  <a href="/methodology" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Methodology</a>
-                  <a href="/guides" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Guides</a>
-                  <a href="/science" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Science</a>
-                  <a href="/blog" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Journal</a>
-                  <a href="/contact" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Contact</a>
-                  <a href="/quiz" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Quiz</a>
-                  <a href="/compare" className="text-[13px] text-dark-400 transition-colors duration-500 hover:text-gold-400">Compare</a>
+                  <a href="/methodology" className="text-[13px] text-cream-200/60 transition-colors duration-500 hover:text-cream-50">Methodology</a>
+                  <a href="/guides" className="text-[13px] text-cream-200/60 transition-colors duration-500 hover:text-cream-50">Guides</a>
+                  <a href="/science" className="text-[13px] text-cream-200/60 transition-colors duration-500 hover:text-cream-50">Science</a>
+                  <a href="/blog" className="text-[13px] text-cream-200/60 transition-colors duration-500 hover:text-cream-50">Journal</a>
+                  <a href="/contact" className="text-[13px] text-cream-200/60 transition-colors duration-500 hover:text-cream-50">Contact</a>
+                  <a href="/quiz" className="text-[13px] text-cream-200/60 transition-colors duration-500 hover:text-cream-50">Quiz</a>
+                  <a href="/compare" className="text-[13px] text-cream-200/60 transition-colors duration-500 hover:text-cream-50">Compare</a>
                 </div>
               </div>
             </div>
-            <div className="line-gold" />
+            <div className="border-t border-cream-50/10" />
             <div className="flex flex-col items-center gap-2 py-8 sm:flex-row sm:justify-between">
-              <span className="text-[10px] text-dark-500">&copy; {new Date().getFullYear()} RetreatVault.com</span>
-              <span className="text-[9px] uppercase tracking-[0.3em] text-dark-600">Precision-Rated Wellness Travel</span>
+              <span className="text-[10px] text-cream-200/60">&copy; {new Date().getFullYear()} RetreatVault.com</span>
+              <span className="text-[9px] uppercase tracking-[0.3em] text-cream-200/60">Precision-Rated Wellness Travel</span>
             </div>
-            <div className="border-t border-white/[0.04] pt-4 pb-6">
-              <p className="text-[10px] uppercase tracking-[0.15em] text-dark-600 mb-2">Also by Chad Waldman</p>
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-dark-600">
-                <a href="https://bestdosage.com" target="_blank" rel="noopener" className="hover:text-dark-400 transition-colors">BestDosage — Find wellness practitioners</a>
-                <a href="https://oktodive.com" target="_blank" rel="noopener" className="hover:text-dark-400 transition-colors">OkToDive — Compare dive sites</a>
-                <a href="https://sourchad.com" target="_blank" rel="noopener" className="hover:text-dark-400 transition-colors">SourChad — Fermentation science</a>
-                <a href="https://dumpstercomparison.com" target="_blank" rel="noopener" className="hover:text-dark-400 transition-colors">DumpsterComparison — Compare dumpster rental</a>
+            <div className="border-t border-cream-50/10 pt-4 pb-6">
+              <p className="text-[10px] uppercase tracking-[0.15em] text-cream-200/60 mb-2">Also by Chad Waldman</p>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-cream-200/60">
+                <a href="https://bestdosage.com" target="_blank" rel="noopener" className="hover:text-cream-50 transition-colors">BestDosage — Find wellness practitioners</a>
+                <a href="https://oktodive.com" target="_blank" rel="noopener" className="hover:text-cream-50 transition-colors">OkToDive — Compare dive sites</a>
+                <a href="https://sourchad.com" target="_blank" rel="noopener" className="hover:text-cream-50 transition-colors">SourChad — Fermentation science</a>
+                <a href="https://dumpstercomparison.com" target="_blank" rel="noopener" className="hover:text-cream-50 transition-colors">DumpsterComparison — Compare dumpster rental</a>
               </div>
             </div>
           </div>

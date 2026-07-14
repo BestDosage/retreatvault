@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
+import { isScorePublic } from "@/lib/types";
 
 interface Props {
   vaultScore: number;
@@ -17,6 +18,7 @@ export default function VaultVsGuest({
   googleCount,
   tripadvisorCount,
 }: Props) {
+  const reduce = useReducedMotion();
   // Normalize guest score to 0-10 scale (Google/TA are out of 5)
   const guestScores: number[] = [];
   if (googleRating > 0) guestScores.push(googleRating * 2);
@@ -29,66 +31,61 @@ export default function VaultVsGuest({
   const diverges = guestScore !== null && Math.abs(vaultScore - guestScore) > 1.0;
 
   return (
-    <div className="rounded-2xl border border-white/[0.04] bg-white/[0.015] p-6 sm:p-8">
-      <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Dual Score</p>
-      <h3 className="mt-2 font-serif text-xl font-light text-white">Vault Score vs Guest Score</h3>
+    <div className="rounded-[2rem] bg-cream-100 p-6 ring-1 ring-cream-200 sm:p-8">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Dual Score</p>
+      <h3 className="mt-2 font-display text-xl text-ink-900">Vault Score vs Guest Score</h3>
 
-      <div className="mt-6 grid grid-cols-2 gap-6">
+      <div className="mt-7 grid grid-cols-2 gap-6">
         {/* Vault Score */}
         <div className="text-center">
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
+            initial={reduce ? false : { scale: 0.9, opacity: 0 }}
             whileInView={{ scale: 1, opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="mx-auto flex h-20 w-20 flex-col items-center justify-center rounded-full border-2 border-gold-400/40 bg-dark-950/60"
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="mx-auto flex h-20 w-20 flex-col items-center justify-center rounded-full bg-cream-50 ring-2 ring-gold/50"
           >
-            <span className="font-serif text-2xl font-light text-white">{vaultScore.toFixed(1)}</span>
-            <span className="text-[7px] font-semibold uppercase tracking-[0.2em] text-gold-400">Vault</span>
+            <span className="font-display text-2xl tabular-nums text-ink-900">{isScorePublic(vaultScore) ? vaultScore.toFixed(1) : "Listed"}</span>
+            <span className="text-[7px] font-semibold uppercase tracking-[0.2em] text-sage-700">Vault</span>
           </motion.div>
-          <p className="mt-3 text-[10px] text-dark-400">Analytical Score</p>
-          <p className="text-[9px] text-dark-500">15 categories &middot; 120+ data points</p>
+          <p className="mt-3 text-xs text-ink-700">Analytical Score</p>
+          <p className="text-[11px] text-ink-500">15 categories &middot; 120+ data points</p>
         </div>
 
         {/* Guest Score */}
         <div className="text-center">
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
+            initial={reduce ? false : { scale: 0.9, opacity: 0 }}
             whileInView={{ scale: 1, opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-            className="mx-auto flex h-20 w-20 flex-col items-center justify-center rounded-full border-2 border-white/10 bg-dark-950/60"
+            transition={{ duration: 0.5, delay: reduce ? 0 : 0.12, ease: [0.22, 1, 0.36, 1] }}
+            className="mx-auto flex h-20 w-20 flex-col items-center justify-center rounded-full bg-cream-50 ring-2 ring-ink-900/15"
           >
-            <span className="font-serif text-2xl font-light text-white">
+            <span className="font-display text-2xl tabular-nums text-ink-900">
               {guestScore !== null ? guestScore.toFixed(1) : "N/A"}
             </span>
-            <span className="text-[7px] font-semibold uppercase tracking-[0.2em] text-dark-400">Guest</span>
+            <span className="text-[7px] font-semibold uppercase tracking-[0.2em] text-ink-500">Guest</span>
           </motion.div>
-          <p className="mt-3 text-[10px] text-dark-400">Aggregated Reviews</p>
-          <p className="text-[9px] text-dark-500">{totalReviews.toLocaleString()} reviews</p>
+          <p className="mt-3 text-xs text-ink-700">Aggregated Reviews</p>
+          <p className="text-[11px] tabular-nums text-ink-500">{totalReviews.toLocaleString()} reviews</p>
         </div>
       </div>
 
       {/* Divergence flag */}
       {diverges && (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={reduce ? false : { opacity: 0, y: 8 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-6 rounded-xl border border-gold-400/15 bg-gold-400/[0.04] px-5 py-4"
+          transition={{ duration: 0.4, delay: reduce ? 0 : 0.24 }}
+          className="mt-7 rounded-2xl bg-sage-100 px-5 py-4"
         >
-          <div className="flex items-start gap-3">
-            <span className="mt-0.5 text-gold-400">{"\u26A0"}</span>
-            <div>
-              <p className="text-[11px] font-semibold text-gold-300">Scores Differ &mdash; Here&rsquo;s Why</p>
-              <p className="mt-1 text-[11px] leading-relaxed text-dark-400">
-                {vaultScore > (guestScore || 0)
-                  ? "Our analytical scoring found strengths in clinical, nutrition, or personalization categories that typical guests don\u2019t rate in reviews. This retreat delivers more than its guest scores suggest."
-                  : "Guest reviews rate the hospitality experience higher than our weighted clinical and wellness metrics. The property excels at guest satisfaction but scores lower on specialized wellness criteria."}
-              </p>
-            </div>
-          </div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sage-700">Scores Differ &mdash; Here&rsquo;s Why</p>
+          <p className="mt-2 text-[13px] leading-relaxed text-ink-700">
+            {vaultScore > (guestScore || 0)
+              ? "Our analytical scoring found strengths in clinical, nutrition, or personalization categories that typical guests don’t rate in reviews. This retreat delivers more than its guest scores suggest."
+              : "Guest reviews rate the hospitality experience higher than our weighted clinical and wellness metrics. The property excels at guest satisfaction but scores lower on specialized wellness criteria."}
+          </p>
         </motion.div>
       )}
     </div>

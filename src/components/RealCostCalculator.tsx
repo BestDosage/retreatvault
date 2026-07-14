@@ -104,73 +104,71 @@ export default function RealCostCalculator({
   ];
 
   return (
-    <div className="rounded-3xl border border-white/[0.04] bg-white/[0.015] p-8 sm:p-12">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">
-        Trip Budget
-      </p>
-      <h2 className="mt-3 font-serif text-3xl font-light text-white">Real Cost Calculator</h2>
-      <p className="mt-2 text-[12px] text-dark-400">
-        Estimate the true total cost of a trip to {retreatName}
-      </p>
-
-      {/* Trip Length Selector */}
-      <div className="mt-8 flex items-center gap-3">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-dark-500">
-          Trip Length
-        </span>
-        <div className="flex gap-2">
-          {TRIP_LENGTHS.map((d) => (
-            <button
-              key={d}
-              onClick={() => setDays(d)}
-              className={`rounded-full px-4 py-1.5 text-[12px] font-medium transition-all duration-300 ${
-                days === d
-                  ? "border border-gold-400/30 bg-gold-400/10 text-gold-300"
-                  : "border border-white/[0.06] bg-white/[0.02] text-dark-400 hover:border-white/[0.1] hover:text-dark-200"
-              }`}
-            >
-              {d} days
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Line Items */}
-      <div className="mt-8 space-y-1">
-        {lineItems.map((item) => (
-          <div
-            key={item.label}
-            className="flex items-center justify-between rounded-xl px-4 py-3 transition-colors hover:bg-white/[0.02]"
-          >
-            <div>
-              <span className="text-[13px] font-medium text-dark-200">{item.label}</span>
-              <span className="ml-3 text-[11px] text-dark-500">{item.detail}</span>
-            </div>
-            <span className={`font-serif text-[15px] ${item.value === 0 ? "text-emerald-400" : "text-white"}`}>
-              {item.value === 0 ? "Included" : fmt(item.value)}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      {/* Divider */}
-      <div className="my-4 border-t border-white/[0.06]" />
-
-      {/* Total */}
-      <div className="flex items-center justify-between rounded-2xl border border-gold-400/10 bg-gold-400/[0.04] px-6 py-5">
+    <section className="border-t border-cream-200 pt-8">
+      <div className="grid gap-6 md:grid-cols-[1fr_2fr] md:gap-10">
         <div>
-          <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-500">
-            Estimated Total
-          </span>
-          <p className="mt-0.5 text-[11px] text-dark-500">{days}-day trip for 1 person</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">
+            Trip Budget
+          </p>
+          <h3 className="mt-2 font-display text-xl text-ink-900">Real Cost Calculator</h3>
+          <p className="mt-3 max-w-[40ch] text-sm leading-relaxed text-ink-700">
+            Estimate the true total cost of a trip to {retreatName}.
+          </p>
         </div>
-        <span className="font-serif text-3xl font-light text-gold-300">{fmt(costs.total)}</span>
-      </div>
+        <div>
+          {/* Trip Length Selector */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="mr-1 text-xs text-ink-500">Trip length:</span>
+            {TRIP_LENGTHS.map((d) => (
+              <button
+                key={d}
+                onClick={() => setDays(d)}
+                className={`rounded-full px-3.5 py-1 text-xs font-medium transition-colors duration-150 ease-out ${
+                  days === d
+                    ? "bg-ink-900 text-cream-50"
+                    : "text-ink-500 ring-1 ring-ink-900/15 hover:text-ink-900"
+                }`}
+              >
+                {d} days
+              </button>
+            ))}
+          </div>
 
-      {/* Disclaimer */}
-      <p className="mt-6 text-[11px] leading-relaxed text-dark-600">
-        Estimates based on typical costs from the US. Actual prices vary by origin, season, and booking.
-      </p>
-    </div>
+          {/* Line Items */}
+          <div className="mt-7">
+            {lineItems.map((item) => (
+              <div
+                key={item.label}
+                className="flex items-center justify-between gap-4 border-b border-cream-200 py-3"
+              >
+                <div>
+                  <span className="text-[13px] font-medium text-ink-700">{item.label}</span>
+                  <span className="ml-3 text-[11px] text-ink-500">{item.detail}</span>
+                </div>
+                <span className={`font-display text-[15px] tabular-nums ${item.value === 0 ? "text-sage-700" : "text-ink-900"}`}>
+                  {item.value === 0 ? "Included" : fmt(item.value)}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Total */}
+          <div className="mt-4 flex items-center justify-between rounded-2xl bg-sage-100 px-6 py-5">
+            <div>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">
+                Estimated Total
+              </span>
+              <p className="mt-0.5 text-[11px] text-sage-700/80">{days}-day trip for 1 person</p>
+            </div>
+            <span className="font-display text-3xl tabular-nums text-sage-700">{fmt(costs.total)}</span>
+          </div>
+
+          {/* Disclaimer */}
+          <p className="mt-6 text-[11px] italic leading-relaxed text-ink-500">
+            Estimates based on typical costs from the US. Actual prices vary by origin, season, and booking.
+          </p>
+        </div>
+      </div>
+    </section>
   );
 }

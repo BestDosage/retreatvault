@@ -1,41 +1,36 @@
-"use client";
-
-import { motion } from "framer-motion";
-
+// Lab-report category bar: a 1px cream track with a 3px sage fill. Categories
+// with no data render "Data pending" in italic ink — never a zero bar.
+// No client JS: below the fold, CSS-only, keeps the performance floor intact.
 export default function ScoreBar({ score, label, weight }: { score: number; label: string; weight?: number }) {
-  const pct = (score / 10) * 100;
-  const isGold = score >= 9;
-  const isSilver = score >= 8;
+  const hasData = typeof score === "number" && score > 0;
+  const pct = Math.max(0, Math.min(100, (score / 10) * 100));
 
   return (
-    <div className="group flex items-center gap-4 py-1.5">
-      <div className="w-36 shrink-0 text-right sm:w-44">
-        <span className="text-[11px] text-dark-400 transition-colors duration-300 group-hover:text-dark-200">
-          {label}
-        </span>
+    <div className="group flex items-center gap-4">
+      <div className="w-36 shrink-0 sm:w-44">
+        <span className="text-xs uppercase tracking-wide text-ink-500">{label}</span>
         {weight !== undefined && (
-          <span className="ml-2 text-[9px] text-dark-600">{(weight * 100).toFixed(0)}%</span>
+          <span className="ml-2 text-[10px] tabular-nums text-ink-500/60">{(weight * 100).toFixed(0)}%</span>
         )}
       </div>
-      <div className="h-[3px] flex-1 overflow-hidden rounded-full bg-white/[0.04]">
-        <motion.div
-          initial={{ width: 0 }}
-          whileInView={{ width: `${pct}%` }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.2, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          className="h-full rounded-full"
-          style={{
-            background: isGold
-              ? "linear-gradient(90deg, #b8952a, #f2d896)"
-              : isSilver
-              ? "linear-gradient(90deg, #9a7623, #d4af37)"
-              : "linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,255,255,0.25))",
-          }}
-        />
-      </div>
-      <span className={`w-8 text-right font-serif text-[13px] ${isGold ? "text-gold-300" : isSilver ? "text-gold-500" : "text-dark-300"}`}>
-        {score.toFixed(1)}
-      </span>
+
+      {hasData ? (
+        <>
+          <div className="relative h-[3px] flex-1">
+            <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-cream-200" />
+            <div
+              className="absolute left-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-sage-600 transition-[width] duration-300 ease-out"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+          <span className="w-8 text-right text-sm tabular-nums text-ink-700">{score.toFixed(1)}</span>
+        </>
+      ) : (
+        <>
+          <div className="h-px flex-1 bg-cream-200" />
+          <span className="w-auto text-right text-xs italic text-ink-500">Data pending</span>
+        </>
+      )}
     </div>
   );
 }

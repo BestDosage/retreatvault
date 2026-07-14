@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllRetreats, getRetreatBySlug, getRetreatAwards, getRetreatVideos, getSimilarRetreats, getEditorialReview, getRetreatReviews, deriveReviewThemes, getRetreatFaqs } from "@/lib/data";
-import { getRetreatImage } from "@/lib/retreat-images";
+import { getRetreatImage, isVerifiedPropertyPhoto } from "@/lib/retreat-images";
 import YouTubeFacade from "@/components/YouTubeFacade";
 import SimilarRetreats from "@/components/SimilarRetreats";
 import EditorialReview from "@/components/EditorialReview";
@@ -53,21 +53,23 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const description = generateMetaDescription(retreat);
 
+  const publicScore = isScorePublic(retreat.wrd_score);
+
   return {
-    title: `${retreat.name} Review — Rated ${retreat.wrd_score}/10 (${retreat.score_tier === "elite" ? "Elite" : retreat.score_tier === "exceptional" ? "Exceptional" : "Recommended"})`,
+    title: `${retreat.name} Review — ${publicScore ? `Rated ${retreat.wrd_score}/10` : "Listed"} (${retreat.score_tier === "elite" ? "Elite" : retreat.score_tier === "exceptional" ? "Exceptional" : "Recommended"})`,
     description,
     alternates: { canonical: `/retreats/${slug}` },
     openGraph: {
-      title: `${retreat.name} — ${retreat.wrd_score}/10 Vault Score`,
+      title: `${retreat.name} — ${publicScore ? `${retreat.wrd_score}/10 Vault Score` : "Listed"}`,
       description,
       images: [{ url: getRetreatImage(retreat) }],
     },
   };
 }
-import { CATEGORY_LABELS, SCORE_WEIGHTS, RetreatScores } from "@/lib/types";
-import TierBadge from "@/components/TierBadge";
-import WrdScore from "@/components/WrdScore";
+import { CATEGORY_LABELS, SCORE_WEIGHTS, RetreatScores, isScorePublic, getTierLabel } from "@/lib/types";
 import ScoreBar from "@/components/ScoreBar";
+import WrdScore from "@/components/WrdScore";
+import TierBadge from "@/components/TierBadge";
 import AnimateIn, { StaggerContainer, StaggerItem } from "@/components/AnimateIn";
 import dynamic from "next/dynamic";
 const RadarChart = dynamic(() => import("@/components/RadarChart"), { ssr: false });
@@ -75,15 +77,17 @@ import VaultVsGuest from "@/components/VaultVsGuest";
 import RealCostCalculator from "@/components/RealCostCalculator";
 import { BestForChips } from "@/components/BestForTags";
 import StickyMobileBar from "@/components/StickyMobileBar";
+import AddToCompareButton from "@/components/AddToCompareButton";
 import EmailCapture from "@/components/EmailCapture";
+import { RetreatJsonLd } from "@/components/RetreatJsonLd";
 import {
   LongevityPanel, DigitalDetoxPanel, RoiCalculator,
   SleepSciencePanel, IdealGuestCard, SeasonalChart,
-  ScoreSparkline, SeventyTwoHourCard, HormoneHealthBadge,
+  ScoreSparkline, SeventyTwoHourCard,
 } from "@/components/IntelligencePanels";
 import {
   deriveLongevityIndex, deriveDigitalDetoxScore, deriveRoiData,
-  deriveSleepScience, deriveHormoneHealthFlag, deriveIdealGuestProfile,
+  deriveSleepScience, deriveIdealGuestProfile,
   deriveSeasonalData, deriveScoreHistory, derive72HourEffect,
 } from "@/lib/retreat-intelligence";
 
@@ -110,7 +114,6 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
   const detox = deriveDigitalDetoxScore(retreat);
   const roi = deriveRoiData(retreat);
   const sleepScience = deriveSleepScience(retreat);
-  const hasHormoneHealth = deriveHormoneHealthFlag(retreat);
   const idealGuest = deriveIdealGuestProfile(retreat);
   const seasonal = deriveSeasonalData(retreat);
   const scoreHistory = deriveScoreHistory(retreat);
@@ -129,6 +132,37 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
   // image. Gallery is restricted to known-safe sources; scraped URLs are dropped.
   const heroImage = getRetreatImage(retreat);
   const hasImage = heroImage.startsWith("http");
+  // Photo-reality: full-bleed is reserved for photos of the actual property
+  // (local assets / official-photos bucket). Every Unsplash/Pexels hero —
+  // curated or keyed fallback — is stock by definition and gets the honest
+  // editorial split with the "official photos pending" caption. Today that
+  // means nearly every page splits; full-bleed is the reward once official
+  // photo outreach lands. (Cards use the looser isStockFallback instead.)
+  const isVerifiedPhoto = isVerifiedPropertyPhoto(heroImage);
+  const scorePublic = isScorePublic(retreat.wrd_score);
+  const tierLabel = scorePublic ? getTierLabel(retreat.score_tier) : "Listed";
+  const isTopTier = scorePublic && (retreat.score_tier === "elite" || retreat.score_tier === "exceptional");
+  const locationLine = [retreat.city, retreat.country].filter(Boolean).join(", ");
+  const propertyType = (retreat.property_type && retreat.property_type.length
+    ? retreat.property_type
+    : [retreat.property_size]
+  )
+    .filter(Boolean)
+    .map((t) => t.charAt(0).toUpperCase() + t.slice(1))
+    .join(", ");
+  const priceBand =
+    retreat.price_min_per_night > 0
+      ? `$${retreat.price_min_per_night.toLocaleString()}–$${retreat.price_max_per_night.toLocaleString()} / night`
+      : "Price on request";
+  const airportLine = retreat.nearest_airport
+    ? `${retreat.nearest_airport}${retreat.airport_distance_km ? ` (${Math.round(retreat.airport_distance_km)} km)` : ""}`
+    : "";
+  const identityItems = [
+    { label: "Location", value: locationLine },
+    { label: "Property", value: propertyType },
+    { label: "Rate", value: priceBand },
+    { label: "Nearest airport", value: airportLine },
+  ].filter((i) => i.value);
   const galleryImages = (retreat.gallery_images || []).filter(
     (img: string) =>
       img?.startsWith("https://images.unsplash.com/") ||
@@ -211,7 +245,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
   };
 
   return (
-    <div className="min-h-screen pb-16 md:pb-0">
+    <div className="min-h-screen bg-cream-50 pb-16 md:pb-0">
       <StickyMobileBar
         retreatName={retreat.name}
         websiteUrl={retreat.website_url || null}
@@ -227,6 +261,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
+      <RetreatJsonLd retreat={retreat} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
@@ -235,98 +270,168 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
       />
-      {/* ════════════════ HERO ════════════════ */}
-      <section className="relative h-[70vh] min-h-[500px] overflow-hidden">
-        {hasImage && (
-          <Image
-            src={heroImage}
-            alt={retreat.name}
-            fill
-            priority
-            fetchPriority="high"
-            sizes="100vw"
-            quality={70}
-            className="object-cover"
-          />
-        )}
-        <div className="absolute inset-0 bg-dark-950/50" />
-        <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/30 to-dark-950/20" />
-        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-dark-950 to-transparent" />
+      {/* ════════════════ HERO — editorial luxury ════════════════ */}
+      {/* Two states by photo-reality: a verified property photo goes full-bleed;
+          any stock imagery gets the honest editorial split (duotone, "photos pending"). */}
+      {isVerifiedPhoto ? (
+        <section className="relative min-h-[68vh] overflow-hidden bg-cream-100 md:min-h-[80vh]">
+          {hasImage && (
+            <Image
+              src={heroImage}
+              alt={retreat.name}
+              fill
+              priority
+              fetchPriority="high"
+              sizes="100vw"
+              quality={70}
+              className="object-cover"
+            />
+          )}
+          {/* Bottom scrim for legibility — warm ink, fading up to clear sky. */}
+          <div className="absolute inset-0 bg-gradient-to-t from-ink-900/60 via-ink-900/10 to-transparent" />
 
-        {/* Content pinned to bottom */}
-        <div className="absolute bottom-0 left-0 right-0 z-10">
-          <div className="mx-auto max-w-[1440px] px-6 pb-16 sm:px-10 lg:px-16">
-            <AnimateIn delay={0.2}>
-              <nav className="mb-8 flex items-center gap-2 text-xs text-dark-300">
-                <a href="/retreats" className="transition-colors hover:text-gold-400">Directory</a>
-                <span className="text-dark-600">/</span>
-                <a href={`/retreats?region=${retreat.region}`} className="transition-colors hover:text-gold-400">{retreat.region}</a>
-                <span className="text-dark-600">/</span>
-                <span className="text-white">{retreat.name}</span>
-              </nav>
-            </AnimateIn>
+          <div className="absolute inset-x-0 bottom-0">
+            <div className="mx-auto max-w-[1440px] px-6 pb-12 sm:px-10 md:pb-16 lg:px-16">
+              <AnimateIn>
+                {/* Chips sit above the scrim's strong zone — each carries its own
+                    ink backdrop so they stay legible over bright imagery. */}
+                <nav className="mb-6 flex w-fit flex-wrap items-center gap-2 rounded-full bg-ink-900/45 px-4 py-1.5 text-xs tracking-wide text-cream-100/90 backdrop-blur-sm">
+                  <a href="/retreats" className="transition-colors hover:text-cream-50">Directory</a>
+                  <span aria-hidden className="text-cream-100/40">/</span>
+                  <a href={`/retreats?region=${retreat.region}`} className="transition-colors hover:text-cream-50">{retreat.region}</a>
+                  <span aria-hidden className="text-cream-100/40">/</span>
+                  <span className="text-cream-50">{retreat.name}</span>
+                </nav>
+              </AnimateIn>
 
-            <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-              <div>
-                <AnimateIn delay={0.3}>
-                  <div className="mb-4 flex items-center gap-3">
-                    <TierBadge tier={retreat.score_tier} size="md" />
-                    {retreat.is_verified && (
-                      <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[9px] font-semibold uppercase tracking-[0.15em] text-emerald-400">
-                        <span className="h-1 w-1 rounded-full bg-emerald-400" />
-                        Verified
-                      </span>
-                    )}
-                    {hasHormoneHealth && <HormoneHealthBadge />}
-                  </div>
-                </AnimateIn>
-                <AnimateIn delay={0.35}>
-                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gold-400/80">
-                    {retreat.city}, {retreat.country}
-                  </p>
-                </AnimateIn>
-                <AnimateIn delay={0.4}>
-                  <h1 className="mt-3 font-serif text-4xl font-light text-white sm:text-5xl lg:text-6xl">
-                    {retreat.name}
-                  </h1>
-                </AnimateIn>
-                <AnimateIn delay={0.5}>
-                  <p className="mt-4 max-w-xl text-[15px] font-light leading-relaxed text-dark-200">
+              <AnimateIn delay={0.06}>
+                <div className="mb-5 flex flex-wrap items-center gap-2.5">
+                  <span className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] backdrop-blur-sm ${isTopTier ? "border-gold/50 bg-ink-900/45 text-cream-50" : "border-cream-100/30 bg-ink-900/45 text-cream-50"}`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${isTopTier ? "bg-gold" : "bg-sage-100"}`} />
+                    {tierLabel}
+                  </span>
+                  {retreat.is_verified && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-cream-100/30 bg-ink-900/45 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-cream-50 backdrop-blur-sm">
+                      <span className="h-1 w-1 rounded-full bg-sage-100" />
+                      Verified
+                    </span>
+                  )}
+                </div>
+              </AnimateIn>
+
+              <AnimateIn delay={0.1}>
+                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cream-100/85">
+                  {locationLine}
+                </p>
+              </AnimateIn>
+              <AnimateIn delay={0.14}>
+                <h1 className="mt-3 max-w-4xl font-display text-5xl leading-[1.02] tracking-tight text-cream-50 md:text-7xl">
+                  {retreat.name}
+                </h1>
+              </AnimateIn>
+              {retreat.subtitle && (
+                <AnimateIn delay={0.2}>
+                  <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-cream-100/85">
                     {retreat.subtitle}
                   </p>
                 </AnimateIn>
-              </div>
-
-              <div className="flex flex-col items-end gap-4">
-                <AnimateIn delay={0.5} direction="left">
-                  <WrdScore score={retreat.wrd_score} size="xl" />
-                </AnimateIn>
-                {retreat.website_url && (
-                  <AnimateIn delay={0.6} direction="left">
-                    <a
-                      href={retreat.website_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn-luxury btn-luxury-md"
-                    >
-                      Visit Website
-                      <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                      </svg>
-                    </a>
-                  </AnimateIn>
-                )}
-              </div>
+              )}
             </div>
           </div>
+        </section>
+      ) : (
+        <section className="bg-cream-50 text-ink-900">
+          <div className="mx-auto grid max-w-[1440px] md:grid-cols-[3fr_2fr]">
+            {/* Left 60% — the honest identity panel */}
+            <div className="flex flex-col justify-center px-6 py-14 sm:px-10 md:py-24 lg:px-16">
+              <AnimateIn>
+                <nav className="mb-7 flex flex-wrap items-center gap-2 text-xs tracking-wide text-ink-500">
+                  <a href="/retreats" className="transition-colors hover:text-ink-900">Directory</a>
+                  <span aria-hidden className="text-cream-200">/</span>
+                  <a href={`/retreats?region=${retreat.region}`} className="transition-colors hover:text-ink-900">{retreat.region}</a>
+                  <span aria-hidden className="text-cream-200">/</span>
+                  <span className="text-ink-700">{retreat.name}</span>
+                </nav>
+              </AnimateIn>
+
+              <AnimateIn delay={0.06}>
+                <div className="mb-5 flex flex-wrap items-center gap-2.5">
+                  <span className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] ${isTopTier ? "border-gold/40 bg-gold/10 text-ink-900" : "border-sage-700/25 bg-sage-100 text-sage-700"}`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${isTopTier ? "bg-gold" : "bg-sage-600"}`} />
+                    {tierLabel}
+                  </span>
+                  {retreat.is_verified && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-sage-700/25 bg-sage-100 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-sage-700">
+                      <span className="h-1 w-1 rounded-full bg-sage-600" />
+                      Verified
+                    </span>
+                  )}
+                </div>
+              </AnimateIn>
+
+              <AnimateIn delay={0.1}>
+                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sage-700">
+                  {locationLine}
+                </p>
+              </AnimateIn>
+              <AnimateIn delay={0.14}>
+                <h1 className="mt-3 font-display text-4xl leading-[1.04] tracking-tight text-ink-900 sm:text-5xl lg:text-6xl">
+                  {retreat.name}
+                </h1>
+              </AnimateIn>
+              {retreat.subtitle && (
+                <AnimateIn delay={0.2}>
+                  <p className="mt-5 max-w-md text-[15px] leading-relaxed text-ink-700">
+                    {retreat.subtitle}
+                  </p>
+                </AnimateIn>
+              )}
+            </div>
+
+            {/* Right 40% — location imagery, muted duotone, honestly captioned */}
+            <div className="relative min-h-[42vh] md:min-h-[70vh]">
+              {hasImage && (
+                <Image
+                  src={heroImage}
+                  alt=""
+                  fill
+                  loading="eager"
+                  sizes="(max-width: 768px) 100vw, 40vw"
+                  quality={70}
+                  className="object-cover"
+                  style={{ filter: "sepia(0.25) saturate(0.55)" }}
+                />
+              )}
+              <figcaption className="absolute bottom-3 left-3 rounded-full bg-cream-50/85 px-3 py-1 text-xs text-ink-500 backdrop-blur-sm">
+                Location imagery — official photos pending
+              </figcaption>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ═══ IDENTITY STRIP ═══ */}
+      <div className="bg-cream-50">
+        <div className="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-16">
+          <dl className="flex flex-wrap items-center gap-x-4 gap-y-2 border-y border-cream-200 py-4 text-sm text-ink-700">
+            {identityItems.map((item, i) => (
+              <div key={item.label} className="flex items-center gap-4">
+                {i > 0 && <span aria-hidden className="h-1 w-1 shrink-0 rounded-full bg-ink-500/40" />}
+                <div className="flex items-baseline gap-2">
+                  <dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-500">{item.label}</dt>
+                  <dd className={item.label === "Rate" ? "tabular-nums" : ""}>{item.value}</dd>
+                </div>
+              </div>
+            ))}
+          </dl>
         </div>
-      </section>
+      </div>
 
       {/* ════════════════ CONTENT ════════════════ */}
       <div className="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-16">
 
         {/* ═══ KEY STATS ═══ */}
-        <StaggerContainer className="-mt-1 mb-20 grid grid-cols-2 gap-4 sm:grid-cols-4" staggerDelay={0.08}>
+        <StaggerContainer className="mt-12 mb-20 grid grid-cols-2 gap-4 sm:grid-cols-4" staggerDelay={0.08}>
           {[
             retreat.price_min_per_night > 0 ? { label: "Price Range", value: `$${retreat.price_min_per_night.toLocaleString()}\u2013$${retreat.price_max_per_night.toLocaleString()}`, sub: "per night" } : null,
             retreat.google_rating > 0 ? { label: "Google Rating", value: retreat.google_rating.toString(), sub: `${retreat.google_review_count} reviews`, star: true } : null,
@@ -334,13 +439,13 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
             retreat.max_guests > 0 ? { label: "Property", value: retreat.property_size.charAt(0).toUpperCase() + retreat.property_size.slice(1), sub: `Max ${retreat.max_guests} guests` } : null,
           ].filter((s): s is NonNullable<typeof s> => s !== null).map((stat) => (
             <StaggerItem key={stat.label}>
-              <div className="rounded-2xl border border-white/[0.04] bg-white/[0.02] p-6">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-dark-500">{stat.label}</div>
+              <div className="rounded-2xl bg-cream-100 p-6 ring-1 ring-cream-200">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-ink-500">{stat.label}</div>
                 <div className="mt-2 flex items-center gap-1.5">
-                  {stat.star && <svg className="h-4 w-4 text-gold-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>}
-                  <span className="font-serif text-2xl font-light text-white">{stat.value}</span>
+                  {stat.star && <svg className="h-4 w-4 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>}
+                  <span className="font-display text-2xl tabular-nums text-ink-900">{stat.value}</span>
                 </div>
-                <div className="mt-1 text-[11px] capitalize text-dark-400">{stat.sub}</div>
+                <div className="mt-1 text-[11px] capitalize text-ink-500">{stat.sub}</div>
               </div>
             </StaggerItem>
           ))}
@@ -348,16 +453,18 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
 
         {/* ═══ EDITORIAL SUMMARY ═══ */}
         <AnimateIn className="mb-20">
-          <div className="rounded-3xl border border-white/[0.04] bg-white/[0.02] px-8 py-10 sm:px-12 sm:py-12">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Editorial Summary</p>
-            <p className="mt-5 font-serif text-[17px] font-light leading-[1.85] text-dark-200 sm:text-[18px]">
+          <div className="border-t border-cream-200 pt-8">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Editorial Summary</p>
+            <p className="mt-5 max-w-[65ch] font-display text-2xl leading-snug text-ink-900 md:text-[28px]">
               {editorialSummary}
             </p>
           </div>
         </AnimateIn>
 
         {/* ═══ SPARKLINE + IDEAL GUEST ═══ */}
-        <div className="mb-20 grid gap-6 sm:grid-cols-2">
+        {/* Trajectory panel renders numeric scores — hide it entirely below the display gate. */}
+        <div className="mb-20 space-y-14">
+          {isScorePublic(retreat.wrd_score) && (
           <AnimateIn>
             <ScoreSparkline history={scoreHistory} categoryHighlights={(() => {
               const trend = scoreHistory[scoreHistory.length - 1].score - scoreHistory[0].score;
@@ -377,13 +484,16 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
               return highlights;
             })()} />
           </AnimateIn>
+          )}
           <AnimateIn delay={0.1}>
             <IdealGuestCard profile={idealGuest} />
           </AnimateIn>
         </div>
 
         {/* ═══ EDITORIAL REVIEW ═══ */}
-        {editorialReview && (
+        {/* Stored AI prose bakes the numeric score into HTML — skip below the gate
+            (regenerating the prose is the real fix if a sub-6.5 retreat gets a review). */}
+        {editorialReview && isScorePublic(retreat.wrd_score) && (
           <AnimateIn className="mb-20">
             <EditorialReview
               retreatName={retreat.name}
@@ -397,36 +507,59 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
           </AnimateIn>
         )}
 
-        {/* ═══ SCORE BREAKDOWN ═══ */}
+        {/* ═══ SCORE BREAKDOWN — lab-report panel (double-bezel enclosure) ═══ */}
         <AnimateIn className="mb-20">
-          <div className="rounded-3xl border border-white/[0.04] bg-white/[0.015] p-8 sm:p-12">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Analysis</p>
-            <h2 className="mt-3 font-serif text-3xl font-light text-white">Score Breakdown</h2>
-            <div className="mt-2 flex items-center gap-3">
-              <p className="text-[12px] text-dark-400">15 categories, weighted by impact on the wellness experience</p>
-              <Link href="/methodology" className="shrink-0 text-[11px] font-medium text-gold-400 transition-colors hover:text-gold-300">
-                How we score&nbsp;&rarr;
-              </Link>
-            </div>
-            <div className="mt-10 space-y-2">
-              {sortedScores.map(([key, cat]) => (
-                <ScoreBar key={key} score={cat.score} label={CATEGORY_LABELS[key]} weight={SCORE_WEIGHTS[key]} />
-              ))}
+          <div className="rounded-[2rem] bg-ink-900/[0.04] p-1.5 ring-1 ring-ink-900/5">
+            <div className="rounded-[calc(2rem-0.375rem)] bg-cream-50 p-8 md:p-10">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-sage-700">Analysis</p>
+
+              {/* Headline number + tier pill + methodology link */}
+              <div className="mt-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
+                <div className="flex items-center gap-4">
+                  <WrdScore score={retreat.wrd_score} />
+                  <TierBadge tier={retreat.score_tier} size="sm" />
+                </div>
+                <Link href="/methodology" className="shrink-0 text-[11px] font-medium tracking-wide text-sage-700 underline-offset-4 transition-colors hover:text-sage-600 hover:underline">
+                  How we score&nbsp;&rarr;
+                </Link>
+              </div>
+
+              {scorePublic ? (
+                <>
+                  <h2 className="mt-9 font-display text-3xl text-ink-900">Score Breakdown</h2>
+                  <p className="mt-2 text-[12px] text-ink-500">15 categories, weighted by impact on the wellness experience</p>
+
+                  <div className="mt-10 space-y-2.5">
+                    {sortedScores.map(([key, cat]) => (
+                      <ScoreBar key={key} score={cat.score} label={CATEGORY_LABELS[key]} weight={SCORE_WEIGHTS[key]} />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                // Display gate: when the composite is "Listed", category numbers stay
+                // private too — no bars, no radar, just an honest designed state.
+                <p className="mt-9 text-sm italic text-ink-500">
+                  Full score breakdown available once this retreat completes verification.
+                </p>
+              )}
             </div>
           </div>
         </AnimateIn>
 
         {/* ═══ RADAR CHART + VAULT VS GUEST ═══ */}
         <div className="mb-20 grid gap-8 lg:grid-cols-2">
+          {/* Radar plots numeric category scores — gated with the breakdown. */}
+          {scorePublic && (
           <AnimateIn>
-            <div className="rounded-3xl border border-white/[0.04] bg-white/[0.015] p-6 sm:p-8">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Visual Profile</p>
-              <h3 className="mt-2 font-serif text-xl font-light text-white">Category Radar</h3>
+            <div className="rounded-[2rem] bg-cream-100 p-6 ring-1 ring-cream-200 sm:p-8">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-sage-700">Visual Profile</p>
+              <h3 className="mt-2 font-display text-xl text-ink-900">Category Radar</h3>
               <div className="mt-4">
                 <RadarChart scores={retreat.scores} name={retreat.name} />
               </div>
             </div>
           </AnimateIn>
+          )}
           <AnimateIn delay={0.15}>
             <VaultVsGuest
               vaultScore={retreat.wrd_score}
@@ -438,26 +571,43 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
           </AnimateIn>
         </div>
 
-        {/* ═══ PROPRIETARY INTELLIGENCE ═══ */}
-        <div className="mb-20 grid gap-6 lg:grid-cols-2">
+        {/* ═══ PROPRIETARY INTELLIGENCE + ROI + 72-HOUR + GUEST SENTIMENT ═══ */}
+        {/* Continuous cream — rule-separated editorial sections (Task 5). Panels
+            stack full-width (heading-left / content-right on md+); no card grid. */}
+        <div className="mb-20 space-y-14">
           <AnimateIn>
             <LongevityPanel data={longevity} />
           </AnimateIn>
-          <AnimateIn delay={0.1}>
+          <AnimateIn>
             <SleepSciencePanel data={sleepScience} />
           </AnimateIn>
-          <AnimateIn delay={0.15}>
+          <AnimateIn>
             <DigitalDetoxPanel data={detox} />
           </AnimateIn>
-          <AnimateIn delay={0.2}>
+          <AnimateIn>
             <SeasonalChart months={seasonal} />
           </AnimateIn>
+          <AnimateIn>
+            <RoiCalculator data={roi} />
+          </AnimateIn>
+          <AnimateIn>
+            <SeventyTwoHourCard effect={effect72} />
+          </AnimateIn>
+          {/* Guest Sentiment moved up into the cream zone (was below Analyst/FAQ). */}
+          {(retreat.google_review_count > 0 || guestReviews.length > 0) && (
+            <AnimateIn>
+              <GuestSentiment
+                retreatName={retreat.name}
+                googleRating={retreat.google_rating}
+                googleCount={retreat.google_review_count}
+                tripadvisorRating={retreat.tripadvisor_rating}
+                tripadvisorCount={retreat.tripadvisor_review_count}
+                reviews={guestReviews}
+                themes={reviewThemes}
+              />
+            </AnimateIn>
+          )}
         </div>
-
-        {/* ═══ ROI CALCULATOR ═══ */}
-        <AnimateIn className="mb-20">
-          <RoiCalculator data={roi} />
-        </AnimateIn>
 
         {/* ═══ REAL COST CALCULATOR ═══ */}
         <AnimateIn className="mb-20">
@@ -474,87 +624,68 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
           />
         </AnimateIn>
 
-        {/* ═══ THE 72-HOUR EFFECT ═══ */}
+        {/* ═══ ANALYST NOTES ═══ */}
         <AnimateIn className="mb-20">
-          <SeventyTwoHourCard effect={effect72} />
+          <div className="border-t border-cream-200 pt-8">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Expert Review</p>
+            <h2 className="mt-2 font-display text-3xl text-ink-900">Analyst Notes</h2>
+            <StaggerContainer className="mt-8 grid gap-x-10 gap-y-0 sm:grid-cols-2" staggerDelay={0.05}>
+              {sortedScores.map(([key, cat]) => cat.notes && (
+                <StaggerItem key={key}>
+                  <div className="border-b border-cream-200 py-4">
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="text-[12px] font-medium text-ink-700">{CATEGORY_LABELS[key]}</span>
+                      <span className={`font-display text-lg tabular-nums ${cat.score >= 9 ? "text-sage-700" : cat.score >= 8 ? "text-sage-600" : "text-ink-500"}`}>
+                        {cat.score.toFixed(1)}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-[12px] leading-relaxed text-ink-500">{cat.notes}</p>
+                  </div>
+                </StaggerItem>
+              ))}
+            </StaggerContainer>
+          </div>
         </AnimateIn>
 
-        {/* ═══ ANALYST NOTES ═══ */}
-        <div className="mb-20">
-          <AnimateIn>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Expert Review</p>
-            <h2 className="mt-3 font-serif text-3xl font-light text-white">Analyst Notes</h2>
-          </AnimateIn>
-          <StaggerContainer className="mt-8 grid gap-4 sm:grid-cols-2" staggerDelay={0.05}>
-            {sortedScores.map(([key, cat]) => cat.notes && (
-              <StaggerItem key={key}>
-                <div className="rounded-2xl border border-white/[0.03] bg-white/[0.015] p-6 transition-all duration-500 hover:border-gold-500/10">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[12px] font-medium text-dark-200">{CATEGORY_LABELS[key]}</span>
-                    <span className={`font-serif text-lg ${cat.score >= 9 ? "text-gold-300" : cat.score >= 8 ? "text-gold-500" : "text-dark-300"}`}>
-                      {cat.score.toFixed(1)}
-                    </span>
-                  </div>
-                  <p className="mt-3 text-[12px] leading-relaxed text-dark-300">{cat.notes}</p>
-                </div>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
-        </div>
-
         {/* ═══ FAQ ═══ */}
-        <div className="mb-20">
-          <AnimateIn>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Common Questions</p>
-            <h2 className="mt-3 font-serif text-3xl font-light text-white">Frequently Asked</h2>
-          </AnimateIn>
-          <StaggerContainer className="mt-8 space-y-4" staggerDelay={0.06}>
-            {faqs.map((faq, i) => (
-              <StaggerItem key={i}>
-                <div className="rounded-2xl border border-white/[0.04] bg-white/[0.02] p-6 sm:p-8">
-                  <h3 className="font-serif text-[16px] font-medium text-white">{faq.question}</h3>
-                  <p className="mt-3 text-[13px] leading-relaxed text-dark-300">{faq.answer}</p>
-                </div>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
-        </div>
-
-        {/* ═══ GUEST SENTIMENT ═══ */}
-        {(retreat.google_review_count > 0 || guestReviews.length > 0) && (
-          <AnimateIn className="mb-20">
-            <GuestSentiment
-              retreatName={retreat.name}
-              googleRating={retreat.google_rating}
-              googleCount={retreat.google_review_count}
-              tripadvisorRating={retreat.tripadvisor_rating}
-              tripadvisorCount={retreat.tripadvisor_review_count}
-              reviews={guestReviews}
-              themes={reviewThemes}
-            />
-          </AnimateIn>
-        )}
+        <AnimateIn className="mb-20">
+          <div className="border-t border-cream-200 pt-8">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Common Questions</p>
+            <h2 className="mt-2 font-display text-3xl text-ink-900">Frequently Asked</h2>
+            <StaggerContainer className="mt-6 divide-y divide-cream-200 border-t border-cream-200" staggerDelay={0.06}>
+              {faqs.map((faq, i) => (
+                <StaggerItem key={i}>
+                  <div className="py-5">
+                    <h3 className="font-display text-[17px] text-ink-900">{faq.question}</h3>
+                    <p className="mt-2 max-w-[70ch] text-[13px] leading-relaxed text-ink-700">{faq.answer}</p>
+                  </div>
+                </StaggerItem>
+              ))}
+            </StaggerContainer>
+          </div>
+        </AnimateIn>
 
         {/* ═══ GALLERY ═══ */}
         {galleryImages.length > 0 && (
           <AnimateIn className="mb-20">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Gallery</p>
-            <h2 className="mt-3 font-serif text-3xl font-light text-white">Visual Tour</h2>
-            <div className="mt-8 grid gap-3 sm:grid-cols-3">
-              {galleryImages.map((img: string, i: number) => (
-                <div key={i} className="group/g relative aspect-[4/3] overflow-hidden rounded-2xl">
-                  <Image
-                    src={img}
-                    alt={`${retreat.name} ${i + 1}`}
-                    fill
-                    loading="lazy"
-                    sizes="(max-width: 640px) 100vw, 33vw"
-                    quality={65}
-                    className="object-cover transition-transform duration-[1s] group-hover/g:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-dark-950/10 transition-opacity duration-500 group-hover/g:opacity-0" />
-                </div>
-              ))}
+            <div className="border-t border-cream-200 pt-8">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Gallery</p>
+              <h2 className="mt-2 font-display text-3xl text-ink-900">Visual Tour</h2>
+              <div className="mt-8 grid gap-3 sm:grid-cols-3">
+                {galleryImages.map((img: string, i: number) => (
+                  <div key={i} className="group/g relative aspect-[4/3] overflow-hidden rounded-2xl bg-cream-100">
+                    <Image
+                      src={img}
+                      alt={`${retreat.name} ${i + 1}`}
+                      fill
+                      loading="lazy"
+                      sizes="(max-width: 640px) 100vw, 33vw"
+                      quality={65}
+                      className="object-cover transition-transform duration-[1s] ease-out group-hover/g:scale-110"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </AnimateIn>
         )}
@@ -562,67 +693,75 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         {/* ═══ REAL GUEST VIDEOS ═══ */}
         {videos.length > 0 && (
           <AnimateIn className="mb-20">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Real Guest Videos</p>
-            <h2 className="mt-3 font-serif text-3xl font-light text-white">See It For Yourself</h2>
-            <p className="mt-2 text-[12px] text-dark-500">Independent reviews, vlogs, and walkthroughs from real visitors</p>
-            <div className={`mt-8 grid gap-4 ${videos.length > 1 ? "sm:grid-cols-2" : "max-w-3xl"}`}>
-              {videos.map((video) => (
-                <div key={video.video_id} className="overflow-hidden rounded-2xl border border-white/[0.04] transition-all duration-300 hover:border-gold-500/15">
-                  <div className="relative aspect-video">
-                    <YouTubeFacade videoId={video.video_id} title={video.title} />
+            <div className="border-t border-cream-200 pt-8">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Real Guest Videos</p>
+              <h2 className="mt-2 font-display text-3xl text-ink-900">See It For Yourself</h2>
+              <p className="mt-2 text-[12px] text-ink-500">Independent reviews, vlogs, and walkthroughs from real visitors</p>
+              <div className={`mt-8 grid gap-4 ${videos.length > 1 ? "sm:grid-cols-2" : "max-w-3xl"}`}>
+                {videos.map((video) => (
+                  <div key={video.video_id} className="overflow-hidden rounded-2xl bg-cream-100 ring-1 ring-cream-200">
+                    <div className="relative aspect-video">
+                      <YouTubeFacade videoId={video.video_id} title={video.title} />
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-[13px] font-medium text-ink-900">{video.title}</h3>
+                      <p className="mt-1 text-[11px] text-ink-500">{video.channel_name}</p>
+                    </div>
                   </div>
-                  <div className="bg-white/[0.02] p-4">
-                    <h3 className="text-[13px] font-medium text-white">{video.title}</h3>
-                    <p className="mt-1 text-[11px] text-dark-400">{video.channel_name}</p>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </AnimateIn>
         )}
 
         {/* ═══ BEST FOR + TAGS ═══ */}
         <AnimateIn className="mb-20">
-          {/* Best For tags */}
-          <div className="mb-8">
-            <h3 className="mb-4 text-[11px] font-semibold uppercase tracking-[0.25em] text-gold-500">Best For</h3>
-            <BestForChips retreat={retreat} />
-          </div>
-          <div className="grid gap-10 sm:grid-cols-3">
-            {[
-              { title: "Specialties", items: retreat.specialty_tags, color: "border-gold-400/10 bg-gold-400/5 text-gold-300" },
-              { title: "Dietary", items: retreat.dietary_options, color: "border-white/[0.06] bg-white/[0.02] text-dark-300" },
-              { title: "Programs", items: retreat.program_types, color: "border-white/[0.06] bg-white/[0.02] text-dark-300" },
-            ].map((section) => (
-              <div key={section.title}>
-                <h3 className="text-[11px] font-semibold uppercase tracking-[0.25em] text-gold-500">{section.title}</h3>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {section.items.map((item) => (
-                    <span key={item} className={`rounded-full border px-3 py-1.5 text-[10px] font-medium capitalize ${section.color}`}>
-                      {item.replace(/-/g, " ")}
-                    </span>
-                  ))}
+          <div className="border-t border-cream-200 pt-8">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Best For</p>
+            <div className="mt-4">
+              <BestForChips retreat={retreat} />
+            </div>
+            <div className="mt-10 grid gap-10 sm:grid-cols-3">
+              {[
+                { title: "Specialties", items: retreat.specialty_tags, highlight: true },
+                { title: "Dietary", items: retreat.dietary_options, highlight: false },
+                { title: "Programs", items: retreat.program_types, highlight: false },
+              ].map((section) => (
+                <div key={section.title}>
+                  <h3 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">{section.title}</h3>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {section.items.map((item) => (
+                      <span
+                        key={item}
+                        className={`rounded-full px-3 py-1.5 text-[10px] font-medium capitalize ${
+                          section.highlight ? "bg-sage-100 text-sage-700" : "bg-cream-100 text-ink-700 ring-1 ring-cream-200"
+                        }`}
+                      >
+                        {item.replace(/-/g, " ")}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </AnimateIn>
 
         {/* ═══ AWARDS ═══ */}
         {awards.length > 0 && (
           <AnimateIn className="mb-20">
-            <div className="rounded-3xl border border-gold-400/8 bg-gradient-to-br from-white/[0.02] to-transparent p-8 sm:p-10">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Recognition</p>
-              <h2 className="mt-3 font-serif text-3xl font-light text-white">Awards</h2>
-              <div className="mt-8 space-y-5">
+            <div className="border-t border-cream-200 pt-8">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Recognition</p>
+              <h2 className="mt-2 font-display text-3xl text-ink-900">Awards</h2>
+              <div className="mt-8">
                 {awards.map((award, i) => (
-                  <div key={i} className="flex items-center gap-5">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-gold-400/20 bg-gold-400/10">
-                      <span className="text-gold-400">{"\u2726"}</span>
+                  <div key={i} className="flex items-center gap-5 border-b border-cream-200 py-4">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-sage-100">
+                      <span aria-hidden className="text-sage-700">{"\u2726"}</span>
                     </div>
                     <div>
-                      <span className="text-[14px] font-medium text-white">{award.name}</span>
-                      <span className="ml-3 text-[12px] text-dark-400">{award.year} &mdash; {award.issuing_body}</span>
+                      <span className="text-[14px] font-medium text-ink-900">{award.name}</span>
+                      <span className="ml-3 text-[12px] text-ink-500">{award.year} &mdash; {award.issuing_body}</span>
                     </div>
                   </div>
                 ))}
@@ -634,54 +773,59 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         {/* ═══ FEATURED IN GUIDES ═══ */}
         {matchingGuides.length > 0 && (
           <AnimateIn className="mb-20">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Featured In</p>
-            <h2 className="mt-3 font-serif text-3xl font-light text-white">Retreat Guides</h2>
-            <p className="mt-2 text-[12px] text-dark-500">This retreat appears in {matchingGuides.length} curated {matchingGuides.length === 1 ? "guide" : "guides"}</p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              {matchingGuides.map((g) => (
-                <a
-                  key={g.slug}
-                  href={`/guides/${g.slug}`}
-                  className="rounded-full border border-gold-400/15 bg-gold-400/[0.05] px-4 py-2 text-[11px] font-medium text-gold-300 transition-all hover:border-gold-400/30 hover:bg-gold-400/[0.08]"
-                >
-                  {g.title}
-                </a>
-              ))}
+            <div className="border-t border-cream-200 pt-8">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Featured In</p>
+              <h2 className="mt-2 font-display text-3xl text-ink-900">Retreat Guides</h2>
+              <p className="mt-2 text-[12px] text-ink-500">This retreat appears in {matchingGuides.length} curated {matchingGuides.length === 1 ? "guide" : "guides"}</p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                {matchingGuides.map((g) => (
+                  <a
+                    key={g.slug}
+                    href={`/guides/${g.slug}`}
+                    className="rounded-full bg-sage-100 px-4 py-2 text-[11px] font-medium text-sage-700 transition-colors duration-150 ease-out hover:bg-sage-100/70"
+                  >
+                    {g.title}
+                  </a>
+                ))}
+              </div>
             </div>
           </AnimateIn>
         )}
 
-        {/* ═══ CTA ═══ */}
+        {/* ═══ CTA — primary conversion moment ═══ */}
         <AnimateIn className="mb-24">
-          <div className="relative overflow-hidden rounded-3xl border border-white/[0.04]">
-            {hasImage && (
-              <Image
-                src={heroImage}
-                alt=""
-                fill
-                loading="lazy"
-                sizes="100vw"
-                quality={65}
-                className="object-cover"
-              />
-            )}
-            <div className="absolute inset-0 bg-dark-950/80 backdrop-blur-sm" />
-            <div className="relative px-10 py-20 text-center sm:px-16 sm:py-28">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-gold-400">Begin Your Journey</p>
-              <h2 className="mt-4 font-serif text-3xl font-light text-white sm:text-4xl">
-                Experience {retreat.name}
-              </h2>
-              <p className="mx-auto mt-4 max-w-md text-[13px] text-dark-300">
-                Visit their official website for current availability and booking.
-              </p>
-              <div className="mt-8">
-                <a href={retreat.website_url} target="_blank" rel="noopener noreferrer" className="btn-luxury">
-                  Visit Official Site
-                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          <div className="rounded-[2rem] bg-cream-100 px-8 py-14 text-center ring-1 ring-cream-200 sm:px-16 sm:py-20">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-sage-700">Begin Your Journey</p>
+            <h2 className="mt-4 font-display text-3xl text-ink-900 sm:text-4xl">
+              Experience {retreat.name}
+            </h2>
+            <p className="mx-auto mt-4 max-w-md text-[13px] leading-relaxed text-ink-700">
+              Visit their official website for current availability and booking.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <a
+                href={retreat.website_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-3 rounded-full bg-ink-900 py-3 pl-7 pr-3 text-sm font-medium text-cream-50 transition-transform duration-150 ease-out active:scale-[0.97]"
+              >
+                Visit Official Site
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10">
+                  <svg className="h-4 w-4 transition-transform duration-150 ease-out group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
-                </a>
-              </div>
+                </span>
+              </a>
+              <AddToCompareButton
+                retreat={{
+                  id: retreat.id,
+                  slug: retreat.slug,
+                  name: retreat.name,
+                  hero_image_url: heroImage,
+                  wrd_score: retreat.wrd_score,
+                }}
+                variant="secondary"
+              />
             </div>
           </div>
         </AnimateIn>
@@ -701,46 +845,29 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
 
         {/* ═══ EXPLORE MORE ═══ */}
         <AnimateIn className="mb-24">
-          <div className="rounded-3xl border border-white/[0.04] bg-white/[0.015] p-8 sm:p-12">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-500">Keep Exploring</p>
-            <h2 className="mt-3 font-serif text-3xl font-light text-white">Explore More</h2>
-            <div className="mt-8 grid gap-4 sm:grid-cols-3">
-              <Link
-                href={`/retreats/region/${retreat.region.toLowerCase()}`}
-                className="group/link flex items-center justify-between rounded-2xl border border-white/[0.04] bg-white/[0.02] p-6 transition-all duration-300 hover:border-gold-500/15 hover:bg-white/[0.04]"
-              >
-                <div>
-                  <p className="text-[13px] font-medium text-white">More {retreat.region} Retreats</p>
-                  <p className="mt-1 text-[11px] text-dark-400">Browse the full directory</p>
-                </div>
-                <svg className="h-4 w-4 text-dark-400 transition-all duration-300 group-hover/link:translate-x-0.5 group-hover/link:text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-              <Link
-                href="/compare"
-                className="group/link flex items-center justify-between rounded-2xl border border-white/[0.04] bg-white/[0.02] p-6 transition-all duration-300 hover:border-gold-500/15 hover:bg-white/[0.04]"
-              >
-                <div>
-                  <p className="text-[13px] font-medium text-white">Compare Retreats</p>
-                  <p className="mt-1 text-[11px] text-dark-400">Side-by-side analysis</p>
-                </div>
-                <svg className="h-4 w-4 text-dark-400 transition-all duration-300 group-hover/link:translate-x-0.5 group-hover/link:text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-              <Link
-                href="/quiz"
-                className="group/link flex items-center justify-between rounded-2xl border border-white/[0.04] bg-white/[0.02] p-6 transition-all duration-300 hover:border-gold-500/15 hover:bg-white/[0.04]"
-              >
-                <div>
-                  <p className="text-[13px] font-medium text-white">Find Your Perfect Retreat</p>
-                  <p className="mt-1 text-[11px] text-dark-400">Take the personalized quiz</p>
-                </div>
-                <svg className="h-4 w-4 text-dark-400 transition-all duration-300 group-hover/link:translate-x-0.5 group-hover/link:text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
+          <div className="border-t border-cream-200 pt-8">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Keep Exploring</p>
+            <h2 className="mt-2 font-display text-3xl text-ink-900">Explore More</h2>
+            <div className="mt-6 divide-y divide-cream-200 border-t border-cream-200">
+              {[
+                { href: `/retreats/region/${retreat.region.toLowerCase()}`, title: `More ${retreat.region} Retreats`, sub: "Browse the full directory" },
+                { href: "/compare", title: "Compare Retreats", sub: "Side-by-side analysis" },
+                { href: "/quiz", title: "Find Your Perfect Retreat", sub: "Take the personalized quiz" },
+              ].map((l) => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className="group flex items-center justify-between gap-4 py-4 transition-colors duration-200 ease-out"
+                >
+                  <div>
+                    <p className="text-sm font-medium text-ink-900 transition-colors duration-200 group-hover:text-sage-700">{l.title}</p>
+                    <p className="mt-0.5 text-xs text-ink-500">{l.sub}</p>
+                  </div>
+                  <svg className="h-4 w-4 shrink-0 text-ink-500 transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:text-sage-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              ))}
             </div>
           </div>
         </AnimateIn>

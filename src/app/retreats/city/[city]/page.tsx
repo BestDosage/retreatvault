@@ -16,8 +16,16 @@ export const dynamicParams = true;
 
 type Params = { city: string };
 
-// No generateStaticParams — render all city pages on-demand via ISR
-// This avoids Supabase timeout during build and OOM on Vercel
+// Pre-render only the TOP 50 cities by retreat count at build time (OOM guard —
+// static-generating all 271 qualifying cities previously choked the Vercel build).
+// Every other city (>=3 retreats) renders on-demand via dynamicParams + ISR.
+export async function generateStaticParams(): Promise<Params[]> {
+  const retreats = await getAllRetreats();
+  // Qualification (>= 3 retreats, slugify, empty-slug filter) lives in getAllCities.
+  return getAllCities(retreats)
+    .slice(0, 50)
+    .map((c) => ({ city: c.slug }));
+}
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { city: citySlug } = await params;
@@ -68,6 +76,34 @@ function BreadcrumbJsonLd({
   );
 }
 
+// ItemList of the city's retreats — data sourced from Supabase rows, not user input.
+function RetreatItemListJsonLd({
+  cityName,
+  retreats,
+}: {
+  cityName: string;
+  retreats: { slug: string; name: string }[];
+}) {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: `Wellness Retreats in ${cityName}`,
+    numberOfItems: retreats.length,
+    itemListElement: retreats.map((r, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: `https://www.retreatvault.com/retreats/${r.slug}`,
+      name: r.name,
+    })),
+  };
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
 export default async function CityPage({ params }: { params: Promise<Params> }) {
   const { city: citySlug } = await params;
   const allRetreats = await getAllRetreats();
@@ -101,42 +137,46 @@ export default async function CityPage({ params }: { params: Promise<Params> }) 
         regionSlug={regionSlug}
         regionName={regionName}
       />
+      <RetreatItemListJsonLd
+        cityName={cityName}
+        retreats={cityRetreats.map((r) => ({ slug: r.slug, name: r.name }))}
+      />
 
-      <main className="min-h-screen bg-dark-950">
+      <main className="min-h-screen bg-cream-50">
         {/* Hero */}
-        <section className="border-b border-white/[0.06] px-6 pb-16 pt-32 md:px-12 lg:px-20">
+        <section className="border-b border-cream-200 px-6 pb-16 pt-32 md:px-12 lg:px-20">
           <div className="mx-auto max-w-7xl">
             {/* Breadcrumb */}
-            <nav className="mb-8 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-dark-400">
-              <a href="/" className="transition-colors hover:text-gold-400">Home</a>
-              <span className="text-dark-700">/</span>
-              <a href="/retreats" className="transition-colors hover:text-gold-400">Retreats</a>
-              <span className="text-dark-700">/</span>
-              <a href={`/retreats/region/${regionSlug}`} className="transition-colors hover:text-gold-400">
+            <nav className="mb-8 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-ink-500">
+              <a href="/" className="transition-colors hover:text-sage-700">Home</a>
+              <span className="text-cream-200">/</span>
+              <a href="/retreats" className="transition-colors hover:text-sage-700">Retreats</a>
+              <span className="text-cream-200">/</span>
+              <a href={`/retreats/region/${regionSlug}`} className="transition-colors hover:text-sage-700">
                 {regionName}
               </a>
-              <span className="text-dark-700">/</span>
-              <a href={`/retreats/country/${countrySlug}`} className="transition-colors hover:text-gold-400">
+              <span className="text-cream-200">/</span>
+              <a href={`/retreats/country/${countrySlug}`} className="transition-colors hover:text-sage-700">
                 {countryName}
               </a>
-              <span className="text-dark-700">/</span>
-              <span className="text-dark-300">{cityName}</span>
+              <span className="text-cream-200">/</span>
+              <span className="text-ink-700">{cityName}</span>
             </nav>
 
-            <h1 className="font-serif text-4xl font-light text-white md:text-5xl lg:text-6xl">
+            <h1 className="font-display text-4xl font-light text-ink-900 md:text-5xl lg:text-6xl">
               Wellness Retreats in {cityName}
             </h1>
-            <p className="mt-4 text-lg text-dark-400">
+            <p className="mt-4 text-lg text-ink-500">
               {cityRetreats.length} {cityRetreats.length === 1 ? "retreat" : "retreats"} in {cityName}, {countryName}
             </p>
           </div>
         </section>
 
         {/* Location intelligence */}
-        <section className="border-b border-white/[0.06] px-6 py-16 md:px-12 lg:px-20">
+        <section className="border-b border-cream-200 px-6 py-16 md:px-12 lg:px-20">
           <div className="mx-auto max-w-7xl">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Market Intelligence</p>
-            <h2 className="mt-3 font-serif text-2xl font-light text-white">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-sage-700">Market Intelligence</p>
+            <h2 className="mt-3 font-display text-2xl font-light text-ink-900">
               {cityName} Wellness Market
             </h2>
             <div className="mt-8">
@@ -146,7 +186,7 @@ export default async function CityPage({ params }: { params: Promise<Params> }) 
         </section>
 
         {/* Retreat cards */}
-        <section className="border-b border-white/[0.06] px-6 py-16 md:px-12 lg:px-20">
+        <section className="border-b border-cream-200 px-6 py-16 md:px-12 lg:px-20">
           <div className="mx-auto max-w-7xl">
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {cityRetreats.map((retreat) => (
@@ -158,9 +198,9 @@ export default async function CityPage({ params }: { params: Promise<Params> }) 
 
         {/* Cross-link to other cities in the same country */}
         {siblingCities.length > 0 && (
-          <section className="border-t border-white/[0.06] px-6 py-16 md:px-12 lg:px-20">
+          <section className="border-t border-cream-200 px-6 py-16 md:px-12 lg:px-20">
             <div className="mx-auto max-w-7xl">
-              <h2 className="font-serif text-2xl font-light text-white">
+              <h2 className="font-display text-2xl font-light text-ink-900">
                 More Cities in {countryName}
               </h2>
               <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
@@ -168,12 +208,12 @@ export default async function CityPage({ params }: { params: Promise<Params> }) 
                   <a
                     key={c.slug}
                     href={`/retreats/city/${c.slug}`}
-                    className="group flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] px-5 py-4 transition-all hover:border-gold-400/30 hover:bg-white/[0.04]"
+                    className="group flex items-center justify-between rounded-xl border border-cream-200 bg-cream-100 px-5 py-4 transition-all hover:border-sage-700/30 hover:bg-cream-50"
                   >
-                    <span className="font-serif text-[15px] text-white group-hover:text-gold-400 transition-colors">
+                    <span className="font-display text-[15px] text-ink-900 group-hover:text-sage-700 transition-colors">
                       {c.city}
                     </span>
-                    <span className="ml-3 text-[12px] text-dark-400">
+                    <span className="ml-3 text-[12px] text-ink-500">
                       {c.count}
                     </span>
                   </a>
@@ -182,7 +222,7 @@ export default async function CityPage({ params }: { params: Promise<Params> }) 
               <div className="mt-8">
                 <a
                   href={`/retreats/country/${countrySlug}`}
-                  className="text-[13px] text-dark-400 hover:text-gold-400 transition-colors"
+                  className="text-[13px] text-ink-500 hover:text-sage-700 transition-colors"
                 >
                   &larr; View all {countryName} retreats
                 </a>
