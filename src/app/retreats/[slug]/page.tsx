@@ -79,6 +79,7 @@ import { BestForChips } from "@/components/BestForTags";
 import StickyMobileBar from "@/components/StickyMobileBar";
 import AddToCompareButton from "@/components/AddToCompareButton";
 import EmailCapture from "@/components/EmailCapture";
+import { RetreatJsonLd } from "@/components/RetreatJsonLd";
 import {
   LongevityPanel, DigitalDetoxPanel, RoiCalculator,
   SleepSciencePanel, IdealGuestCard, SeasonalChart,
@@ -260,6 +261,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
+      <RetreatJsonLd retreat={retreat} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
