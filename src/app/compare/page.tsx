@@ -21,12 +21,13 @@ export default async function ComparePage({
   searchParams: Promise<{ retreats?: string }>;
 }) {
   const params = await searchParams;
-  // URL -> state: parse slugs, validate against real retreats, cap at 3.
-  const slugs = (params.retreats || "").split(",").filter(Boolean).slice(0, 3);
+  // URL -> state: parse slugs, validate against real retreats FIRST, then cap
+  // at 3 — so junk slugs can't consume cap slots.
+  const slugs = (params.retreats || "").split(",").filter(Boolean);
   const allRetreats = await getAllRetreats();
-  const selected = slugs
+  const selected = (slugs
     .map((slug) => allRetreats.find((r) => r.slug === slug))
-    .filter(Boolean) as WellnessRetreat[];
+    .filter(Boolean) as WellnessRetreat[]).slice(0, 3);
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -95,7 +96,7 @@ export default async function ComparePage({
                   Compare <span className="text-ink-500">retreats</span>
                 </h1>
                 <p className="mt-4 text-[14px] leading-relaxed text-ink-700">
-                  Scores across 15 weighted categories. No paid placements.
+                  Scores across 15 weighted categories
                 </p>
               </div>
               <CopyLinkButton />
@@ -143,7 +144,7 @@ export default async function ComparePage({
                       {/* Score + Price */}
                       <div className="mt-2 flex items-center justify-center gap-2">
                         <div className="flex h-9 w-9 flex-col items-center justify-center rounded-full bg-cream-100 ring-1 ring-cream-200">
-                          <span className="font-display text-[12px] tabular-nums text-ink-900">{isScorePublic(r.wrd_score) ? r.wrd_score.toFixed(1) : "—"}</span>
+                          <span className="font-display text-[12px] tabular-nums text-ink-900">{isScorePublic(r.wrd_score) ? r.wrd_score.toFixed(1) : "Listed"}</span>
                           <span className="text-[4px] uppercase tracking-wider text-sage-700">RV</span>
                         </div>
                         <span className="text-[11px] tabular-nums text-ink-700">${r.price_min_per_night.toLocaleString()}/night</span>

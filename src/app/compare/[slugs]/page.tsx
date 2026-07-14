@@ -90,7 +90,7 @@ export default async function HeadToHeadPage({ params }: { params: Promise<{ slu
                   <p className="mt-1 text-[12px] text-ink-500">{r.city}, {r.country}</p>
                   <div className="mt-4 flex items-center gap-3">
                     <div className="flex h-14 w-14 flex-col items-center justify-center rounded-full bg-cream-50 ring-1 ring-cream-200">
-                      <span className="font-display text-xl tabular-nums text-ink-900">{isScorePublic(r.wrd_score) ? r.wrd_score.toFixed(1) : "\u2014"}</span>
+                      <span className="font-display text-xl tabular-nums text-ink-900">{isScorePublic(r.wrd_score) ? r.wrd_score.toFixed(1) : "Listed"}</span>
                       <span className="text-[6px] uppercase tracking-wider text-sage-700">Vault</span>
                     </div>
                     <div>
