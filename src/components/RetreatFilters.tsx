@@ -65,7 +65,7 @@ export default function RetreatFilters() {
   return (
     // Sticky researcher toolbar. Full-bleed cream glass that stays fixed as the
     // grid scrolls beneath it. position:sticky reserves no space → CLS 0.
-    <div className="sticky top-16 z-30 -mx-6 border-y border-cream-200 bg-cream-50/85 px-6 py-4 backdrop-blur-md sm:-mx-10 sm:px-10 lg:-mx-16 lg:px-16">
+    <div className="mt-10 sticky top-20 z-30 -mx-6 border-y border-cream-200 bg-cream-50/85 px-6 py-4 backdrop-blur-md sm:-mx-10 sm:px-10 lg:-mx-16 lg:px-16">
       <div
         className="flex items-center gap-2 overflow-x-auto sm:flex-wrap"
         style={{ scrollbarWidth: "none" }}

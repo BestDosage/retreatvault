@@ -1,10 +1,13 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useCompare } from "./CompareProvider";
 
 export default function CompareBar() {
   const { items, remove, clear } = useCompare();
+  // Respect prefers-reduced-motion: the bar appears/leaves with a plain opacity
+  // fade, no slide-up sweep (same pattern as IntelligencePanels).
+  const reduce = useReducedMotion();
 
   if (items.length === 0) return null;
 
@@ -13,10 +16,10 @@ export default function CompareBar() {
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 100, opacity: 0 }}
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        initial={reduce ? { opacity: 0 } : { y: 100, opacity: 0 }}
+        animate={reduce ? { opacity: 1 } : { y: 0, opacity: 1 }}
+        exit={reduce ? { opacity: 0 } : { y: 100, opacity: 0 }}
+        transition={reduce ? { duration: 0.15 } : { duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         className="fixed inset-x-0 bottom-5 z-50 flex justify-center px-4"
       >
         {/* Floating cream-glass pill */}

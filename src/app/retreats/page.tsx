@@ -130,11 +130,14 @@ export default async function RetreatsPage({ searchParams }: { searchParams: Pro
           </p>
         </AnimateIn>
 
-        <div className="mt-10">
-          <Suspense fallback={null}>
-            <RetreatFilters />
-          </Suspense>
-        </div>
+        {/* RetreatFilters is a DIRECT child of the max-width container so its
+            position:sticky containing block spans the whole grid. Wrapping it in
+            its own short div made that wrapper the containing block and the
+            toolbar scrolled away instantly (never stuck). Top spacing lives on
+            the toolbar's own root now. */}
+        <Suspense fallback={null}>
+          <RetreatFilters />
+        </Suspense>
 
         {/* Result count + applied-filters summary — the scent of state */}
         <p className="mt-6 text-sm tabular-nums text-ink-500">

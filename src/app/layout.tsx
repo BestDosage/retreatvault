@@ -5,7 +5,7 @@ import "./globals.css";
 import CompareProvider from "@/components/CompareProvider";
 import CompareBar from "@/components/CompareBar";
 import PressStrip from "@/components/PressStrip";
-import MobileNav from "@/components/MobileNav";
+import SiteNav from "@/components/SiteNav";
 import EmailCapture from "@/components/EmailCapture";
 
 const display = Gloock({
@@ -64,46 +64,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <CompareProvider>
 
         {/* ═══ NAV ═══ */}
-        <nav className="fixed top-0 z-50 w-full">
-          <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-5 sm:px-10 lg:px-16">
-            {/* Logo */}
-            <a href="/" className="group flex items-center -my-8">
-              <Image
-                src="/logo-transparent.png"
-                alt="RetreatVault"
-                width={224}
-                height={112}
-                priority
-                className="h-28 w-auto"
-              />
-            </a>
-
-            {/* Links */}
-            <div className="flex items-center gap-8">
-              <a href="/retreats" className="hidden text-[11px] font-medium uppercase tracking-[0.2em] text-dark-300 transition-colors duration-500 hover:text-white sm:block">
-                Directory
-              </a>
-              <a href="/retreats?region=USA" className="hidden text-[11px] font-medium uppercase tracking-[0.2em] text-dark-400 transition-colors duration-500 hover:text-white md:block">
-                USA
-              </a>
-              <a href="/retreats?region=Europe" className="hidden text-[11px] font-medium uppercase tracking-[0.2em] text-dark-400 transition-colors duration-500 hover:text-white md:block">
-                Europe
-              </a>
-              <a href="/retreats?region=Asia" className="hidden text-[11px] font-medium uppercase tracking-[0.2em] text-dark-400 transition-colors duration-500 hover:text-white lg:block">
-                Asia
-              </a>
-              <a href="/blog" className="hidden text-[11px] font-medium uppercase tracking-[0.2em] text-dark-400 transition-colors duration-500 hover:text-white lg:block">
-                Journal
-              </a>
-              <a href="/quiz" className="hidden sm:inline-flex btn-luxury btn-luxury-sm">
-                Take the Quiz
-              </a>
-              <MobileNav />
-            </div>
-          </div>
-          {/* Fade line */}
-          <div className="line-gold" />
-        </nav>
+        <SiteNav />
 
         <main>{children}</main>
         <CompareBar />

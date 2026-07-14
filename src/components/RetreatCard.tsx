@@ -1,8 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { WellnessRetreat, isScorePublic } from "@/lib/types";
-import { getRetreatImage, isStockFallback } from "@/lib/retreat-images";
+import { getRetreatImage, isStockFallback, safeImageUrl } from "@/lib/retreat-images";
 import TierBadge from "./TierBadge";
+import AddToCompareButton from "./AddToCompareButton";
 
 /**
  * System-wide editorial retreat card (cream). Used across the directory,
@@ -15,7 +16,15 @@ import TierBadge from "./TierBadge";
  * untreated. Server component — hover is pure CSS, no client JS.
  */
 export default function RetreatCard({ retreat }: { retreat: WellnessRetreat }) {
-  const img = getRetreatImage(retreat);
+  // Cards only ever want a network-loadable hero. getRetreatImage trusts local
+  // "/images/*" paths as verified property photos, but those files don't exist
+  // yet (e.g. Buchinger Wilhelmi) → next/image renders a blank grey box. Guard:
+  // anything that isn't an http(s) URL falls back to the keyed location photo.
+  // Future official photos live in the Supabase bucket (https) and pass through.
+  const resolved = getRetreatImage(retreat);
+  const img = resolved.startsWith("http")
+    ? resolved
+    : safeImageUrl("", retreat.region || "", retreat.country || "", retreat.slug);
   const muted = isStockFallback(img);
   const scorePublic = isScorePublic(retreat.wrd_score);
   const showTier = retreat.score_tier === "elite" || retreat.score_tier === "exceptional";
@@ -49,6 +58,20 @@ export default function RetreatCard({ retreat }: { retreat: WellnessRetreat }) {
             <TierBadge tier={retreat.score_tier} size="sm" />
           </div>
         )}
+        {/* Compare trigger — client leaf; swallows the click so the card link
+            doesn't fire. Card itself stays a server component. */}
+        <div className="absolute right-3 top-3 z-10">
+          <AddToCompareButton
+            retreat={{
+              id: retreat.id,
+              slug: retreat.slug,
+              name: retreat.name,
+              hero_image_url: img,
+              wrd_score: retreat.wrd_score,
+            }}
+            variant="circle"
+          />
+        </div>
       </div>
 
       {/* Cream caption body */}

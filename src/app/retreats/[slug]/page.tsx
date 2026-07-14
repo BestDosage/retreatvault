@@ -77,6 +77,7 @@ import VaultVsGuest from "@/components/VaultVsGuest";
 import RealCostCalculator from "@/components/RealCostCalculator";
 import { BestForChips } from "@/components/BestForTags";
 import StickyMobileBar from "@/components/StickyMobileBar";
+import AddToCompareButton from "@/components/AddToCompareButton";
 import EmailCapture from "@/components/EmailCapture";
 import {
   LongevityPanel, DigitalDetoxPanel, RoiCalculator,
@@ -799,7 +800,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
             <p className="mx-auto mt-4 max-w-md text-[13px] leading-relaxed text-ink-700">
               Visit their official website for current availability and booking.
             </p>
-            <div className="mt-8 flex justify-center">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <a
                 href={retreat.website_url}
                 target="_blank"
@@ -813,6 +814,16 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
                   </svg>
                 </span>
               </a>
+              <AddToCompareButton
+                retreat={{
+                  id: retreat.id,
+                  slug: retreat.slug,
+                  name: retreat.name,
+                  hero_image_url: heroImage,
+                  wrd_score: retreat.wrd_score,
+                }}
+                variant="secondary"
+              />
             </div>
           </div>
         </AnimateIn>
