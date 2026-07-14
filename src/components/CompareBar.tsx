@@ -34,7 +34,7 @@ export default function CompareBar() {
                 <div key={item.id} className="group relative">
                   <div className="h-10 w-10 overflow-hidden rounded-full ring-1 ring-cream-200 sm:h-11 sm:w-11">
                     {item.hero_image_url?.startsWith("http") ? (
-                      <img src={item.hero_image_url} alt={item.name} className="h-full w-full object-cover" />
+                      <img src={item.hero_image_url} alt={item.name} className="h-full w-full object-cover [filter:saturate(0.85)]" />
                     ) : (
                       <div className="h-full w-full bg-cream-200" />
                     )}

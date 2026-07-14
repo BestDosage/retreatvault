@@ -47,6 +47,9 @@
      new Gloock/Hanken Grotesk stack instead of silently losing font-family. */
   --font-family-serif: var(--font-display), "Georgia", serif;
   --font-family-sans: var(--font-sans), system-ui, sans-serif;
+  /* Tailwind v4's font-serif utility resolves --font-serif (in its namespace);
+     legacy pages using font-serif now get Gloock instead of falling to Georgia. */
+  --font-serif: var(--font-display), "Georgia", serif;
 }
 
 * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
@@ -55,7 +58,7 @@ html { scroll-behavior: auto; }
 
 body {
   font-family: var(--font-family-sans);
-  background: #050505;
+  background: oklch(0.975 0.008 85);
   color: #b0b0b0;
   overflow-x: hidden;
 }
