@@ -244,6 +244,9 @@ export function getRetreatImage(retreat: WellnessRetreat): string {
   const hero = retreat.hero_image_url || "";
   // Retreat-owned photography (local asset / official-photos bucket) always wins.
   if (isVerifiedPropertyPhoto(hero)) return hero;
-  if (hero.startsWith("https://images.unsplash.com/")) return hero;
+  // Any copyright-safe hosted image renders as-is: curated Unsplash heroes, the
+  // per-country Pexels location images written by scripts/enrich-pexels-images.ts,
+  // and our own keyed Unsplash fallbacks. Everything else → keyed fallback.
+  if (isSafeImageUrl(hero) && hero.startsWith("http")) return hero;
   return pickFallback(retreat);
 }
