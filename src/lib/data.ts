@@ -101,57 +101,30 @@ async function _fetchAllRetreats(): Promise<WellnessRetreat[]> {
     "google_rating,google_review_count,tripadvisor_rating,tripadvisor_review_count," +
     "specialty_tags,dietary_options,program_types,last_data_refresh,is_sponsored," +
     "is_verified,created_at";
-  // Keyset ("seek") pagination over the composite index
-  // (wrd_score DESC, slug ASC). A single 9,400-row SELECT was brushing the
-  // anon statement timeout on cold build lambdas (80+ timeout retries per
-  // build). Fetching in 1,000-row batches with a (score,slug) cursor keeps
-  // every query a fast bounded index-range scan — no offset walk, no timeout.
-  const BATCH = 1000;
-  const data: any[] = [];
-  let cursor: { score: any; slug: string } | null = null;
-  // Build one batch query fresh (Supabase builders are single-use, so a fresh
-  // one per attempt is required for retries).
-  const runBatch = (cur: { score: any; slug: string } | null) => {
-    let q = supabase
-      .from("retreats")
-      .select(LIST_COLUMNS)
-      .neq("slug", "test")
-      .neq("slug", "cape-kalevala")
-      .gt("wrd_score", 0)
-      .order("wrd_score", { ascending: false })
-      .order("slug", { ascending: true })
-      .limit(BATCH);
-    if (cur) {
-      // rows after the cursor in (score DESC, slug ASC) order
-      q = q.or(`wrd_score.lt.${cur.score},and(wrd_score.eq.${cur.score},slug.gt.${cur.slug})`);
-    }
-    return q;
-  };
-  for (let guard = 0; guard < 60; guard++) {
-    // Retry each batch with backoff: during a cold build, dozens of static-page
-    // workers hit Supabase at once (thundering herd) and individual batches can
-    // transiently hit the anon statement timeout. Staggered retries recover
-    // instead of failing the whole load (which would bake an empty page).
-    let batch: any = null;
-    let lastErr: any = null;
-    for (let attempt = 0; attempt < 4; attempt++) {
-      const res = await runBatch(cursor);
-      if (!res.error) { batch = res.data; lastErr = null; break; }
-      lastErr = res.error;
-      await new Promise((r) => setTimeout(r, 400 * (attempt + 1) + Math.floor(Math.random() * 300)));
-    }
-    if (lastErr) {
-      console.error("Supabase getAllRetreats error:", lastErr.message);
-      // Throw — unstable_cache does not cache thrown errors, so a transient
-      // failure won't poison the cache for the next hour.
-      throw new Error(`Supabase getAllRetreats failed: ${lastErr.message}`);
-    }
-    const rows = (batch as any[]) || [];
-    if (rows.length === 0) break;
-    data.push(...rows);
-    if (rows.length < BATCH) break;
-    const last = rows[rows.length - 1] as any;
-    cursor = { score: last.wrd_score, slug: last.slug };
+  // Single bulk fetch over the composite index (wrd_score DESC, slug ASC).
+  // NOTE: this query can transiently hit the anon statement timeout during a
+  // cold build, when Vercel's many static-page workers all cold-call this at
+  // once (thundering herd on Supabase). That is tolerated: the caller turns a
+  // failure into a retry on the next request and ISR self-heals. Splitting into
+  // more queries (keyset) or adding per-batch retries was tried and made the
+  // herd WORSE (more concurrent queries → more contention), so we keep it to a
+  // single query. The real levers are DB-side (raise anon statement_timeout) or
+  // build-side (lower static-gen concurrency) — deliberately left to ops.
+  const { data, error } = await supabase
+    .from("retreats")
+    .select(LIST_COLUMNS)
+    .neq("slug", "test")
+    .neq("slug", "cape-kalevala")
+    .gt("wrd_score", 0)
+    .order("wrd_score", { ascending: false })
+    .order("slug", { ascending: true })
+    .range(0, 49999);
+
+  if (error) {
+    console.error("Supabase getAllRetreats error:", error.message);
+    // Throw — unstable_cache does not cache thrown errors, so a transient
+    // failure won't poison the cache for the next hour.
+    throw new Error(`Supabase getAllRetreats failed: ${error.message}`);
   }
 
   if (!data || data.length === 0) {
