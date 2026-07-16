@@ -130,10 +130,11 @@ async function _fetchAllRetreats(): Promise<WellnessRetreat[]> {
       // failure won't poison the cache for the next hour.
       throw new Error(`Supabase getAllRetreats failed: ${error.message}`);
     }
-    if (!batch || batch.length === 0) break;
-    data.push(...batch);
-    if (batch.length < BATCH) break;
-    const last = batch[batch.length - 1];
+    const rows = (batch as any[]) || [];
+    if (rows.length === 0) break;
+    data.push(...rows);
+    if (rows.length < BATCH) break;
+    const last = rows[rows.length - 1] as any;
     cursor = { score: last.wrd_score, slug: last.slug };
   }
 
