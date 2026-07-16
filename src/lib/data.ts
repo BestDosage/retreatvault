@@ -87,9 +87,23 @@ async function _fetchAllRetreats(): Promise<WellnessRetreat[]> {
   // db-max-rows (1000 on default Supabase). The table has ~9.4k rows today;
   // 50k leaves room to grow ~5x before this needs to become a real
   // keyset-paginated loop.
+  // Explicit column list (NOT select *): omit `gallery_images`, which is a
+  // per-row array of image URLs only ever rendered on the detail page (loaded
+  // separately via getRetreatBySlug). Bulk-loading it for all ~9,400 rows
+  // pushed the Next data-cache entry past 2MB (4.7MB) and inflated the payload
+  // enough to brush the anon statement timeout during builds. Everything the
+  // directory/guides/aggregate pages actually read is still selected.
+  const LIST_COLUMNS =
+    "id,slug,name,subtitle,website_url,booking_url,country,region,city,address," +
+    "lat,lng,nearest_airport,airport_distance_km,property_size,room_count,max_guests," +
+    "founded_year,property_type,price_min_per_night,price_max_per_night,pricing_model," +
+    "minimum_stay_nights,hero_image_url,instagram_handle,scores,wrd_score,score_tier," +
+    "google_rating,google_review_count,tripadvisor_rating,tripadvisor_review_count," +
+    "specialty_tags,dietary_options,program_types,last_data_refresh,is_sponsored," +
+    "is_verified,created_at";
   const { data, error } = await supabase
     .from("retreats")
-    .select("*")
+    .select(LIST_COLUMNS)
     .neq("slug", "test")
     .neq("slug", "cape-kalevala")
     .gt("wrd_score", 0)
