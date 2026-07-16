@@ -35,6 +35,9 @@ const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_P
 // ---- args ----
 const argv = process.argv.slice(2);
 const DRY = argv.includes("--dry");
+// Re-pick images for retreats already on Pexels (upgrade quality), leaving
+// curated Unsplash heroes and local/official photos untouched.
+const REENRICH = argv.includes("--reenrich");
 const LIMIT = Number((argv.find((a) => a.startsWith("--limit=")) || "").split("=")[1]) || Infinity;
 const ONLY = ((argv.find((a) => a.startsWith("--only=")) || "").split("=")[1] || "")
   .split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
@@ -103,13 +106,31 @@ function normalizeLocation(country, region, city) {
   place = COUNTRY_FIX[place.toLowerCase()] || place;
 
   const key = place.toLowerCase();
-  return { key, place, query: `${place} landscape scenery` };
+  // Query with strong scenery nouns (NOT "spa/wellness/resort", which surface
+  // people). The alt-text filter below is the real guard against portraits.
+  return { key, place, query: `${place} landscape nature` };
 }
 
+// A hero is "safe" (copyright-clean, keep as-is) if it's a local asset or an
+// Unsplash/Pexels URL. Everything else needs enrichment.
 function safe(u) {
   return !!u && (u.startsWith("/") ||
     u.startsWith("https://images.unsplash.com/") ||
     u.startsWith("https://images.pexels.com/"));
+}
+
+// A photo is usable ONLY if its Pexels alt-text describes a PLACE, not a person.
+// orientation=landscape only controls aspect ratio, so a wide headshot slips
+// through (e.g. Canyon Ranch got a smiling man). alt-text is how we exclude it.
+const PEOPLE_RE = /\b(man|men|woman|women|person|people|portrait|face|smil|model|girl|boy|selfie|beard|hair|skin|wearing|posing|couple|lady|guy|male|female|child|kid|baby|worker|athlete|hands?|body|yoga|meditat|massage|therapist|closeup|close-up)\b/i;
+const PLACE_RE = /\b(landscape|mountain|forest|lake|beach|ocean|sea|river|valley|hill|coast|cliff|sky|sunset|sunrise|aerial|countryside|garden|pool|resort|villa|hotel|building|architecture|temple|waterfall|field|desert|canyon|island|palm|jungle|meadow|nature|scenic|scenery|view|park|trail|snow|glacier|road|terrace|lagoon|bay|harbor|harbour|town|village|castle|vineyard|rainforest|tropical|landmark|monument|street|skyline|cityscape|water)\b/i;
+
+// Keep a photo if alt is place-like and NOT people-like.
+function altUsable(alt, strict = true) {
+  const a = alt || "";
+  if (PEOPLE_RE.test(a)) return false;      // never a person
+  if (!strict) return true;                 // relaxed: no-people is enough
+  return PLACE_RE.test(a);                   // strict: must be place-like
 }
 
 // ---- Pexels ----
@@ -139,15 +160,22 @@ const poolCache = new Map();
 async function getPool(loc) {
   if (poolCache.has(loc.key)) return poolCache.get(loc.key);
   let photos = await pexelsSearch(loc.query);
-  if (photos.length < 4) photos = photos.concat(await pexelsSearch(loc.place));           // broaden
-  if (photos.length < 4) photos = photos.concat(await pexelsSearch(`${loc.place} nature mountains`));
-  // de-dup by photo id, drop any non-pexels host defensively
+  if (photos.length < 30) photos = photos.concat(await pexelsSearch(`${loc.place} scenery countryside`));
+  if (photos.length < 30) photos = photos.concat(await pexelsSearch(`${loc.place} nature`));
+
+  // de-dup by photo id
   const seen = new Set();
-  const pool = [];
-  for (const p of photos) {
-    if (seen.has(p.id)) continue; seen.add(p.id);
-    const hero = sizedUrl(p, 1200, 900);
-    if (hero && hero.startsWith("https://images.pexels.com/")) pool.push(hero);
+  const uniq = [];
+  for (const p of photos) { if (!seen.has(p.id)) { seen.add(p.id); uniq.push(p); } }
+
+  // Prefer strictly place-like alts; if that leaves too few, accept any non-people
+  // photo. Portraits (people-like alt) are dropped in BOTH tiers — never used.
+  const toUrl = (p) => sizedUrl(p, 1200, 900);
+  const isPex = (u) => u && u.startsWith("https://images.pexels.com/");
+  let pool = uniq.filter((p) => altUsable(p.alt, true)).map(toUrl).filter(isPex);
+  if (pool.length < 8) {
+    const relaxed = uniq.filter((p) => altUsable(p.alt, false)).map(toUrl).filter(isPex);
+    pool = [...new Set([...pool, ...relaxed])];
   }
   poolCache.set(loc.key, pool);
   await sleep(250); // gentle on rate limit
@@ -170,7 +198,11 @@ async function loadRetreats() {
 
 async function run() {
   const all = await loadRetreats();
-  let targets = all.filter((r) => !safe(r.hero_image_url));
+  const isPexels = (u) => !!u && u.startsWith("https://images.pexels.com/");
+  // Default: only retreats without a safe image. --reenrich also re-targets
+  // retreats already on Pexels (to upgrade them with the alt-filtered pool).
+  let targets = all.filter((r) =>
+    !safe(r.hero_image_url) || (REENRICH && isPexels(r.hero_image_url)));
   // group by normalized location
   for (const r of targets) r._loc = normalizeLocation(r.country, r.region, r.city);
   if (ONLY.length) targets = targets.filter((r) => ONLY.some((o) => r._loc.key.includes(o)));
