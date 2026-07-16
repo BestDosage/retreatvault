@@ -123,13 +123,17 @@ function safe(u) {
 // orientation=landscape only controls aspect ratio, so a wide headshot slips
 // through (e.g. Canyon Ranch got a smiling man). alt-text is how we exclude it.
 const PEOPLE_RE = /\b(man|men|woman|women|person|people|portrait|face|smil|model|girl|boy|selfie|beard|hair|skin|wearing|posing|couple|lady|guy|male|female|child|kid|baby|worker|athlete|hands?|body|yoga|meditat|massage|therapist|closeup|close-up)\b/i;
-const PLACE_RE = /\b(landscape|mountain|forest|lake|beach|ocean|sea|river|valley|hill|coast|cliff|sky|sunset|sunrise|aerial|countryside|garden|pool|resort|villa|hotel|building|architecture|temple|waterfall|field|desert|canyon|island|palm|jungle|meadow|nature|scenic|scenery|view|park|trail|snow|glacier|road|terrace|lagoon|bay|harbor|harbour|town|village|castle|vineyard|rainforest|tropical|landmark|monument|street|skyline|cityscape|water)\b/i;
+// Dense urban imagery is wrong for a wellness retreat (Lefay got a HK skyline,
+// Lanserhof Lans a Chicago skyline). Reject cities hard — nature/resort only.
+const URBAN_RE = /\b(city|cityscape|skyline|skyscrapers?|downtown|urban|metropolis|high-?rise|office|financial district|traffic|intersection|billboard|subway|times square|manhattan|shibuya)\b/i;
+const PLACE_RE = /\b(landscape|mountain|forest|lake|beach|ocean|sea|river|valley|hill|coast|cliff|sky|sunset|sunrise|aerial|countryside|garden|pool|resort|villa|temple|waterfall|field|desert|canyon|island|palm|jungle|meadow|nature|scenic|scenery|park|trail|snow|glacier|lagoon|bay|vineyard|rainforest|tropical|castle|village|water|pond|greenery|hills?ide|wilderness|serene|tranquil)\b/i;
 
-// Keep a photo if alt is place-like and NOT people-like.
+// Keep a photo if alt is place-like and NOT people/urban.
 function altUsable(alt, strict = true) {
   const a = alt || "";
   if (PEOPLE_RE.test(a)) return false;      // never a person
-  if (!strict) return true;                 // relaxed: no-people is enough
+  if (URBAN_RE.test(a)) return false;       // never a cityscape
+  if (!strict) return true;                 // relaxed: no-people/urban is enough
   return PLACE_RE.test(a);                   // strict: must be place-like
 }
 
