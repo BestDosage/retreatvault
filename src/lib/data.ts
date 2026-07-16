@@ -109,7 +109,9 @@ async function _fetchAllRetreats(): Promise<WellnessRetreat[]> {
   const BATCH = 1000;
   const data: any[] = [];
   let cursor: { score: any; slug: string } | null = null;
-  for (let guard = 0; guard < 60; guard++) {
+  // Build one batch query fresh (Supabase builders are single-use, so a fresh
+  // one per attempt is required for retries).
+  const runBatch = (cur: { score: any; slug: string } | null) => {
     let q = supabase
       .from("retreats")
       .select(LIST_COLUMNS)
@@ -119,16 +121,30 @@ async function _fetchAllRetreats(): Promise<WellnessRetreat[]> {
       .order("wrd_score", { ascending: false })
       .order("slug", { ascending: true })
       .limit(BATCH);
-    if (cursor) {
+    if (cur) {
       // rows after the cursor in (score DESC, slug ASC) order
-      q = q.or(`wrd_score.lt.${cursor.score},and(wrd_score.eq.${cursor.score},slug.gt.${cursor.slug})`);
+      q = q.or(`wrd_score.lt.${cur.score},and(wrd_score.eq.${cur.score},slug.gt.${cur.slug})`);
     }
-    const { data: batch, error } = await q;
-    if (error) {
-      console.error("Supabase getAllRetreats error:", error.message);
+    return q;
+  };
+  for (let guard = 0; guard < 60; guard++) {
+    // Retry each batch with backoff: during a cold build, dozens of static-page
+    // workers hit Supabase at once (thundering herd) and individual batches can
+    // transiently hit the anon statement timeout. Staggered retries recover
+    // instead of failing the whole load (which would bake an empty page).
+    let batch: any = null;
+    let lastErr: any = null;
+    for (let attempt = 0; attempt < 4; attempt++) {
+      const res = await runBatch(cursor);
+      if (!res.error) { batch = res.data; lastErr = null; break; }
+      lastErr = res.error;
+      await new Promise((r) => setTimeout(r, 400 * (attempt + 1) + Math.floor(Math.random() * 300)));
+    }
+    if (lastErr) {
+      console.error("Supabase getAllRetreats error:", lastErr.message);
       // Throw — unstable_cache does not cache thrown errors, so a transient
       // failure won't poison the cache for the next hour.
-      throw new Error(`Supabase getAllRetreats failed: ${error.message}`);
+      throw new Error(`Supabase getAllRetreats failed: ${lastErr.message}`);
     }
     const rows = (batch as any[]) || [];
     if (rows.length === 0) break;
