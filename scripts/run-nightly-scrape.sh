@@ -1,22 +1,30 @@
 #!/bin/bash
-# Nightly Google Reviews scraper — 4 parallel browser instances
-# Runs 11pm-6am, 4x throughput
+# Nightly Google Reviews scraper — sequential, 1am-5am IST window
+# Stops gracefully at 5am to free the machine during the day
 
-set -e
 export PATH="/Users/waldman/.nvm/versions/node/v24.14.0/bin:$PATH"
 
 DIR="/Users/waldman/Projects/retreatvault"
 LOG="$DIR/data/scraper-$(date +%Y%m%d).log"
+STOP_HOUR=5  # Stop at 5am
 
-echo "$(date): Starting nightly scrape (4 parallel agents)" >> "$LOG"
+echo "$(date): Starting nightly scrape (sequential, stop at ${STOP_HOUR}:00)" >> "$LOG"
 
 caffeinate -dimsu -t 28800 &
 CAFFEINE_PID=$!
+trap 'kill $CAFFEINE_PID 2>/dev/null; wait $CAFFEINE_PID 2>/dev/null' EXIT
 
 cd "$DIR"
 
-# Run 4 chunks in parallel
+# Run chunks sequentially — parallel browsers get Killed:9 by macOS
 for i in 1 2 3 4; do
+  # Check if past stop time (7am)
+  CURRENT_HOUR=$(date +%H)
+  if [ "$CURRENT_HOUR" -ge "$STOP_HOUR" ] && [ "$CURRENT_HOUR" -lt 24 ]; then
+    echo "$(date): Past ${STOP_HOUR}:00, stopping for the day" >> "$LOG"
+    break
+  fi
+
   INPUT="$DIR/data/remaining-chunk-${i}.json"
   OUTPUT="$DIR/data/reviews-chunk-${i}.json"
 
@@ -28,17 +36,39 @@ for i in 1 2 3 4; do
 
   echo "$(date): Starting chunk $i ($REMAINING retreats)" >> "$LOG"
 
+  # Run scraper in background so we can monitor the clock
   npx tsx scripts/google-reviews-scraper/index.ts \
     --file "$INPUT" \
     --max 30 \
     --output "$OUTPUT" \
     >> "$DIR/data/scraper-chunk-${i}-$(date +%Y%m%d).log" 2>&1 &
+  SCRAPER_PID=$!
 
-  echo "$(date): Chunk $i launched (PID $!)" >> "$LOG"
-  sleep 5
+  # Wait for scraper but check clock every 60s
+  while kill -0 $SCRAPER_PID 2>/dev/null; do
+    CURRENT_HOUR=$(date +%H)
+    if [ "$CURRENT_HOUR" -ge "$STOP_HOUR" ] && [ "$CURRENT_HOUR" -lt 24 ]; then
+      echo "$(date): 5am cutoff — killing chunk $i (PID $SCRAPER_PID)" >> "$LOG"
+      kill $SCRAPER_PID 2>/dev/null
+      sleep 2
+      kill -9 $SCRAPER_PID 2>/dev/null
+      break
+    fi
+    sleep 60
+  done
+
+  wait $SCRAPER_PID 2>/dev/null
+  EXIT_CODE=$?
+  echo "$(date): Chunk $i finished (exit=$EXIT_CODE)" >> "$LOG"
+
+  # Break out of chunk loop if we hit the time limit
+  CURRENT_HOUR=$(date +%H)
+  if [ "$CURRENT_HOUR" -ge "$STOP_HOUR" ] && [ "$CURRENT_HOUR" -lt 24 ]; then
+    break
+  fi
+
+  sleep 10
 done
-
-wait
 
 echo "$(date): All chunks complete, merging..." >> "$LOG"
 
@@ -73,5 +103,4 @@ json.dump(existing, open(master, 'w'), indent=2)
 print(f'Master file: {len(existing)} total reviews')
 " >> "$LOG" 2>&1
 
-kill $CAFFEINE_PID 2>/dev/null
 echo "$(date): Nightly scrape complete" >> "$LOG"

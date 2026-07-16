@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllRetreats, getRetreatBySlug, getRetreatAwards, getRetreatVideos, getSimilarRetreats, getEditorialReview, getRetreatReviews, deriveReviewThemes, getRetreatFaqs } from "@/lib/data";
-import { getRetreatImage, isVerifiedPropertyPhoto } from "@/lib/retreat-images";
+import { getRetreatImage, isVerifiedPropertyPhoto, sizedImageUrl } from "@/lib/retreat-images";
 import YouTubeFacade from "@/components/YouTubeFacade";
 import SimilarRetreats from "@/components/SimilarRetreats";
 import EditorialReview from "@/components/EditorialReview";
@@ -139,6 +139,9 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
   // means nearly every page splits; full-bleed is the reward once official
   // photo outreach lands. (Cards use the looser isStockFallback instead.)
   const isVerifiedPhoto = isVerifiedPropertyPhoto(heroImage);
+  // Right-sized hero for display (LCP image). Canonical heroImage is still used
+  // for OG/JSON-LD/honesty-gate above; only the rendered <img> src is sized.
+  const heroDisplay = sizedImageUrl(heroImage, 1600, 1000);
   const scorePublic = isScorePublic(retreat.wrd_score);
   const tierLabel = scorePublic ? getTierLabel(retreat.score_tier) : "Listed";
   const isTopTier = scorePublic && (retreat.score_tier === "elite" || retreat.score_tier === "exceptional");
@@ -277,7 +280,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         <section className="relative min-h-[68vh] overflow-hidden bg-cream-100 md:min-h-[80vh]">
           {hasImage && (
             <Image
-              src={heroImage}
+              src={heroDisplay}
               alt={retreat.name}
               fill
               priority
@@ -392,7 +395,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
             <div className="relative min-h-[42vh] md:min-h-[70vh]">
               {hasImage && (
                 <Image
-                  src={heroImage}
+                  src={heroDisplay}
                   alt=""
                   fill
                   loading="eager"
@@ -821,7 +824,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
                   id: retreat.id,
                   slug: retreat.slug,
                   name: retreat.name,
-                  hero_image_url: heroImage,
+                  hero_image_url: sizedImageUrl(heroImage, 240, 180),
                   wrd_score: retreat.wrd_score,
                 }}
                 variant="secondary"

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { WellnessRetreat, isScorePublic } from "@/lib/types";
-import { getRetreatImage, isStockFallback, safeImageUrl } from "@/lib/retreat-images";
+import { getRetreatImage, isStockFallback, safeImageUrl, sizedImageUrl } from "@/lib/retreat-images";
 import TierBadge from "./TierBadge";
 import AddToCompareButton from "./AddToCompareButton";
 
@@ -25,7 +25,10 @@ export default function RetreatCard({ retreat }: { retreat: WellnessRetreat }) {
   const img = resolved.startsWith("http")
     ? resolved
     : safeImageUrl("", retreat.region || "", retreat.country || "", retreat.slug);
+  // Honesty gate on the CANONICAL url, THEN size for the card slot (~380px CSS,
+  // 2x for retina). Cuts each card image from a 1200px JPEG to a ~760px AVIF.
   const muted = isStockFallback(img);
+  const displaySrc = sizedImageUrl(img, 760, 570);
   const scorePublic = isScorePublic(retreat.wrd_score);
   const showTier = retreat.score_tier === "elite" || retreat.score_tier === "exceptional";
   const location = [retreat.city, retreat.country].filter(Boolean).join(", ");
@@ -44,7 +47,7 @@ export default function RetreatCard({ retreat }: { retreat: WellnessRetreat }) {
       {/* Image — ambience only, no text overlaid */}
       <div className="relative aspect-[4/3] overflow-hidden bg-cream-200">
         <Image
-          src={img}
+          src={displaySrc}
           alt=""
           fill
           loading="lazy"
@@ -66,7 +69,7 @@ export default function RetreatCard({ retreat }: { retreat: WellnessRetreat }) {
               id: retreat.id,
               slug: retreat.slug,
               name: retreat.name,
-              hero_image_url: img,
+              hero_image_url: sizedImageUrl(img, 240, 180),
               wrd_score: retreat.wrd_score,
             }}
             variant="circle"

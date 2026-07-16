@@ -12,7 +12,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getFeaturedRetreats, getRegionCounts, getTopRetreatPerRegion } from "@/lib/data";
 import { isScorePublic } from "@/lib/types";
-import { getRetreatImage } from "@/lib/retreat-images";
+import { getRetreatImage, sizedImageUrl } from "@/lib/retreat-images";
 import AnimateIn, { StaggerContainer, StaggerItem, Counter, Marquee } from "@/components/AnimateIn";
 import TierBadge from "@/components/TierBadge";
 import PressStrip from "@/components/PressStrip";
@@ -23,7 +23,7 @@ import type { WellnessRetreat } from "@/lib/types";
 // dusk), used as pure atmosphere. IMPORTANT: this is stock (Unsplash); it is
 // never captioned as any specific retreat's property. Real property heroes
 // live on the detail pages.
-const HERO_IMAGE = "https://images.unsplash.com/photo-1540541338287-41700207dee6?w=1400&h=1800&fit=crop&q=75";
+const HERO_IMAGE = "https://images.unsplash.com/photo-1540541338287-41700207dee6?w=1200&h=1500&fit=crop&auto=format&q=70";
 
 // ═══ small arrow-circle CTA pill (matches detail-page primary CTA) ═══
 function ArrowCircle({ className = "" }: { className?: string }) {
@@ -46,7 +46,7 @@ function CompactCard({ retreat }: { retreat: WellnessRetreat }) {
     >
       <div className="relative aspect-square w-24 shrink-0 overflow-hidden rounded-xl sm:w-28">
         <Image
-          src={getRetreatImage(retreat)}
+          src={sizedImageUrl(getRetreatImage(retreat), 760, 570)}
           alt=""
           fill
           loading="lazy"
@@ -312,7 +312,7 @@ export default async function HomePage() {
                 >
                   <div className="relative min-h-[300px] flex-1 overflow-hidden sm:min-h-[360px]">
                     <Image
-                      src={getRetreatImage(feature)}
+                      src={sizedImageUrl(getRetreatImage(feature), 760, 570)}
                       alt=""
                       fill
                       loading="lazy"
@@ -535,7 +535,7 @@ export default async function HomePage() {
                   const topInRegion = topByRegion[region.name];
                   const topScore = topInRegion?.wrd_score || 0;
                   const topName = topInRegion?.name || "";
-                  const topImage = topInRegion ? getRetreatImage(topInRegion) : "";
+                  const topImage = topInRegion ? sizedImageUrl(getRetreatImage(topInRegion), 640, 480) : "";
                   const scorePublic = isScorePublic(topScore);
                   return (
                     <StaggerItem key={region.name}>

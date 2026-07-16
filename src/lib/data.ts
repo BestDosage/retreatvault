@@ -185,13 +185,15 @@ export async function getAllRetreats(): Promise<WellnessRetreat[]> {
 }
 
 export async function getRetreatBySlug(slug: string): Promise<WellnessRetreat | undefined> {
-  if (!_retreatsCache) await getAllRetreats();
+  // Fast path: reuse the bulk cache if a list page already warmed it in this
+  // lambda (zero query).
   const cached = _retreatsBySlugCache.get(slug);
   if (cached) return cached;
 
-  // Safety net: if the bulk fetch truncated or the cache is stale, fall back
-  // to a direct Supabase query by slug so detail pages never 404 on valid data.
-  // This is cheap — slug is indexed — and only runs on cache misses.
+  // Otherwise do a DIRECT indexed slug lookup — do NOT load all ~9,410 rows
+  // just to read one. That full-table scan (incl. the heavy scores JSONB) was
+  // the dominant Supabase load on cold detail-page lambdas and a top driver of
+  // the compute-exhaustion warning. slug is indexed, so this is a point read.
   try {
     const { data, error } = await supabase
       .from("retreats")
@@ -302,20 +304,23 @@ function applyBudgetFilter(query: any, budget: string) {
   }
 }
 
-export async function queryRetreatsForDirectory(
-  args: DirectoryQueryArgs
-): Promise<DirectoryQueryResult> {
+// Directory cards render only name/location/price/score/hero — never the
+// scores JSONB (prose notes) or gallery arrays. Select just those columns so
+// the hottest browse page stops pulling SELECT * for 60 rows on every hit.
+const DIRECTORY_COLUMNS =
+  "id,slug,name,city,country,region,wrd_score,score_tier," +
+  "price_min_per_night,price_max_per_night,pricing_model,hero_image_url,specialty_tags,is_sponsored,is_verified";
+
+async function _queryDirectory(args: DirectoryQueryArgs): Promise<DirectoryQueryResult> {
   const { region, tag, budget, page, pageSize } = args;
   const offset = Math.max(0, (page - 1) * pageSize);
 
-  // Build filter chain. `count: "planned"` uses the PostgreSQL planner
-  // estimate instead of a full COUNT(*) scan — orders of magnitude faster
-  // on 9,400+ rows and avoids the statement-timeout failure mode that was
-  // silently returning 0 results on prod.
+  // `count: "planned"` uses the PostgreSQL planner estimate instead of a full
+  // COUNT(*) scan — orders of magnitude faster on 9,400+ rows.
   const buildBase = () => {
     let q: any = supabase
       .from("retreats")
-      .select("*", { count: "planned" })
+      .select(DIRECTORY_COLUMNS, { count: "planned" })
       .neq("slug", "test")
       .neq("slug", "cape-kalevala")
       .gt("wrd_score", 0);
@@ -335,20 +340,39 @@ export async function queryRetreatsForDirectory(
       console.error("[queryRetreatsForDirectory] supabase error:", error.message, error);
       return { retreats: [], total: 0 };
     }
-
-    const rowCount = data?.length || 0;
-    console.log(
-      `[queryRetreatsForDirectory] ok region=${region} tag=${tag} budget=${budget} page=${page} rows=${rowCount} count=${count}`
-    );
-
     return {
       retreats: (data || []).map(mapRow),
-      total: count || rowCount,
+      total: count || data?.length || 0,
     };
   } catch (e: any) {
     console.error("[queryRetreatsForDirectory] threw:", e?.message || e);
     return { retreats: [], total: 0 };
   }
+}
+
+export async function queryRetreatsForDirectory(
+  args: DirectoryQueryArgs
+): Promise<DirectoryQueryResult> {
+  const { region, tag, budget, page, pageSize } = args;
+  // Cache per unique filter combination. The /retreats route reads searchParams
+  // (so it renders dynamically), which made this the ONLY page fetcher hitting
+  // the DB live on every visit (~2-3s). Caching the data by exact filter args
+  // means repeat/paginated loads of the same filters serve from the Data Cache
+  // with zero Supabase round-trip. Key MUST include every filter arg or results
+  // cross-contaminate. Invalidated by the ["retreats"] tag on data refresh.
+  const cached = unstable_cache(
+    () => _queryDirectory(args),
+    [
+      "directory-v1",
+      region || "all",
+      tag || "all",
+      budget || "all",
+      String(page),
+      String(pageSize),
+    ],
+    { revalidate: 86400, tags: ["retreats"] }
+  );
+  return cached();
 }
 
 export async function getRetreatsByRegion(region: string): Promise<WellnessRetreat[]> {

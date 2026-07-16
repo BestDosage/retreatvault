@@ -1,4 +1,5 @@
-// One-off: quantify hero_image_url coverage & host distribution across retreats.
+// Quantify hero_image_url coverage & host distribution across retreats.
+// (Diagnostic companion to enrich-pexels-images.mjs.)
 import { createClient } from "@supabase/supabase-js";
 import { readFileSync } from "node:fs";
 

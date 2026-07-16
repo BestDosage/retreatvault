@@ -234,6 +234,35 @@ export function safeImageUrl(rawUrl: string, region: string, country: string, sl
 }
 
 /**
+ * Right-size + format-negotiate an image at its source CDN via query params.
+ *
+ * next.config has `images.unoptimized: true`, so next/image emits a plain <img>
+ * with the exact source URL — no srcset, no downscale, no AVIF/WebP. That means
+ * full 1200–1800px JPEGs were pouring into 64–380px slots. Both source CDNs
+ * resize AND content-negotiate modern formats for free via query params:
+ *   - Unsplash (Imgix): ?w=&h=&fit=crop&auto=format&q=70  (auto=format → AVIF/WebP)
+ *   - Pexels:           ?auto=compress&cs=tinysrgb&fit=crop&w=&h=
+ * Anything else (local /public asset, unknown host) is returned unchanged.
+ *
+ * IMPORTANT: call this ONLY when building the final `src`. The honesty gate
+ * `isStockFallback()` exact-matches the canonical fallback query string, so
+ * compute muted/duotone flags on the ORIGINAL url first, then size for display.
+ * Resizing changes which BYTES load, never which PHOTO — scoring/honesty intact.
+ */
+export function sizedImageUrl(url: string, w: number, h: number): string {
+  if (!url) return url;
+  if (url.startsWith("https://images.unsplash.com/")) {
+    const base = url.split("?")[0];
+    return `${base}?w=${w}&h=${h}&fit=crop&auto=format&q=70`;
+  }
+  if (url.startsWith("https://images.pexels.com/")) {
+    const base = url.split("?")[0];
+    return `${base}?auto=compress&cs=tinysrgb&fit=crop&w=${w}&h=${h}`;
+  }
+  return url; // local asset / unknown host — leave as-is
+}
+
+/**
  * Return a reliable image URL for a retreat.
  *
  * - If the retreat's hero_image_url is already a direct Unsplash URL, use it.

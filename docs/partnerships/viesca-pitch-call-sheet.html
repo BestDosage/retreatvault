@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Viesca × RetreatVault — Call Sheet</title>
+<style>
+  :root {
+    --ink: #1c1917;
+    --muted: #6b6560;
+    --cream: #faf7f2;
+    --card: #ffffff;
+    --sage: #5f7161;
+    --gold: #b08d3e;
+    --red: #a33c2f;
+    --line: #e7e0d6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Hanken Grotesk", -apple-system, "Segoe UI", sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    line-height: 1.55;
+    font-size: 16px;
+  }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 28px 24px 80px; }
+
+  header { margin-bottom: 22px; }
+  header h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 500;
+    font-size: 30px;
+    letter-spacing: -0.01em;
+  }
+  header .sub { color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+  nav {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--cream);
+    border-bottom: 1px solid var(--line);
+    padding: 10px 0; margin-bottom: 26px;
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  nav a {
+    text-decoration: none; color: var(--ink);
+    font-size: 13px; font-weight: 600;
+    padding: 5px 12px; border: 1px solid var(--line); border-radius: 999px;
+    background: var(--card);
+  }
+  nav a:hover { border-color: var(--sage); color: var(--sage); }
+
+  section { margin-bottom: 30px; scroll-margin-top: 70px; }
+  h2 {
+    font-family: Georgia, serif; font-weight: 500; font-size: 21px;
+    padding-bottom: 6px; margin-bottom: 14px;
+    border-bottom: 2px solid var(--gold);
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  h2 .step {
+    font-family: "Hanken Grotesk", sans-serif; font-size: 12px; font-weight: 700;
+    color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 10px; padding: 16px 18px; margin-bottom: 12px;
+  }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+
+  ul { padding-left: 20px; }
+  li { margin-bottom: 7px; }
+  .big { font-size: 17px; }
+  .k { font-weight: 700; }
+  .sage { color: var(--sage); font-weight: 700; }
+  .gold { color: var(--gold); font-weight: 700; }
+  .red { color: var(--red); font-weight: 700; }
+  .muted { color: var(--muted); }
+
+  .callout {
+    border-left: 4px solid var(--sage);
+    background: #eef1ec; border-radius: 0 10px 10px 0;
+    padding: 14px 18px; margin-bottom: 12px;
+  }
+  .callout.warn { border-left-color: var(--red); background: #f6ebe8; }
+  .callout.gold { border-left-color: var(--gold); background: #f5efe1; }
+
+  .say {
+    font-family: Georgia, serif; font-style: italic; font-size: 17px;
+    background: #f3f0ea; border: 1px dashed var(--gold); border-radius: 10px;
+    padding: 14px 18px; margin: 10px 0;
+  }
+
+  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 10px; overflow: hidden; font-size: 15px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { background: #f0ece4; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  tr:last-child td { border-bottom: none; }
+
+  .obj { margin-bottom: 10px; }
+  .obj .q { font-weight: 700; color: var(--red); margin-bottom: 3px; }
+  .obj .a { padding-left: 14px; border-left: 3px solid var(--sage); }
+
+  .stat { text-align: center; padding: 14px 8px; }
+  .stat .n { font-family: Georgia, serif; font-size: 30px; color: var(--sage); }
+  .stat .l { font-size: 12.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .statrow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
+  @media (max-width: 760px) { .statrow { grid-template-columns: repeat(2, 1fr); } }
+
+  .num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--sage); color: #fff; font-size: 12.5px; font-weight: 700;
+    margin-right: 8px; flex-shrink: 0;
+  }
+  .offer-item { display: flex; align-items: flex-start; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Viesca Toscana × RetreatVault — Call Sheet</h1>
+  <div class="sub">Call with Head of Sales · July 15, 2026 · Goal: exclusive flagship partnership, 4-night content trip</div>
+</header>
+
+<nav>
+  <a href="#insight">⚡ Key Insight</a>
+  <a href="#them">Who They Are</a>
+  <a href="#structure">Call Flow</a>
+  <a href="#cred">Your Numbers</a>
+  <a href="#offer">The Offer</a>
+  <a href="#ask">The Ask</a>
+  <a href="#ladder">Negotiation Ladder</a>
+  <a href="#objections">Objections</a>
+  <a href="#dont">Don't Say</a>
+  <a href="#close">Close</a>
+</nav>
+
+<section id="insight">
+  <h2><span class="step">Lead with this</span> The Killer Insight</h2>
+  <div class="callout gold big">
+    <span class="k">They are mid-pivot into wellness.</span> Spa La Corte opened 2025 (whirlpool, Turkish bath, sauna, Spa Suite). Holistic program — yoga, breathwork, sound healing with Debra Kochanczyk. Owners' stated aim: <em>"making Viesca a holistic retreat for body and mind."</em><br><br>
+    👉 You're not selling traffic. <span class="sage">You're installing them in the category they're spending capital to enter.</span>
+  </div>
+  <div class="callout">
+    <span class="k">The 4-night ask is easy for them:</span> they already run a <em>"book 4 nights, 4th night free"</em> promo + August discounts. They have soft periods — the comp costs them nearly nothing on unsold nights.
+  </div>
+</section>
+
+<section id="them">
+  <h2><span class="step">Homework</span> Who They Are</h2>
+  <div class="grid">
+    <div class="card">
+      <span class="k">The property</span>
+      <ul>
+        <li>Renaissance estate, Reggello — <span class="k">~30 min from Florence</span>, 170 acres</li>
+        <li>Bought by <span class="k">Salvatore &amp; Wanda Ferragamo</span> (1950s); owned by Ferragamo Holding, <span class="k">operated by Il Borro</span> (Relais &amp; Châteaux)</li>
+        <li>Manor Villa + 6 villas + 20 suites + Rose Garden + Due Torri cottage</li>
+        <li>Member: <span class="k">SLH + Virtuoso</span> · Il Borro Tuscan Bistro on site</li>
+        <li>Wine tasting, cooking classes, pool, tennis, weddings to 120</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="k">What a Head of Sales cares about</span>
+      <ul>
+        <li><span class="sage">US market growth</span> — highest-ADR inbound segment for Tuscany</li>
+        <li><span class="sage">Direct bookings</span> vs. OTA commissions (Booking/Expedia take 15–20%)</li>
+        <li><span class="sage">Shoulder-season occupancy</span> — hence the August promos</li>
+        <li><span class="sage">Brand safety</span> — Ferragamo name = they'll want content approval. <span class="k">Offer it before they ask.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="structure">
+  <h2><span class="step">30 min</span> Call Flow</h2>
+  <table>
+    <tr><th style="width:120px">Time</th><th>Move</th></tr>
+    <tr><td class="k">3 min</td><td><span class="k">Rapport:</span> congratulate them on Spa La Corte + the wellness direction (shows homework). One-line RetreatVault intro with numbers.</td></tr>
+    <tr><td class="k">5–7 min</td><td><span class="k">Discovery — ASK BEFORE PITCHING:</span><br>
+      · "How big is the US market for you today — where do you want it?"<br>
+      · "How much of your business is direct vs. OTA?"<br>
+      · "Which months do you most want to fill?"<br>
+      <span class="muted">Their answers tell you which benefit to lead with.</span></td></tr>
+    <tr><td class="k">5 min</td><td><span class="k">The offer</span> (section below), tuned to what they just said.</td></tr>
+    <tr><td class="k">1 min</td><td><span class="k">The ask.</span> Say it once, plainly. <span class="red">Then stop talking.</span></td></tr>
+    <tr><td class="k">5 min</td><td>Objections (cheat sheet below).</td></tr>
+    <tr><td class="k">2 min</td><td><span class="k">Close:</span> one-pager today + pencil dates week of Aug 17 + get decision-maker's name.</td></tr>
+  </table>
+</section>
+
+<section id="cred">
+  <h2><span class="step">2 min</span> Your Credibility Numbers</h2>
+  <div class="statrow">
+    <div class="card stat"><div class="n">9,400+</div><div class="l">Retreats scored (WRD)</div></div>
+    <div class="card stat"><div class="n">15K/mo</div><div class="l">US visitors today</div></div>
+    <div class="card stat"><div class="n">~85K</div><div class="l">Projected in 6 mo — <span class="red">say "projected"</span></div></div>
+    <div class="card stat"><div class="n">2 mo</div><div class="l">YouTube series launch</div></div>
+  </div>
+  <div class="card">
+    <ul>
+      <li>1,600+ editorial reviews · YouTube intel on hundreds of properties · Europe city/country landing pages</li>
+      <li>Premium editorial redesign just shipped — <span class="k">send them retreatvault.com live on the call</span></li>
+      <li>Audience: Americans actively comparing &amp; booking retreats — <span class="sage">high intent</span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="offer">
+  <h2><span class="step">Frame</span> The Offer — "Exclusive European Flagship of RetreatVault" (6-mo pilot)</h2>
+  <div class="card">
+    <div class="offer-item"><span class="num">1</span><div><span class="k">Singular recommendation status.</span> Not a listing among 9,400 — <em>the</em> endorsed European pick for Americans.</div></div>
+    <div class="offer-item"><span class="num">2</span><div><span class="k">Sitewide popup</span> to our US audience → dedicated Viesca page. Smart-targeted (Europe-intent, luxury-tier) — quality clicks.</div></div>
+    <div class="offer-item"><span class="num">3</span><div><span class="k">Dedicated landing page</span> from pro content shot on property → their <span class="sage">direct booking engine, UTM-tracked, zero commission</span> (vs. 15–20% OTA toll).</div></div>
+    <div class="offer-item"><span class="num">4</span><div><span class="k">Flagship of the YouTube series</span> — Episode 1, the anchor property. Evergreen film they can license for their own marketing.</div></div>
+    <div class="offer-item"><span class="num">5</span><div><span class="k">Premium editorial treatment:</span> verified official photography = full hero treatment, in-depth review, top placement on Tuscany/Italy/Europe pages.</div></div>
+    <div class="offer-item"><span class="num">6</span><div><span class="k">Monthly performance report:</span> clicks, landing traffic, booking clickthroughs. Full transparency.</div></div>
+  </div>
+  <div class="callout gold">
+    <span class="k">Media-value framing:</span> production + dedicated placement + popup on a six-figure-visitor trajectory + destination film = a <span class="k">$15–25K package</span> sourced separately. The ask is four room-nights.
+  </div>
+</section>
+
+<section id="ask">
+  <h2><span class="step">Verbatim</span> The Ask</h2>
+  <div class="say">
+    "In exchange, we'd ask Viesca to host our founder for <b>four nights</b> to produce all of this content on property — accommodation plus access to the spa, dining, and experiences for filming. We cover our own travel. And everything we produce, <b>you get approval rights on before it goes live</b>."
+  </div>
+  <div class="grid">
+    <div class="card"><span class="k">Timing:</span> within ~6 weeks — week of <span class="sage">Aug 17</span> (their soft period; hits YouTube launch).</div>
+    <div class="card"><span class="k">Term:</span> 6-month exclusive pilot. Money/affiliate talk happens at renewal, <span class="red">not today</span>.</div>
+  </div>
+</section>
+
+<section id="ladder">
+  <h2><span class="step">Hold the line</span> Negotiation Ladder</h2>
+  <table>
+    <tr><th style="width:130px">Level</th><th>You accept</th></tr>
+    <tr><td class="sage">🎯 Dream</td><td>4 nights villa/suite · spa + experiences + dining comped · exclusive flagship · footage reuse license</td></tr>
+    <tr><td class="gold">✅ Target</td><td>4 nights suite · spa access for filming · dining partially comped</td></tr>
+    <tr><td class="k">🪜 Floor</td><td>3 nights on their "4th-night-free" mechanic + media rate on extras — take it, over-deliver, upgrade at renewal</td></tr>
+    <tr><td class="red">🚪 Walk-away</td><td>They want payment AND no comp → "Let me send you the media kit and we'll revisit."</td></tr>
+  </table>
+</section>
+
+<section id="objections">
+  <h2><span class="step">Cheat sheet</span> Objection Handling</h2>
+  <div class="card">
+    <div class="obj"><div class="q">"What's your traffic actually worth to us?"</div>
+      <div class="a">"15K/month today, high-intent Americans comparing retreats. Fully transparent — monthly UTM-tracked reports. If it doesn't perform, the pilot ends at 6 months and it cost you four unsold room-nights."</div></div>
+    <div class="obj"><div class="q">"Why should we be exclusive with you?"</div>
+      <div class="a">Flip it: "The exclusivity runs the other way — <b>we're</b> exclusive to <b>you</b>. Keep every other channel. We recommend only Viesca in Europe."</div></div>
+    <div class="obj"><div class="q">"We need brand / content approval." (Ferragamo)</div>
+      <div class="a">"Built in. Nothing publishes without your sign-off. You also get a license to reuse the film and photography in your own channels."</div></div>
+    <div class="obj"><div class="q">"Why not just pay a media rate like press?"</div>
+      <div class="a">"Press gives you one article. We're building a permanent sales channel — landing page, video, top placement — with monthly reporting. A channel partnership, not a press stay."</div></div>
+    <div class="obj"><div class="q">"We need to check with Il Borro / ownership."</div>
+      <div class="a">"Understood — who should be on the follow-up? I'll send a one-pager you can forward today." <span class="sage">← Get the name.</span></div></div>
+    <div class="obj"><div class="q">"Can you guarantee bookings?"</div>
+      <div class="a">Never. "I can guarantee placement, production quality, and transparent reporting. Bookings follow intent — and our audience is intent."</div></div>
+  </div>
+</section>
+
+<section id="dont">
+  <h2><span class="step">Guardrails</span> Do NOT Say</h2>
+  <div class="callout warn">
+    <ul>
+      <li>Don't state <span class="k">85K/mo as fact</span> — it's a projection; they can check SimilarWeb.</li>
+      <li>No promises of "#1 on Google" or specific booking volumes.</li>
+      <li><span class="k">No money talk</span> — no affiliate %, no fees. Comp-for-content only; monetization at renewal.</li>
+      <li>Don't trash OTAs or their partners (SLH, Virtuoso) — you're an <em>additive direct channel</em>.</li>
+      <li>Don't accept "sounds interesting, send us something" <span class="k">without a next step + date</span>.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="close">
+  <h2><span class="step">Last 2 min</span> Close + After the Call</h2>
+  <div class="say">"I'll send a one-page partnership summary today. Can we pencil dates the week of August 17th?"</div>
+  <div class="card">
+    <ul>
+      <li><span class="k">Same day:</span> thank-you email + one-pager (offer, ask, timeline, approval rights) + RetreatVault links as proof of quality</li>
+      <li>Proposed content-trip dates (Aug 17 week or theirs)</li>
+      <li>If engaged: 1-page letter agreement — exclusivity scope, term, deliverables, approval rights, footage license, comp details</li>
+    </ul>
+  </div>
+  <p class="muted" style="margin-top:14px">Full plan: ~/Projects/retreatvault/docs/partnerships/2026-07-15-viesca-toscana-pitch.md · Sources: viescatoscana.com, SLH, Virtuoso, Travel Curator, Luxe Getaways, TripAdvisor (fetched 7/15)</p>
+</section>
+
+</div>
+</body>
+</html>

@@ -58,7 +58,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${display.variable} ${sans.variable}`}>
       <head>
-        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="" />
+        {/* Images load as plain <img> (no CORS), so preconnect must NOT be
+            crossorigin or it won't match the real connection. Warm both image
+            CDNs — Unsplash is the dominant host, Pexels covers enriched heroes. */}
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        <link rel="preconnect" href="https://images.pexels.com" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://images.pexels.com" />
       </head>
       <body>
         <CompareProvider>

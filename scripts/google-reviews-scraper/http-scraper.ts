@@ -127,6 +127,7 @@ export async function scrapeReviewsHttp(
 
   const launchOptions: any = {
     headless: opts.headless,
+    ...(opts.headless ? { channel: "chromium" } : {}),
     args: [
       "--window-position=9999,9999", // push far off-screen
       "--window-size=1,1",           // minimize window size
