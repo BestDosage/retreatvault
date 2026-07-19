@@ -31,10 +31,12 @@ export default function EditorialReview({
         </p>
       </div>
 
-      {/* Pull-quote deck (first paragraph) + body.
-          Content is trusted editorial HTML from our generation script. */}
+      {/* Review body — clean article text (not the oversized display style;
+          the whole review is one block, so a first-child pull-quote would blow
+          up the entire thing into a giant left-column). Content is trusted
+          editorial HTML from our generation script. */}
       <div
-        className="mt-7 max-w-[65ch] text-ink-700 leading-relaxed [&>p]:mt-5 [&>p:first-child]:mt-0 [&>p:first-child]:font-display [&>p:first-child]:text-2xl [&>p:first-child]:leading-snug [&>p:first-child]:text-ink-900 md:[&>p:first-child]:text-3xl"
+        className="mt-7 max-w-[68ch] text-[17px] leading-[1.75] text-ink-700 [&>p]:mt-5 [&>p:first-child]:mt-0"
         dangerouslySetInnerHTML={{ __html: reviewHtml }}
       />
 

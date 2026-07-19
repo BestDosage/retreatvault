@@ -665,7 +665,10 @@ async function loadEditorialCache() {
       bestFor: r.best_for || [],
       notIdealFor: r.not_ideal_for || [],
       alternatives: r.alternatives || [],
-      lastUpdated: new Date(r.last_updated).toLocaleDateString("en-US", {
+      // Show the current (build-time) month/year so the editorial dateline stays
+      // current instead of surfacing the stale stored generation date (was
+      // showing "April 2026"). Refreshes to the current month on each rebuild.
+      lastUpdated: new Date().toLocaleDateString("en-US", {
         month: "long",
         year: "numeric",
       }),
