@@ -3,7 +3,7 @@ const nextConfig = {
   // Give data-heavy pages (homepage, guides) more room to finish their Supabase
   // queries during static generation. Default is 60s; cold Supabase reads
   // occasionally exceed it and fail the whole build. 180s absorbs that flake.
-  staticPageGenerationTimeout: 180,
+  staticPageGenerationTimeout: 240,
   // Serialize static generation to a single worker. Many routes (city/country/
   // region/type/guides) call getAllRetreats() — the ~9,400-row bulk query —
   // inside generateStaticParams/generateMetadata. On a cold parallel build the

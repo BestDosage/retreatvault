@@ -110,25 +110,42 @@ async function _fetchAllRetreats(): Promise<WellnessRetreat[]> {
   // herd WORSE (more concurrent queries → more contention), so we keep it to a
   // single query. The real levers are DB-side (raise anon statement_timeout) or
   // build-side (lower static-gen concurrency) — deliberately left to ops.
-  const { data, error } = await supabase
-    .from("retreats")
-    .select(LIST_COLUMNS)
-    .neq("slug", "test")
-    .neq("slug", "cape-kalevala")
-    .gt("wrd_score", 0)
-    .order("wrd_score", { ascending: false })
-    .order("slug", { ascending: true })
-    .range(0, 49999);
-
-  if (error) {
-    console.error("Supabase getAllRetreats error:", error.message);
-    // Throw — unstable_cache does not cache thrown errors, so a transient
-    // failure won't poison the cache for the next hour.
-    throw new Error(`Supabase getAllRetreats failed: ${error.message}`);
+  // Single bulk fetch, but RESILIENT. With cpus:1 (see next.config.js) there is
+  // no build-time herd, so retrying this one query on a transient cold-read
+  // timeout is safe — and it's what makes the whole build reliable: every static
+  // page and every sitemap chunk cascades from this one call's cached result, so
+  // if it cold-fails once, the entire build fails (that was the "/sitemap/0.xml
+  // timing out" failure). Each attempt is abort-bounded so a hung read fails fast
+  // and retries instead of eating the whole page-generation budget. (The old
+  // "retries made it worse" warning was about PER-BATCH retries multiplying the
+  // herd — that herd no longer exists under cpus:1, so a single-query retry is
+  // the correct, safe fix.)
+  let data: any[] | null = null;
+  let lastErr = "unknown";
+  for (let attempt = 1; attempt <= 4; attempt++) {
+    const res = await supabase
+      .from("retreats")
+      .select(LIST_COLUMNS)
+      .neq("slug", "test")
+      .neq("slug", "cape-kalevala")
+      .gt("wrd_score", 0)
+      .order("wrd_score", { ascending: false })
+      .order("slug", { ascending: true })
+      .range(0, 49999)
+      .abortSignal(AbortSignal.timeout(25_000));
+    if (!res.error && res.data && res.data.length > 0) {
+      data = res.data as any[];
+      break;
+    }
+    lastErr = res.error?.message || "returned 0 rows";
+    console.error(`Supabase getAllRetreats attempt ${attempt}/4 failed: ${lastErr}`);
+    if (attempt < 4) await new Promise((r) => setTimeout(r, 1500 * attempt));
   }
 
-  if (!data || data.length === 0) {
-    throw new Error("Supabase getAllRetreats returned 0 rows — refusing to cache empty result");
+  if (!data) {
+    // Throw — unstable_cache does not cache thrown errors, so a transient
+    // failure won't poison the cache for the next hour.
+    throw new Error(`Supabase getAllRetreats failed after 4 attempts: ${lastErr}`);
   }
 
   const mapped = data.map(mapRow);
