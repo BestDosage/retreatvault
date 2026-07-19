@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { sendLeadAlert } from "@/lib/notify";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -51,6 +52,16 @@ export async function POST(req: NextRequest) {
     const { error } = await supabase.from("booking_leads").insert(leadPayload);
 
     if (!error) {
+      await sendLeadAlert(`New booking lead: ${retreatName || retreatSlug}`, {
+        Retreat: retreatName || retreatSlug,
+        Email: email,
+        Phone: phone,
+        "Travel month": travelMonth,
+        "Party size": partySize,
+        "Budget band": budgetBand,
+        Message: message,
+        Source: source,
+      });
       return NextResponse.json({ ok: true });
     }
 
@@ -72,6 +83,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Failed to submit request" }, { status: 500 });
     }
 
+    await sendLeadAlert(`New booking lead: ${retreatName || retreatSlug}`, {
+      Retreat: retreatName || retreatSlug,
+      Email: email,
+      Phone: phone,
+      "Travel month": travelMonth,
+      "Party size": partySize,
+      "Budget band": budgetBand,
+      Message: message,
+      Source: source,
+      Note: "captured via fallback (booking_leads insert failed)",
+    });
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });

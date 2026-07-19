@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { sendLeadAlert } from "@/lib/notify";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -36,6 +37,16 @@ export async function POST(req: NextRequest) {
     if (error) {
       console.error("Subscribe error:", error);
       return NextResponse.json({ error: "Failed to subscribe" }, { status: 500 });
+    }
+
+    // Alert on quiz completions only (they're leads). Other sources (footer
+    // newsletter, etc.) are stored but not alerted, to keep the inbox signal high.
+    if (source === "quiz") {
+      await sendLeadAlert("New quiz lead", {
+        Email: email.toLowerCase().trim(),
+        Goal: sourceDetail,
+        Source: source,
+      });
     }
 
     // A duplicate email is a no-op above, not an error — treat it as success
