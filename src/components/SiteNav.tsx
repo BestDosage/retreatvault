@@ -60,7 +60,7 @@ export default function SiteNav() {
             width={224}
             height={112}
             priority
-            className="h-11 w-auto"
+            className="h-[59px] w-auto"
           />
         </a>
 
