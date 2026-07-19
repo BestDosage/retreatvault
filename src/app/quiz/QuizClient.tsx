@@ -472,7 +472,7 @@ export default function QuizClient({ retreats }: { retreats: RetreatData[] }) {
                 placeholder="Email address"
                 aria-label="Email address"
                 aria-invalid={!!gateError}
-                className="w-full rounded-xl border border-white/[0.08] bg-dark-900 px-4 py-3 text-[13px] text-white placeholder-dark-500 outline-none transition-colors focus:border-gold-400/30"
+                className="w-full rounded-xl border border-white/25 bg-white/10 px-4 py-3.5 text-[15px] text-white placeholder-white/55 outline-none transition-colors focus:border-gold-400/70 focus:bg-white/[0.16]"
               />
               {gateError && (
                 <p className="px-1 text-[11px] text-red-400">{gateError}</p>

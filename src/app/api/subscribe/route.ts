@@ -42,15 +42,16 @@ export async function POST(req: NextRequest) {
       console.error("Subscribe store threw (non-fatal):", e);
     }
 
-    // Alert on quiz completions only (they're leads). Other sources (footer
-    // newsletter, etc.) are stored but not alerted, to keep the inbox signal high.
-    if (source === "quiz") {
-      await sendLeadAlert("New quiz lead", {
+    // Alert on EVERY email submission (per Chad: all site email captures notify
+    // info@bestdosage.com). The alert is best-effort-independent of DB storage.
+    await sendLeadAlert(
+      source === "quiz" ? "New quiz lead" : `New email signup${source ? ` (${source})` : ""}`,
+      {
         Email: email.toLowerCase().trim(),
-        Goal: sourceDetail,
-        Source: source,
-      });
-    }
+        ...(sourceDetail ? { Detail: sourceDetail } : {}),
+        Source: source || "unknown",
+      }
+    );
 
     // A duplicate email is a no-op above, not an error — treat it as success
     // so returning subscribers still see the confirmation state.
