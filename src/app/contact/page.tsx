@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
+import AnimateIn from "@/components/AnimateIn";
+import ContactForm from "@/components/ContactForm";
 
 export const metadata: Metadata = {
   title: "Contact RetreatVault — Submit a Retreat or Partner With Us",
   description:
-    "Get in touch with the RetreatVault team. Submit a wellness retreat for review, ask about our scoring methodology, or explore partnership opportunities. Operated by BestDosage LLC.",
+    "Get in touch with the RetreatVault team. Submit a wellness retreat for review, ask about our scoring methodology, or explore partnership opportunities.",
 };
-
-import AnimateIn from "@/components/AnimateIn";
 
 export default function ContactPage() {
   const breadcrumbJsonLd = {
@@ -20,147 +20,93 @@ export default function ContactPage() {
 
   return (
     <>
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-    />
-    <div className="min-h-screen pt-28 pb-20">
-      <div className="mx-auto max-w-4xl px-6 sm:px-10">
-        {/* Hero */}
-        <AnimateIn>
-          <div className="text-center">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.4em] text-gold-500">Get in Touch</p>
-            <h1 className="mt-4 font-serif text-4xl font-light text-white sm:text-5xl">
-              Contact Us
-            </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-[14px] leading-relaxed text-dark-400">
-              RetreatVault is a property of BestDosage LLC &mdash; a wellness company building independent
-              tools and content across the wellness industry. We&rsquo;d love to hear from you.
-            </p>
-          </div>
-        </AnimateIn>
-
-        <div className="mt-14 grid gap-8 sm:grid-cols-2">
-          {/* Contact Form */}
-          <AnimateIn delay={0.1}>
-            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 sm:p-8">
-              <h2 className="font-serif text-xl font-light text-white">Send a Message</h2>
-              <p className="mt-2 text-[12px] text-dark-400">
-                Questions about our methodology, partnership opportunities, or retreat submissions &mdash; we respond within 48 hours.
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <div className="min-h-screen bg-cream-50 pt-28 pb-24 text-ink-900">
+        <div className="mx-auto max-w-4xl px-6 sm:px-10">
+          {/* Hero */}
+          <AnimateIn>
+            <div className="text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-sage-700">Get in Touch</p>
+              <h1 className="mt-4 font-display text-[clamp(2.2rem,5vw,3.6rem)] leading-[1.05] tracking-tight text-ink-900">
+                Contact Us
+              </h1>
+              <p className="mx-auto mt-6 max-w-xl text-[15px] leading-relaxed text-ink-700">
+                Questions about our methodology, partnership opportunities, or a retreat you think
+                belongs in the vault &mdash; we&rsquo;d love to hear from you.
               </p>
-              <form
-                action={`mailto:info@bestdosage.com`}
-                method="POST"
-                encType="text/plain"
-                className="mt-6 space-y-4"
-              >
-                <div>
-                  <label className="text-[10px] uppercase tracking-wider text-dark-500">Name</label>
-                  <input
-                    name="name"
-                    type="text"
-                    required
-                    className="mt-1 w-full rounded-xl border border-white/[0.08] bg-dark-900 px-4 py-3 text-[13px] text-white placeholder-dark-500 outline-none transition-colors focus:border-gold-400/30"
-                    placeholder="Your name"
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] uppercase tracking-wider text-dark-500">Email</label>
-                  <input
-                    name="email"
-                    type="email"
-                    required
-                    className="mt-1 w-full rounded-xl border border-white/[0.08] bg-dark-900 px-4 py-3 text-[13px] text-white placeholder-dark-500 outline-none transition-colors focus:border-gold-400/30"
-                    placeholder="you@email.com"
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] uppercase tracking-wider text-dark-500">Subject</label>
-                  <select
-                    name="subject"
-                    className="mt-1 w-full rounded-xl border border-white/[0.08] bg-dark-900 px-4 py-3 text-[13px] text-white outline-none transition-colors focus:border-gold-400/30"
-                  >
-                    <option value="general">General Inquiry</option>
-                    <option value="methodology">Question About Our Scoring</option>
-                    <option value="submit">Submit a Retreat for Review</option>
-                    <option value="partnership">Partnership / Advertising</option>
-                    <option value="press">Press / Media</option>
-                    <option value="correction">Data Correction</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-[10px] uppercase tracking-wider text-dark-500">Message</label>
-                  <textarea
-                    name="message"
-                    rows={5}
-                    required
-                    className="mt-1 w-full rounded-xl border border-white/[0.08] bg-dark-900 px-4 py-3 text-[13px] text-white placeholder-dark-500 outline-none transition-colors focus:border-gold-400/30 resize-none"
-                    placeholder="How can we help?"
-                  />
-                </div>
-                <button type="submit" className="btn-luxury btn-luxury-md btn-luxury-full">
-                  Send Message
-                </button>
-              </form>
             </div>
           </AnimateIn>
 
-          {/* Info Cards */}
-          <div className="space-y-6">
-            <AnimateIn delay={0.15}>
-              <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
-                <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Email</p>
-                <a href="mailto:info@bestdosage.com" className="mt-3 block font-serif text-xl font-light text-white hover:text-gold-300 transition-colors">
-                  info@bestdosage.com
-                </a>
-                <p className="mt-2 text-[12px] text-dark-400">For all inquiries. We typically respond within 48 hours.</p>
+          <div className="mt-14 grid gap-8 sm:grid-cols-2">
+            {/* Contact Form */}
+            <AnimateIn delay={0.1}>
+              <div className="rounded-[1.5rem] bg-cream-100 p-6 ring-1 ring-cream-200 sm:p-8">
+                <h2 className="font-display text-xl text-ink-900">Send a Message</h2>
+                <p className="mt-2 text-[12px] leading-relaxed text-ink-700">
+                  Questions about our methodology, partnership opportunities, or retreat submissions
+                  &mdash; we respond within 48 hours.
+                </p>
+                <ContactForm />
               </div>
             </AnimateIn>
 
-            <AnimateIn delay={0.2}>
-              <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
-                <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Submit a Retreat</p>
-                <h3 className="mt-3 font-serif text-xl font-light text-white">Think we&rsquo;re missing a property?</h3>
-                <p className="mt-2 text-[12px] leading-relaxed text-dark-400">
-                  We&rsquo;re always expanding the vault. If you own, manage, or have visited a wellness retreat that
-                  deserves to be rated, let us know. We review all submissions and add qualifying properties to our
-                  next quarterly evaluation cycle.
-                </p>
-              </div>
-            </AnimateIn>
-
-            <AnimateIn delay={0.25}>
-              <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
-                <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Partnerships</p>
-                <h3 className="mt-3 font-serif text-xl font-light text-white">Work with Us</h3>
-                <p className="mt-2 text-[12px] leading-relaxed text-dark-400">
-                  RetreatVault does not sell placements or accept payment to influence scores. We do partner with
-                  retreats on verified badges, enhanced profiles, and featured placement in our editorial content.
-                  Reach out to discuss options.
-                </p>
-              </div>
-            </AnimateIn>
-
-            <AnimateIn delay={0.3}>
-              <div className="rounded-2xl border border-gold-400/[0.08] bg-gradient-to-br from-white/[0.025] to-white/[0.01] p-6">
-                <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">About</p>
-                <h3 className="mt-3 font-serif text-lg font-light text-white">BestDosage LLC</h3>
-                <p className="mt-2 text-[12px] leading-relaxed text-dark-400">
-                  RetreatVault is built and operated by BestDosage LLC, a wellness company creating
-                  independent tools, content, and resources across the global wellness industry.
-                  Our mission: help people make smarter decisions about their health and wellbeing.
-                </p>
-                <div className="mt-3 flex items-center gap-4">
-                  <a href="https://bestdosage.com" target="_blank" rel="noopener noreferrer" className="text-[11px] text-gold-400 hover:text-gold-300 transition-colors">
-                    BestDosage.com &rarr;
+            {/* Info Cards */}
+            <div className="space-y-6">
+              <AnimateIn delay={0.15}>
+                <div className="rounded-[1.5rem] bg-cream-100 p-6 ring-1 ring-cream-200">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-sage-700">Email</p>
+                  <a
+                    href="mailto:hello@retreatvault.com"
+                    className="mt-3 block font-display text-xl text-ink-900 transition-colors hover:text-sage-700"
+                  >
+                    hello@retreatvault.com
                   </a>
+                  <p className="mt-2 text-[12px] text-ink-700">For all inquiries. We typically respond within 48 hours.</p>
                 </div>
-              </div>
-            </AnimateIn>
+              </AnimateIn>
+
+              <AnimateIn delay={0.2}>
+                <div className="rounded-[1.5rem] bg-cream-100 p-6 ring-1 ring-cream-200">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-sage-700">Submit a Retreat</p>
+                  <h3 className="mt-3 font-display text-xl text-ink-900">Think we&rsquo;re missing a property?</h3>
+                  <p className="mt-2 text-[12px] leading-relaxed text-ink-700">
+                    We&rsquo;re always expanding the vault. If you own, manage, or have visited a wellness retreat that
+                    deserves to be rated, let us know. We review all submissions and add qualifying properties to our
+                    next quarterly evaluation cycle.
+                  </p>
+                </div>
+              </AnimateIn>
+
+              <AnimateIn delay={0.25}>
+                <div className="rounded-[1.5rem] border border-sage-700/20 bg-sage-50/60 p-6">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-sage-700">Partnerships</p>
+                  <h3 className="mt-3 font-display text-xl text-ink-900">Work with Us</h3>
+                  <p className="mt-2 text-[12px] leading-relaxed text-ink-700">
+                    Scores and rankings are never for sale. Retreats can claim their listing, get owner-verified,
+                    and pay us on the bookings and leads we send &mdash; none of which ever touches how a property
+                    is scored. Reach out to discuss options.
+                  </p>
+                </div>
+              </AnimateIn>
+
+              <AnimateIn delay={0.3}>
+                <div className="rounded-[1.5rem] bg-cream-100 p-6 ring-1 ring-cream-200">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-sage-700">About</p>
+                  <h3 className="mt-3 font-display text-lg text-ink-900">Independent by design</h3>
+                  <p className="mt-2 text-[12px] leading-relaxed text-ink-700">
+                    RetreatVault indexes and scores 9,400+ wellness retreats worldwide across the same 15 weighted
+                    categories. Our mission: help people make smarter, better-informed decisions about where they
+                    spend their money and their health.
+                  </p>
+                </div>
+              </AnimateIn>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </>
   );
 }
