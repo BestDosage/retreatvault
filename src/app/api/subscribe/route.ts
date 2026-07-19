@@ -20,23 +20,26 @@ export async function POST(req: NextRequest) {
     // upsert({ onConflict }) fails for existing emails. ignoreDuplicates: true
     // turns this into INSERT ... ON CONFLICT DO NOTHING, which works under an
     // insert-only policy — a duplicate email simply no-ops instead of erroring.
-    const { error } = await supabase
-      .from("email_subscribers")
-      .upsert(
-        {
-          email: email.toLowerCase().trim(),
-          first_name: firstName?.trim() || null,
-          source: source || "unknown",
-          source_detail: sourceDetail || null,
-          status: "active",
-          subscribed_at: new Date().toISOString(),
-        },
-        { onConflict: "email", ignoreDuplicates: true }
-      );
-
-    if (error) {
-      console.error("Subscribe error:", error);
-      return NextResponse.json({ error: "Failed to subscribe" }, { status: 500 });
+    // Store best-effort. A DB failure (e.g. email_subscribers table not yet
+    // created, or a duplicate under the unique-email index) must not lose a quiz
+    // lead — the alert below is the real notification, so never 500 a valid email.
+    try {
+      const { error } = await supabase
+        .from("email_subscribers")
+        .upsert(
+          {
+            email: email.toLowerCase().trim(),
+            first_name: firstName?.trim() || null,
+            source: source || "unknown",
+            source_detail: sourceDetail || null,
+            status: "active",
+            subscribed_at: new Date().toISOString(),
+          },
+          { onConflict: "email", ignoreDuplicates: true }
+        );
+      if (error) console.error("Subscribe store failed (non-fatal):", error.message);
+    } catch (e) {
+      console.error("Subscribe store threw (non-fatal):", e);
     }
 
     // Alert on quiz completions only (they're leads). Other sources (footer

@@ -40,25 +40,28 @@ export async function POST(req: NextRequest) {
       source: "contact",
     };
 
-    // Plain .insert() — never upsert/.select() (email_subscribers is insert-only
-    // RLS with no read policy for anon). Full payload lives in metadata.
-    const { error } = await supabase.from("email_subscribers").insert({
-      email,
-      source: "contact",
-      source_detail: subject,
-      status: "active",
-      subscribed_at: new Date().toISOString(),
-      metadata: contactPayload,
-    });
-
-    if (error) {
-      console.error("Contact insert error:", error);
-      return NextResponse.json(
-        { error: "Failed to send message" },
-        { status: 500 }
+    // Store best-effort. The email alert below is the real delivery, so a DB
+    // failure (table missing, or a duplicate under the unique-email index) must
+    // NEVER fail the submission. upsert+ignoreDuplicates = ON CONFLICT DO NOTHING,
+    // safe under the insert-only RLS policy.
+    try {
+      const { error } = await supabase.from("email_subscribers").upsert(
+        {
+          email,
+          source: "contact",
+          source_detail: subject,
+          status: "active",
+          subscribed_at: new Date().toISOString(),
+          metadata: contactPayload,
+        },
+        { onConflict: "email", ignoreDuplicates: true }
       );
+      if (error) console.error("Contact store failed (non-fatal):", error.message);
+    } catch (e) {
+      console.error("Contact store threw (non-fatal):", e);
     }
 
+    // The alert IS the delivery — always fire it, regardless of DB state.
     await sendLeadAlert(`New contact message: ${subject}`, {
       Name: name,
       Email: email,
