@@ -36,36 +36,56 @@ if (!url || !key) {
 }
 
 const supabase = createClient(url, key);
-let rows = null;
-let lastErr = "unknown";
-for (let attempt = 1; attempt <= 4; attempt++) {
-  try {
-    const res = await supabase
-      .from("retreats")
-      .select(LIST_COLUMNS)
-      .neq("slug", "test")
-      .neq("slug", "cape-kalevala")
-      .gt("wrd_score", 0)
-      .order("wrd_score", { ascending: false })
-      .order("slug", { ascending: true })
-      .range(0, 49999)
-      .abortSignal(AbortSignal.timeout(60_000));
-    if (!res.error && res.data && res.data.length > 0) {
-      rows = res.data;
-      break;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// Fetch in PAGE-sized chunks. Pulling all ~9,400 rows (with the heavy per-category
+// `scores` JSONB) in ONE query times out even in-region on Vercel; small pages
+// each return in ~1-2s and never trip the timeout. This is a sequential one-shot
+// script (no parallel page workers), so paginating here carries no herd risk —
+// that concern only applied to per-page fetches during a parallel build.
+const PAGE = 1000;
+const all = [];
+let from = 0;
+while (true) {
+  let batch = null;
+  let lastErr = "unknown";
+  for (let attempt = 1; attempt <= 4; attempt++) {
+    try {
+      const res = await supabase
+        .from("retreats")
+        .select(LIST_COLUMNS)
+        .neq("slug", "test")
+        .neq("slug", "cape-kalevala")
+        .gt("wrd_score", 0)
+        .order("wrd_score", { ascending: false })
+        .order("slug", { ascending: true })
+        .range(from, from + PAGE - 1)
+        .abortSignal(AbortSignal.timeout(30_000));
+      if (!res.error) {
+        batch = res.data || [];
+        break;
+      }
+      lastErr = res.error.message;
+    } catch (e) {
+      lastErr = e instanceof Error ? e.message : String(e);
     }
-    lastErr = res.error?.message || "returned 0 rows";
-  } catch (e) {
-    lastErr = e instanceof Error ? e.message : String(e);
+    console.warn(`[snapshot] page @${from} attempt ${attempt}/4 failed: ${lastErr}`);
+    if (attempt < 4) await sleep(1500 * attempt);
   }
-  console.warn(`[snapshot] attempt ${attempt}/4 failed: ${lastErr}`);
-  if (attempt < 4) await new Promise((r) => setTimeout(r, 2000 * attempt));
+  if (batch === null) {
+    console.warn(`[snapshot] page @${from} failed after 4 attempts (${lastErr}) — skipping snapshot; build falls back to live query.`);
+    process.exit(0);
+  }
+  all.push(...batch);
+  console.log(`[snapshot] fetched ${all.length} rows...`);
+  if (batch.length < PAGE) break;
+  from += PAGE;
 }
 
-if (!rows) {
-  console.warn(`[snapshot] could not fetch after 4 attempts (${lastErr}) — skipping; build falls back to live query.`);
+if (all.length === 0) {
+  console.warn("[snapshot] 0 rows returned — skipping; build falls back to live query.");
   process.exit(0);
 }
 
-fs.writeFileSync(OUT, JSON.stringify(rows));
-console.log(`[snapshot] wrote ${rows.length} retreats to ${OUT}`);
+fs.writeFileSync(OUT, JSON.stringify(all));
+console.log(`[snapshot] wrote ${all.length} retreats to ${OUT}`);
