@@ -5,7 +5,7 @@ export const revalidate = 86400;
 export const metadata: Metadata = {
   title: "Best Wellness Retreats 2026 — Rated & Ranked | RetreatVault",
   description:
-    "9,400+ wellness retreats scored across 15 categories. Compare luxury spas, medical clinics, yoga ashrams & detox centers. No paid placements.",
+    "9,400+ wellness retreats scored across 15 categories. Compare luxury spas, medical clinics, yoga ashrams & detox centers. Scores are never for sale.",
 };
 
 import Image from "next/image";
@@ -209,9 +209,9 @@ export default async function HomePage() {
             </AnimateIn>
             <AnimateIn delay={0.16}>
               <p className="hero-description mt-7 max-w-md text-[15px] leading-relaxed text-ink-700">
-                Every property graded across 15 weighted categories by an analytical
-                chemist — the WRD methodology. No paid placements, no affiliate bias.
-                The data you need for a $10,000 decision.
+                Every property graded across 15 weighted categories — the WRD
+                methodology. Scores are never for sale: retreats pay us when you book,
+                and the score doesn&rsquo;t move.
               </p>
             </AnimateIn>
 
@@ -239,7 +239,7 @@ export default async function HomePage() {
                 {[
                   { v: "9,408", l: "Retreats scored" },
                   { v: "15", l: "Weighted categories" },
-                  { v: "0", l: "Paid placements" },
+                  { v: "Never", l: "Scores for sale" },
                 ].map((s) => (
                   <div key={s.l}>
                     <dt className="font-display text-2xl tabular-nums text-ink-900">{s.v}</dt>
@@ -291,7 +291,7 @@ export default async function HomePage() {
             <AnimateIn delay={0.12}>
               <div className="flex items-center justify-between gap-6 sm:justify-end">
                 <p className="max-w-xs text-[13px] leading-relaxed text-ink-500">
-                  Independently scored. Zero paid placements — the top of the ranking, every quarter.
+                  Independently scored. Scores are never for sale — the top of the ranking, every quarter.
                 </p>
                 <a href="/retreats" className="hidden shrink-0 text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700 transition-colors hover:text-sage-600 sm:block">
                   View all →
@@ -403,7 +403,7 @@ export default async function HomePage() {
             </div>
             <AnimateIn delay={0.12}>
               <p className="max-w-sm text-[14px] leading-relaxed text-ink-700 sm:justify-self-end">
-                A framework built by an analytical chemist — not influencer opinion,
+                A framework built on the Independence Charter — not influencer opinion,
                 not paid review. Verifiable evidence only.
               </p>
             </AnimateIn>
@@ -421,7 +421,7 @@ export default async function HomePage() {
                 step: "02",
                 title: "Independent scoring",
                 desc: "Each sub-criterion is scored 1–10 against verifiable evidence: menus, staff credentials, certifications, real guest reviews. No self-reported data accepted.",
-                detail: "No paid placements · No affiliate bias",
+                detail: "Never for sale · Zero affiliate bias",
               },
               {
                 step: "03",

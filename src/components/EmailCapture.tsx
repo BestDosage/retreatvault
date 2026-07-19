@@ -16,7 +16,7 @@ export default function EmailCapture({
   sourceDetail,
   variant = "card",
   headline = "Get the Weekly Vault Report",
-  subtext = "The 3 retreats our data says are underpriced right now. Plus new scores and insider intel.",
+  subtext = "The three best-value retreats our data surfaced this week. Plus new scores and insider intel.",
   showName = false,
 }: EmailCaptureProps) {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -32,23 +32,21 @@ export default function EmailCapture({
     const firstName = showName ? (form.elements.namedItem("firstName") as HTMLInputElement)?.value : undefined;
 
     try {
-      const { createClient } = await import("@supabase/supabase-js");
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-      const { error } = await supabase
-        .from("email_subscribers")
-        .upsert({
-          email: email.toLowerCase().trim(),
-          first_name: firstName?.trim() || null,
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          firstName,
           source: source || "unknown",
-          source_detail: sourceDetail || null,
-          status: "active",
-          subscribed_at: new Date().toISOString(),
-        }, { onConflict: "email" });
+          sourceDetail,
+        }),
+      });
 
-      if (error) throw new Error("Failed to subscribe");
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error || "Failed to subscribe");
+      }
 
       setStatus("success");
     } catch (err) {

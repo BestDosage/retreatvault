@@ -126,7 +126,7 @@ export default async function RetreatsPage({ searchParams }: { searchParams: Pro
         </AnimateIn>
         <AnimateIn delay={0.15}>
           <p className="mt-4 max-w-md text-[14px] leading-relaxed text-ink-700">
-            Every property independently scored across 15 weighted categories. No paid placements.
+            Every property independently scored across 15 weighted categories. Scores are never for sale.
           </p>
         </AnimateIn>
 

@@ -153,6 +153,8 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
       { url: `${BASE_URL}/methodology`, lastModified: new Date("2026-03-15"), changeFrequency: "monthly", priority: 0.6 },
       { url: `${BASE_URL}/compare`, lastModified: new Date("2026-04-10"), changeFrequency: "weekly", priority: 0.7 },
       { url: `${BASE_URL}/contact`, lastModified: new Date("2026-01-15"), changeFrequency: "yearly", priority: 0.5 },
+      { url: `${BASE_URL}/about`, lastModified: new Date("2026-07-18"), changeFrequency: "monthly", priority: 0.5 },
+      { url: `${BASE_URL}/for-retreats`, lastModified: new Date("2026-07-18"), changeFrequency: "monthly", priority: 0.6 },
     ];
 
     // Retreat type pages: /retreats/type/[type]

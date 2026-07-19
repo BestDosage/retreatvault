@@ -11,7 +11,7 @@ export const revalidate = 86400;
 export const metadata: Metadata = {
   title: "Wellness Retreat Insights — Evidence-Based Guides & Analysis",
   description:
-    "Honest, science-backed guides to choosing wellness retreats. Cost breakdowns, scam red flags, burnout recovery, and comparison guides — written by an analytical chemist.",
+    "Honest, science-backed guides to choosing wellness retreats. Cost breakdowns, scam red flags, burnout recovery, and comparison guides — scores are never for sale.",
 };
 
 export default async function BlogPage() {

@@ -15,6 +15,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Valid email required" }, { status: 400 });
     }
 
+    // RLS on email_subscribers is INSERT-only (no UPDATE policy), so a plain
+    // upsert({ onConflict }) fails for existing emails. ignoreDuplicates: true
+    // turns this into INSERT ... ON CONFLICT DO NOTHING, which works under an
+    // insert-only policy — a duplicate email simply no-ops instead of erroring.
     const { error } = await supabase
       .from("email_subscribers")
       .upsert(
@@ -26,7 +30,7 @@ export async function POST(req: NextRequest) {
           status: "active",
           subscribed_at: new Date().toISOString(),
         },
-        { onConflict: "email" }
+        { onConflict: "email", ignoreDuplicates: true }
       );
 
     if (error) {
@@ -34,6 +38,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Failed to subscribe" }, { status: 500 });
     }
 
+    // A duplicate email is a no-op above, not an error — treat it as success
+    // so returning subscribers still see the confirmation state.
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });

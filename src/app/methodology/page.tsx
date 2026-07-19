@@ -3,9 +3,10 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "How We Score Retreats — 15 Categories, Zero Bias | Methodology",
   description:
-    "Our scoring methodology explained: 15 weighted categories, triangulated data sources, first-hand visits, and peer-reviewed research. Built by an analytical chemist. No paid placements.",
+    "Our scoring methodology explained: 15 weighted categories, triangulated data sources, first-hand visits, and peer-reviewed research. Scores are never for sale.",
 };
 
+import Link from "next/link";
 import AnimateIn, { StaggerContainer, StaggerItem } from "@/components/AnimateIn";
 
 const scoringCategories = [
@@ -31,7 +32,7 @@ const dataSources = [
   { name: "Google Reviews", desc: "Aggregate ratings and sentiment analysis across hundreds of verified guest reviews." },
   { name: "TripAdvisor", desc: "Cross-referenced ratings, review volume, and recency-weighted sentiment scoring." },
   { name: "Industry Awards", desc: "World Spa Awards, Cond\u00e9 Nast Traveler, Travel + Leisure, Forbes Travel Guide designations." },
-  { name: "First-Hand Visits", desc: "Select retreats are visited personally by our team. On-site observations calibrate our scoring models." },
+  { name: "First-Hand Visits", desc: "Select retreats are visited personally by our team. Visits add verified media and data corrections — never points." },
   { name: "Published Research", desc: "PubMed studies on retreat outcomes, fasting protocols, and wellness modality efficacy inform category weights." },
 ];
 
@@ -45,7 +46,7 @@ export default function MethodologyPage() {
         name: "How does RetreatVault score wellness retreats?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Every retreat is scored 0-10 across 15 weighted categories including Nutrition & Food Quality, Fitness & Movement, Medical & Clinical, Spa & Relaxation, Sleep & Recovery, and 10 more. The final Vault Score is a weighted average calibrated by peer-reviewed research on what drives wellness outcomes. The system was designed by an analytical chemist.",
+          text: "Every retreat is scored 0-10 across 15 weighted categories including Nutrition & Food Quality, Fitness & Movement, Medical & Clinical, Spa & Relaxation, Sleep & Recovery, and 10 more. The final Vault Score is a weighted average calibrated by peer-reviewed research on what drives wellness outcomes. The system was built by RetreatVault founder Chad Waldman.",
         },
       },
       {
@@ -53,7 +54,7 @@ export default function MethodologyPage() {
         name: "Can retreats pay for a higher score on RetreatVault?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "No. RetreatVault does not accept paid placements, affiliate commissions, or sponsored content. Every score is independently calculated using the same weighted methodology across all retreats. There is zero pay-to-play.",
+          text: "No. Scores are never for sale. Retreats can pay us when a guest books through RetreatVault, and can claim their listing to verify factual details — neither touches scores or rankings. Every score is independently calculated using the same weighted methodology across all retreats, sealed off from the revenue side of the business.",
         },
       },
       {
@@ -112,8 +113,9 @@ export default function MethodologyPage() {
               How We Score Every Retreat
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-[14px] leading-relaxed text-dark-400">
-              RetreatVault doesn&rsquo;t accept paid placements, affiliate commissions, or sponsored content.
-              Every score is independently calculated using the same weighted methodology across all 120+ retreats.
+              Scores are never for sale. Retreats pay us when you book &mdash; you pay nothing, and the score
+              doesn&rsquo;t move. Every score is independently calculated using the same weighted methodology
+              across all 120+ retreats.
             </p>
           </div>
         </AnimateIn>
@@ -122,21 +124,49 @@ export default function MethodologyPage() {
         <AnimateIn delay={0.1}>
           <div className="mt-16 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 sm:p-8">
             <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Philosophy</p>
-            <h2 className="mt-3 font-serif text-2xl font-light text-white">Built by an Analytical Chemist</h2>
+            <h2 className="mt-3 font-serif text-2xl font-light text-white">Built Independent</h2>
             <div className="mt-4 space-y-4 text-[13px] leading-relaxed text-dark-300">
               <p>
                 RetreatVault was founded on a simple premise: if you&rsquo;re spending $5,000&ndash;$50,000 on a wellness retreat,
                 you deserve data you can trust &mdash; not marketing copy.
               </p>
               <p>
-                Our scoring system was designed by an analytical chemist with deep experience in quantitative evaluation.
-                The same rigor applied to laboratory analysis is applied to every retreat in our vault: controlled variables,
-                weighted criteria, reproducible methodology, and zero conflicts of interest.
+                The scoring system was built by RetreatVault founder{" "}
+                <Link href="/about" className="text-gold-400 underline underline-offset-2 hover:text-gold-300">
+                  Chad Waldman
+                </Link>{" "}
+                with deep experience in quantitative evaluation. That same rigor is applied to every retreat in the
+                vault: controlled variables, weighted criteria, reproducible methodology &mdash; and a scoring
+                pipeline sealed from revenue.
+              </p>
+              <p>
+                <strong className="font-medium text-white">How we make money:</strong> retreats can pay us for
+                bookings and leads we send them, and can claim their listing to verify factual details. None of
+                that touches scores or rankings &mdash; the scoring pipeline is sealed from revenue.
               </p>
               <p>
                 Where possible, retreats are visited first-hand. Where not, we rely on a triangulation of multiple verified
                 data sources &mdash; never a single point of reference. The result is the most comprehensive, unbiased
                 wellness retreat rating system available.
+              </p>
+            </div>
+          </div>
+        </AnimateIn>
+
+        {/* The Score Freeze */}
+        <AnimateIn delay={0.12}>
+          <div className="mt-8 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 sm:p-8">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-gold-500">Independence Charter</p>
+            <h2 className="mt-3 font-serif text-2xl font-light text-white">The Score Freeze</h2>
+            <div className="mt-4 space-y-4 text-[13px] leading-relaxed text-dark-300">
+              <p>
+                Every score is computed from data and frozen with a database timestamp <em>before</em> any property
+                visit or partnership is booked. The number exists first; the relationship comes after.
+              </p>
+              <p>
+                On-site visits add verified media and data corrections to a listing &mdash; new photos, confirmed
+                amenities, corrected details. They never add points. A retreat that hosts a founder visit and a
+                retreat that never responds to an email are held to the identical weighted formula.
               </p>
             </div>
           </div>

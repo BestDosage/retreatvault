@@ -56,7 +56,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const publicScore = isScorePublic(retreat.wrd_score);
 
   return {
-    title: `${retreat.name} Review — ${publicScore ? `Rated ${retreat.wrd_score}/10` : "Listed"} (${retreat.score_tier === "elite" ? "Elite" : retreat.score_tier === "exceptional" ? "Exceptional" : "Recommended"})`,
+    title: `${retreat.name} Analysis — ${publicScore ? `Rated ${retreat.wrd_score}/10` : "Listed"} (${retreat.score_tier === "elite" ? "Elite" : retreat.score_tier === "exceptional" ? "Exceptional" : "Recommended"})`,
     description,
     alternates: { canonical: `/retreats/${slug}` },
     openGraph: {
@@ -79,17 +79,8 @@ import { BestForChips } from "@/components/BestForTags";
 import StickyMobileBar from "@/components/StickyMobileBar";
 import AddToCompareButton from "@/components/AddToCompareButton";
 import EmailCapture from "@/components/EmailCapture";
+import RequestRatesForm from "@/components/RequestRatesForm";
 import { RetreatJsonLd } from "@/components/RetreatJsonLd";
-import {
-  LongevityPanel, DigitalDetoxPanel, RoiCalculator,
-  SleepSciencePanel, IdealGuestCard, SeasonalChart,
-  ScoreSparkline, SeventyTwoHourCard,
-} from "@/components/IntelligencePanels";
-import {
-  deriveLongevityIndex, deriveDigitalDetoxScore, deriveRoiData,
-  deriveSleepScience, deriveIdealGuestProfile,
-  deriveSeasonalData, deriveScoreHistory, derive72HourEffect,
-} from "@/lib/retreat-intelligence";
 
 
 export default async function RetreatPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -109,15 +100,6 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
 
   const scoreEntries = Object.entries(retreat.scores) as [keyof RetreatScores, (typeof retreat.scores)[keyof RetreatScores]][];
   const sortedScores = [...scoreEntries].sort(([, a], [, b]) => b.score - a.score);
-  // Derive proprietary intelligence
-  const longevity = deriveLongevityIndex(retreat);
-  const detox = deriveDigitalDetoxScore(retreat);
-  const roi = deriveRoiData(retreat);
-  const sleepScience = deriveSleepScience(retreat);
-  const idealGuest = deriveIdealGuestProfile(retreat);
-  const seasonal = deriveSeasonalData(retreat);
-  const scoreHistory = deriveScoreHistory(retreat);
-  const effect72 = derive72HourEffect(retreat);
 
   const editorialSummary = generateRetreatSummary(retreat);
   // Prefer AI-generated FAQs from Supabase, fall back to template-generated
@@ -157,6 +139,17 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
     retreat.price_min_per_night > 0
       ? `$${retreat.price_min_per_night.toLocaleString()}–$${retreat.price_max_per_night.toLocaleString()} / night`
       : "Price on request";
+  // Coarse budget band for lead context (mirrors applyBudgetFilter in data.ts).
+  const budgetBand =
+    retreat.price_max_per_night >= 3000
+      ? "ultra"
+      : retreat.price_max_per_night >= 1500
+      ? "premium"
+      : retreat.price_max_per_night >= 500
+      ? "mid"
+      : retreat.price_max_per_night > 0
+      ? "accessible"
+      : undefined;
   const airportLine = retreat.nearest_airport
     ? `${retreat.nearest_airport}${retreat.airport_distance_km ? ` (${Math.round(retreat.airport_distance_km)} km)` : ""}`
     : "";
@@ -313,12 +306,6 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
                     <span className={`h-1.5 w-1.5 rounded-full ${isTopTier ? "bg-gold" : "bg-sage-100"}`} />
                     {tierLabel}
                   </span>
-                  {retreat.is_verified && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-cream-100/30 bg-ink-900/45 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-cream-50 backdrop-blur-sm">
-                      <span className="h-1 w-1 rounded-full bg-sage-100" />
-                      Verified
-                    </span>
-                  )}
                 </div>
               </AnimateIn>
 
@@ -363,12 +350,6 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
                     <span className={`h-1.5 w-1.5 rounded-full ${isTopTier ? "bg-gold" : "bg-sage-600"}`} />
                     {tierLabel}
                   </span>
-                  {retreat.is_verified && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-sage-700/25 bg-sage-100 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-sage-700">
-                      <span className="h-1 w-1 rounded-full bg-sage-600" />
-                      Verified
-                    </span>
-                  )}
                 </div>
               </AnimateIn>
 
@@ -464,35 +445,6 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
           </div>
         </AnimateIn>
 
-        {/* ═══ SPARKLINE + IDEAL GUEST ═══ */}
-        {/* Trajectory panel renders numeric scores — hide it entirely below the display gate. */}
-        <div className="mb-20 space-y-14">
-          {isScorePublic(retreat.wrd_score) && (
-          <AnimateIn>
-            <ScoreSparkline history={scoreHistory} categoryHighlights={(() => {
-              const trend = scoreHistory[scoreHistory.length - 1].score - scoreHistory[0].score;
-              const catLabels: Record<string, string> = {
-                social_proof: "Reputation", amenities: "Amenities", medical: "Medical",
-                sustainability: "Sustainability", pricing_value: "Value", spa: "Spa",
-              };
-              const age = retreat.founded_year ? 2026 - retreat.founded_year : 5;
-              const maturity = Math.min(age / 10, 1);
-              const highlights: { label: string; direction: "up" | "down"; amount: string }[] = [];
-              if (maturity < 0.5) highlights.push({ label: "Reputation", direction: "up", amount: "+0.5" });
-              else highlights.push({ label: "Sustainability", direction: "up", amount: "+0.2" });
-              const medScore = retreat.scores.medical?.score || 0;
-              if (medScore >= 8) highlights.push({ label: "Medical", direction: "up", amount: "+0.3" });
-              else highlights.push({ label: "Amenities", direction: "up", amount: "+0.2" });
-              highlights.push({ label: "Value", direction: "down", amount: "-0.2" });
-              return highlights;
-            })()} />
-          </AnimateIn>
-          )}
-          <AnimateIn delay={0.1}>
-            <IdealGuestCard profile={idealGuest} />
-          </AnimateIn>
-        </div>
-
         {/* ═══ EDITORIAL REVIEW ═══ */}
         {/* Stored AI prose bakes the numeric score into HTML — skip below the gate
             (regenerating the prose is the real fix if a sub-6.5 retreat gets a review). */}
@@ -574,27 +526,30 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
           </AnimateIn>
         </div>
 
-        {/* ═══ PROPRIETARY INTELLIGENCE + ROI + 72-HOUR + GUEST SENTIMENT ═══ */}
-        {/* Continuous cream — rule-separated editorial sections (Task 5). Panels
-            stack full-width (heading-left / content-right on md+); no card grid. */}
+        {/* ═══ AMENITY & PROGRAM DATA (honest stub) + GUEST SENTIMENT ═══ */}
+        {/* The fabricated "Estimated"/"Projected" intelligence panels were removed:
+            we haven't visited these properties, so we don't invent amenity data. */}
         <div className="mb-20 space-y-14">
           <AnimateIn>
-            <LongevityPanel data={longevity} />
-          </AnimateIn>
-          <AnimateIn>
-            <SleepSciencePanel data={sleepScience} />
-          </AnimateIn>
-          <AnimateIn>
-            <DigitalDetoxPanel data={detox} />
-          </AnimateIn>
-          <AnimateIn>
-            <SeasonalChart months={seasonal} />
-          </AnimateIn>
-          <AnimateIn>
-            <RoiCalculator data={roi} />
-          </AnimateIn>
-          <AnimateIn>
-            <SeventyTwoHourCard effect={effect72} />
+            <section className="border-t border-cream-200 pt-8">
+              <div className="grid gap-6 md:grid-cols-[1fr_2fr] md:gap-10">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">On-Site Data</p>
+                  <h3 className="mt-2 font-display text-xl text-ink-900">Amenity &amp; Program Data</h3>
+                </div>
+                <div>
+                  <p className="max-w-[60ch] text-sm leading-relaxed text-ink-700">
+                    We haven&rsquo;t verified this retreat&rsquo;s amenity and program details on-site yet.
+                  </p>
+                  <a
+                    href="/for-retreats"
+                    className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-medium text-sage-700 underline-offset-4 transition-colors duration-150 ease-out hover:text-sage-600 hover:underline"
+                  >
+                    Is this your retreat? Verify your profile &rarr;
+                  </a>
+                </div>
+              </div>
+            </section>
           </AnimateIn>
           {/* Guest Sentiment moved up into the cream zone (was below Analyst/FAQ). */}
           {(retreat.google_review_count > 0 || guestReviews.length > 0) && (
@@ -630,7 +585,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
         {/* ═══ ANALYST NOTES ═══ */}
         <AnimateIn className="mb-20">
           <div className="border-t border-cream-200 pt-8">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Expert Review</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sage-700">Expert Analysis</p>
             <h2 className="mt-2 font-display text-3xl text-ink-900">Analyst Notes</h2>
             <StaggerContainer className="mt-8 grid gap-x-10 gap-y-0 sm:grid-cols-2" staggerDelay={0.05}>
               {sortedScores.map(([key, cat]) => cat.notes && (
@@ -795,42 +750,42 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
           </AnimateIn>
         )}
 
-        {/* ═══ CTA — primary conversion moment ═══ */}
+        {/* ═══ CTA — primary conversion moment (gated concierge lead) ═══ */}
         <AnimateIn className="mb-24">
-          <div className="rounded-[2rem] bg-cream-100 px-8 py-14 text-center ring-1 ring-cream-200 sm:px-16 sm:py-20">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-sage-700">Begin Your Journey</p>
-            <h2 className="mt-4 font-display text-3xl text-ink-900 sm:text-4xl">
-              Experience {retreat.name}
-            </h2>
-            <p className="mx-auto mt-4 max-w-md text-[13px] leading-relaxed text-ink-700">
-              Visit their official website for current availability and booking.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <a
-                href={retreat.website_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center gap-3 rounded-full bg-ink-900 py-3 pl-7 pr-3 text-sm font-medium text-cream-50 transition-transform duration-150 ease-out active:scale-[0.97]"
-              >
-                Visit Official Site
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10">
-                  <svg className="h-4 w-4 transition-transform duration-150 ease-out group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </span>
-              </a>
-              <AddToCompareButton
-                retreat={{
-                  id: retreat.id,
-                  slug: retreat.slug,
-                  name: retreat.name,
-                  hero_image_url: sizedImageUrl(heroImage, 240, 180),
-                  wrd_score: retreat.wrd_score,
-                }}
-                variant="secondary"
-              />
+          <section id="request-rates" className="scroll-mt-24">
+            <RequestRatesForm
+              retreatSlug={retreat.slug}
+              retreatName={retreat.name}
+              budgetBand={budgetBand}
+            />
+            <div className="mt-6 flex flex-col items-center gap-4 text-center">
+              <p className="max-w-md text-[12px] leading-relaxed text-ink-500">
+                Scores are never for sale. Retreats pay us when you book — you pay nothing and the score doesn&rsquo;t move.
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                {retreat.website_url && (
+                  <a
+                    href={`/go/${retreat.slug}`}
+                    target="_blank"
+                    rel="nofollow noopener"
+                    className="text-[12px] font-medium text-sage-700 underline-offset-4 transition-colors duration-150 ease-out hover:text-sage-600 hover:underline"
+                  >
+                    Or visit the official site &rarr;
+                  </a>
+                )}
+                <AddToCompareButton
+                  retreat={{
+                    id: retreat.id,
+                    slug: retreat.slug,
+                    name: retreat.name,
+                    hero_image_url: sizedImageUrl(heroImage, 240, 180),
+                    wrd_score: retreat.wrd_score,
+                  }}
+                  variant="secondary"
+                />
+              </div>
             </div>
-          </div>
+          </section>
         </AnimateIn>
 
         {/* ═══ EMAIL CAPTURE ═══ */}
@@ -839,7 +794,7 @@ export default async function RetreatPage({ params }: { params: Promise<{ slug: 
             source="retreat_page"
             sourceDetail={retreat.slug}
             headline="Get Retreats Like This in Your Inbox"
-            subtext="We'll send you underpriced retreats similar to this one. Plus new scores and insider intel."
+            subtext="We'll send you the best-value retreats similar to this one. Plus new scores and insider intel."
           />
         </AnimateIn>
 

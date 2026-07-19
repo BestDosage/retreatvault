@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, type FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { isScorePublic } from "@/lib/types";
 
@@ -311,17 +311,86 @@ function matchRetreats(answers: QuizAnswer[], retreats: RetreatData[]): MatchedR
 // ═══════════════════════════════════════════════════════════
 
 export default function QuizClient({ retreats }: { retreats: RetreatData[] }) {
-  const [step, setStep] = useState(0); // 0-6 = questions, 7 = loading, 8 = results
+  // Steps: 0-7 = questions, 8 = loading, 9 = email gate, 10 = results
+  const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswer[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [results, setResults] = useState<MatchedRetreat[]>([]);
   const [direction, setDirection] = useState(1);
 
+  // Email gate state
+  const [gateEmail, setGateEmail] = useState("");
+  const [gateError, setGateError] = useState("");
+  const [gateSubmitting, setGateSubmitting] = useState(false);
+  const [quizStarted, setQuizStarted] = useState(false);
+
   const currentAnswer = answers.find((a) => a.questionIndex === step)?.value || null;
 
-  const handleSelect = useCallback((value: string) => {
-    setSelected(value);
-  }, []);
+  // Primary result archetype = the goal chosen on the first question
+  const archetype = answers.find((a) => a.questionIndex === 0)?.value || "";
+
+  const handleSelect = useCallback(
+    (value: string) => {
+      // Fire quiz_start once, when the user answers the first question
+      if (!quizStarted && step === 0) {
+        (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag?.("event", "quiz_start");
+        setQuizStarted(true);
+      }
+      setSelected(value);
+    },
+    [quizStarted, step]
+  );
+
+  // Reveal results (fires quiz_complete). Only called after the gate passes.
+  const revealResults = useCallback(() => {
+    (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag?.("event", "quiz_complete", {
+      archetype,
+    });
+    setDirection(1);
+    setStep(10);
+  }, [archetype]);
+
+  const handleGateSubmit = useCallback(
+    async (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      const email = gateEmail.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setGateError("Please enter a valid email address.");
+        return;
+      }
+      setGateError("");
+      setGateSubmitting(true);
+
+      const payload = JSON.stringify({ email, source: "quiz", sourceDetail: archetype });
+      const attempt = async (): Promise<boolean> => {
+        const res = await fetch("/api/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: payload,
+        });
+        return res.ok;
+      };
+
+      // One attempt + one retry on network/API error.
+      let ok = false;
+      for (let i = 0; i < 2 && !ok; i++) {
+        try {
+          ok = await attempt();
+        } catch {
+          ok = false;
+        }
+      }
+
+      if (ok) {
+        (window as unknown as { fbq?: (...args: unknown[]) => void }).fbq?.("track", "CompleteRegistration");
+      }
+
+      // Reveal regardless — a valid email was submitted, never trap the user.
+      setGateSubmitting(false);
+      revealResults();
+    },
+    [gateEmail, archetype, revealResults]
+  );
 
   const handleNext = useCallback(() => {
     if (!selected && !currentAnswer) return;
@@ -371,8 +440,67 @@ export default function QuizClient({ retreats }: { retreats: RetreatData[] }) {
     );
   }
 
-  // ═══ RESULTS ═══
+  // ═══ EMAIL GATE ═══
   if (step === 9) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-dark-950 px-4 sm:px-10">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="w-full max-w-lg"
+        >
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-8 text-center sm:p-10">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.4em] text-gold-500">Your Matches Are Ready</p>
+            <h1 className="mt-4 font-serif text-3xl font-light text-white sm:text-4xl">
+              Your matches are ready
+            </h1>
+            <p className="mx-auto mt-4 max-w-sm text-[13px] leading-relaxed text-dark-300">
+              Tell us where to send your personalized retreat report and unlock your matches.
+            </p>
+
+            <form onSubmit={handleGateSubmit} className="mt-8 space-y-3 text-left">
+              <input
+                name="email"
+                type="email"
+                required
+                value={gateEmail}
+                onChange={(e) => {
+                  setGateEmail(e.target.value);
+                  if (gateError) setGateError("");
+                }}
+                placeholder="Email address"
+                aria-label="Email address"
+                aria-invalid={!!gateError}
+                className="w-full rounded-xl border border-white/[0.08] bg-dark-900 px-4 py-3 text-[13px] text-white placeholder-dark-500 outline-none transition-colors focus:border-gold-400/30"
+              />
+              {gateError && (
+                <p className="px-1 text-[11px] text-red-400">{gateError}</p>
+              )}
+              <button
+                type="submit"
+                disabled={gateSubmitting}
+                className={`btn-luxury btn-luxury-md btn-luxury-full transition-all ${
+                  gateSubmitting ? "cursor-not-allowed opacity-60" : "opacity-100"
+                }`}
+              >
+                {gateSubmitting ? "Unlocking..." : "Show My Matches"}
+                {!gateSubmitting && (
+                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                )}
+              </button>
+            </form>
+            <p className="mt-4 text-[10px] text-dark-600">No spam. Unsubscribe anytime.</p>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // ═══ RESULTS ═══
+  if (step === 10) {
     return (
       <div className="min-h-screen bg-dark-950 px-4 pb-20 pt-28 sm:px-10">
         <div className="mx-auto max-w-4xl">
@@ -527,7 +655,7 @@ export default function QuizClient({ retreats }: { retreats: RetreatData[] }) {
           {/* Retake */}
           <div className="mt-10 text-center">
             <button
-              onClick={() => { setStep(0); setAnswers([]); setSelected(null); setResults([]); }}
+              onClick={() => { setStep(0); setAnswers([]); setSelected(null); setResults([]); setGateEmail(""); setGateError(""); }}
               className="text-[11px] uppercase tracking-wider text-dark-400 transition-colors hover:text-gold-400"
             >
               Retake Quiz

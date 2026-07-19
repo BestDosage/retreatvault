@@ -48,6 +48,16 @@ function hash(s: string): number {
   return Math.abs(h);
 }
 
+/** "City, Country" with an empty/null city collapsed so we never render "in , Thailand". */
+function cityCountry(r: Pick<WellnessRetreat, "city" | "country">): string {
+  return [r.city, r.country].filter(Boolean).join(", ");
+}
+
+/** City if present, else falls back to country — for slots that reference only the city. */
+function cityOrCountry(r: Pick<WellnessRetreat, "city" | "country">): string {
+  return r.city || r.country;
+}
+
 function pick<T>(arr: T[], seed: number, offset = 0): T {
   return arr[(seed + offset) % arr.length];
 }
@@ -57,24 +67,24 @@ function pick<T>(arr: T[], seed: number, offset = 0): T {
 type OpenerFn = (r: WellnessRetreat, pd: string, top: ScoredCategory) => string;
 
 const OPENERS_ELITE: OpenerFn[] = [
-  (r, pd) => `Situated in ${r.city}, ${r.country}, ${r.name} operates as a ${pd} that has earned an elite Vault Score of ${r.wrd_score}/10.`,
-  (r, pd) => `Few wellness destinations command a ${r.wrd_score}/10 rating — ${r.name}, a ${pd} in ${r.city}, ${r.country}, is one of them.`,
-  (r, pd) => `With a Vault Score of ${r.wrd_score}/10, ${r.name} in ${r.city} stands among the top-rated ${pd.replace("boutique ", "").replace("full-scale ", "")}s globally.`,
-  (r, pd) => `${r.name} has established itself as a benchmark in the wellness industry, earning ${r.wrd_score}/10 from our analysts at this ${pd} in ${r.city}, ${r.country}.`,
+  (r, pd) => `Situated in ${cityCountry(r)}, ${r.name} operates as a ${pd} that has earned an elite Vault Score of ${r.wrd_score}/10.`,
+  (r, pd) => `Few wellness destinations command a ${r.wrd_score}/10 rating — ${r.name}, a ${pd} in ${cityCountry(r)}, is one of them.`,
+  (r, pd) => `With a Vault Score of ${r.wrd_score}/10, ${r.name} in ${cityOrCountry(r)} stands among the top-rated ${pd.replace("boutique ", "").replace("full-scale ", "")}s globally.`,
+  (r, pd) => `${r.name} has established itself as a benchmark in the wellness industry, earning ${r.wrd_score}/10 from our analysts at this ${pd} in ${cityCountry(r)}.`,
 ];
 
 const OPENERS_EXCEPTIONAL: OpenerFn[] = [
-  (r, pd) => `${r.name} in ${r.city}, ${r.country} delivers an exceptional wellness experience, reflected in its ${r.wrd_score}/10 Vault Score as a ${pd}.`,
-  (r, pd) => `Scoring ${r.wrd_score}/10 on our proprietary rating, ${r.name} is an ${pd} in ${r.city} that consistently outperforms across multiple categories.`,
-  (r, pd) => `Our data positions ${r.name} — a ${pd} based in ${r.city}, ${r.country} — firmly in exceptional territory at ${r.wrd_score}/10.`,
-  (r, pd, top) => `${r.city}'s ${r.name} earned a ${r.wrd_score}/10 Vault Score, driven in part by a standout ${top.score.toFixed(1)} in ${top.label}.`,
+  (r, pd) => `${r.name} in ${cityCountry(r)} delivers an exceptional wellness experience, reflected in its ${r.wrd_score}/10 Vault Score as a ${pd}.`,
+  (r, pd) => `Scoring ${r.wrd_score}/10 on our proprietary rating, ${r.name} is an ${pd} in ${cityOrCountry(r)} that consistently outperforms across multiple categories.`,
+  (r, pd) => `Our data positions ${r.name} — a ${pd} based in ${cityCountry(r)} — firmly in exceptional territory at ${r.wrd_score}/10.`,
+  (r, pd, top) => `${cityOrCountry(r)}'s ${r.name} earned a ${r.wrd_score}/10 Vault Score, driven in part by a standout ${top.score.toFixed(1)} in ${top.label}.`,
 ];
 
 const OPENERS_MID: OpenerFn[] = [
-  (r, pd) => `${r.name} is a ${pd} in ${r.city}, ${r.country} that earned a ${r.wrd_score}/10 Vault Score across our 15-category analysis.`,
-  (r, pd) => `Located in ${r.city}, ${r.country}, ${r.name} is a ${tierAdj(r.score_tier)} ${pd} rated ${r.wrd_score}/10 by our analysts.`,
-  (r, pd) => `Our review of ${r.name}, a ${pd} in ${r.city}, yields a ${r.wrd_score}/10 composite score with notable category variation.`,
-  (r, pd) => `At ${r.wrd_score}/10, ${r.name} in ${r.city}, ${r.country} shows clear strengths that distinguish this ${pd} from its regional peers.`,
+  (r, pd) => `${r.name} is a ${pd} in ${cityCountry(r)} that earned a ${r.wrd_score}/10 Vault Score across our 15-category analysis.`,
+  (r, pd) => `Located in ${cityCountry(r)}, ${r.name} is a ${tierAdj(r.score_tier)} ${pd} rated ${r.wrd_score}/10 by our analysts.`,
+  (r, pd) => `Our review of ${r.name}, a ${pd} in ${cityOrCountry(r)}, yields a ${r.wrd_score}/10 composite score with notable category variation.`,
+  (r, pd) => `At ${r.wrd_score}/10, ${r.name} in ${cityCountry(r)} shows clear strengths that distinguish this ${pd} from its regional peers.`,
 ];
 
 // ─── strength sentences ────────────────────────────────────────────────
@@ -154,7 +164,7 @@ export function generateRetreatFaqs(retreat: WellnessRetreat): FaqItem[] {
   const faqs: FaqItem[] = [
     {
       question: `What is ${retreat.name} best known for?`,
-      answer: `${retreat.name} is best known for its ${top.label.toLowerCase()} programming, which scored ${top.score.toFixed(1)}/10 in our analysis. The property in ${retreat.city}, ${retreat.country} specializes in ${topSpecialty} and is classified as a ${propertyDesc(retreat)}.`,
+      answer: `${retreat.name} is best known for its ${top.label.toLowerCase()} programming, which scored ${top.score.toFixed(1)}/10 in our analysis. The property in ${cityCountry(retreat)} specializes in ${topSpecialty} and is classified as a ${propertyDesc(retreat)}.`,
     },
     {
       question: `How much does a stay at ${retreat.name} cost?`,
@@ -202,14 +212,14 @@ export function generateMetaDescription(retreat: WellnessRetreat): string {
     retreat.score_tier === "good" ? "Good" : "Listed";
 
   const templates = [
-    () => `Rated ${retreat.wrd_score}/10 (${tierLabel}), ${retreat.name} in ${retreat.city}, ${retreat.country} excels in ${top.label.toLowerCase()} (${top.score.toFixed(1)}). A ${pt} ${topSpecialty} retreat from $${retreat.price_min_per_night}/night.`,
-    () => `${retreat.name} earned a ${retreat.wrd_score}/10 Vault Score. This ${pt} retreat in ${retreat.city}, ${retreat.country} is rated ${tierLabel}, with top marks in ${top.label.toLowerCase()}. From $${retreat.price_min_per_night}/night.`,
+    () => `Rated ${retreat.wrd_score}/10 (${tierLabel}), ${retreat.name} in ${cityCountry(retreat)} excels in ${top.label.toLowerCase()} (${top.score.toFixed(1)}). A ${pt} ${topSpecialty} retreat from $${retreat.price_min_per_night}/night.`,
+    () => `${retreat.name} earned a ${retreat.wrd_score}/10 Vault Score. This ${pt} retreat in ${cityCountry(retreat)} is rated ${tierLabel}, with top marks in ${top.label.toLowerCase()}. From $${retreat.price_min_per_night}/night.`,
     () => `Our analysts gave ${retreat.name} in ${retreat.country} a ${retreat.wrd_score}/10. Strongest in ${top.label.toLowerCase()} (${top.score.toFixed(1)}), this ${topSpecialty} retreat starts at $${retreat.price_min_per_night}/night.`,
-    () => `Is ${retreat.name} worth it? Our 15-category review rates it ${retreat.wrd_score}/10 (${tierLabel}). Located in ${retreat.city}, ${retreat.country}. ${top.label}: ${top.score.toFixed(1)}/10. From $${retreat.price_min_per_night}/night.`,
-    () => `${retreat.city}'s ${retreat.name} scores ${retreat.wrd_score}/10 in our independent review. Top category: ${top.label.toLowerCase()} at ${top.score.toFixed(1)}. ${tierLabel}-rated ${topSpecialty} retreat from $${retreat.price_min_per_night}/night.`,
+    () => `Is ${retreat.name} worth it? Our 15-category review rates it ${retreat.wrd_score}/10 (${tierLabel}). Located in ${cityCountry(retreat)}. ${top.label}: ${top.score.toFixed(1)}/10. From $${retreat.price_min_per_night}/night.`,
+    () => `${cityOrCountry(retreat)}'s ${retreat.name} scores ${retreat.wrd_score}/10 in our independent review. Top category: ${top.label.toLowerCase()} at ${top.score.toFixed(1)}. ${tierLabel}-rated ${topSpecialty} retreat from $${retreat.price_min_per_night}/night.`,
     () => `A ${tierLabel.toLowerCase()}-rated retreat in ${retreat.country}, ${retreat.name} scores ${retreat.wrd_score}/10 with standout ${top.label.toLowerCase()} (${top.score.toFixed(1)}). Nightly rates from $${retreat.price_min_per_night}.`,
-    () => `${retreat.wrd_score}/10 Vault Score — ${retreat.name} in ${retreat.city} delivers ${pt} ${topSpecialty} programming. ${top.label} leads at ${top.score.toFixed(1)}/10. Read the full analysis.`,
-    () => `Discover ${retreat.name}, a ${tierLabel.toLowerCase()}-rated retreat in ${retreat.city}, ${retreat.country}. Vault Score: ${retreat.wrd_score}/10. Known for ${top.label.toLowerCase()} (${top.score.toFixed(1)}). From $${retreat.price_min_per_night}/night.`,
+    () => `${retreat.wrd_score}/10 Vault Score — ${retreat.name} in ${cityOrCountry(retreat)} delivers ${pt} ${topSpecialty} programming. ${top.label} leads at ${top.score.toFixed(1)}/10. Read the full analysis.`,
+    () => `Discover ${retreat.name}, a ${tierLabel.toLowerCase()}-rated retreat in ${cityCountry(retreat)}. Vault Score: ${retreat.wrd_score}/10. Known for ${top.label.toLowerCase()} (${top.score.toFixed(1)}). From $${retreat.price_min_per_night}/night.`,
   ];
 
   return pick(templates, seed)();

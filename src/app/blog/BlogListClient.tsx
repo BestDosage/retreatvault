@@ -43,8 +43,8 @@ export default function BlogListClient({
         <AnimateIn delay={0.2}>
           <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-dark-300">
             Honest, science-backed guides to choosing the right wellness retreat.
-            No sponsored content. No pay-to-play. Just an analytical chemist
-            doing what chemists do — testing claims.
+            Scores are never for sale — retreats pay us when you book, and the
+            score doesn&rsquo;t move.
           </p>
         </AnimateIn>
 

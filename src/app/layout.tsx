@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Gloock, Hanken_Grotesk } from "next/font/google";
 import Image from "next/image";
+import Script from "next/script";
 import "./globals.css";
 import CompareProvider from "@/components/CompareProvider";
 import CompareBar from "@/components/CompareBar";
@@ -67,6 +68,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="dns-prefetch" href="https://images.pexels.com" />
       </head>
       <body>
+        {process.env.NEXT_PUBLIC_GA4_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA4_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${process.env.NEXT_PUBLIC_GA4_ID}');`}
+            </Script>
+          </>
+        )}
+        {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
+          <Script id="meta-pixel" strategy="afterInteractive">
+            {`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+              fbq('init', '${process.env.NEXT_PUBLIC_META_PIXEL_ID}');
+              fbq('track', 'PageView');`}
+          </Script>
+        )}
         <CompareProvider>
 
         {/* ═══ NAV ═══ */}
@@ -93,8 +115,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </div>
               <p className="mx-auto mt-6 max-w-md text-[13px] leading-relaxed text-cream-200/60 md:mx-0">
                 The world&rsquo;s most rigorous wellness retreat rating system.
-                15 weighted categories. Zero bias. Built by an analytical chemist
-                who demands precision from every score.
+                15 weighted categories. Scores are never for sale &mdash; retreats
+                pay us when you book; you pay nothing and the score doesn&rsquo;t move.
               </p>
               <div className="mt-8">
                 <p className="mb-3 font-display text-[9px] font-semibold uppercase tracking-[0.3em] text-cream-50">Weekly Vault Report</p>
@@ -132,7 +154,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <div>
                 <h4 className="font-display text-[9px] font-semibold uppercase tracking-[0.3em] text-cream-50">Company</h4>
                 <div className="mt-5 flex flex-col gap-3">
+                  <a href="/about" className="text-[13px] text-cream-200/60 transition-colors duration-500 hover:text-cream-50">About</a>
                   <a href="/methodology" className="text-[13px] text-cream-200/60 transition-colors duration-500 hover:text-cream-50">Methodology</a>
+                  <a href="/for-retreats" className="text-[13px] text-cream-200/60 transition-colors duration-500 hover:text-cream-50">For Retreat Owners</a>
                   <a href="/guides" className="text-[13px] text-cream-200/60 transition-colors duration-500 hover:text-cream-50">Guides</a>
                   <a href="/science" className="text-[13px] text-cream-200/60 transition-colors duration-500 hover:text-cream-50">Science</a>
                   <a href="/blog" className="text-[13px] text-cream-200/60 transition-colors duration-500 hover:text-cream-50">Journal</a>
@@ -148,12 +172,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <span className="text-[9px] uppercase tracking-[0.3em] text-cream-200/60">Precision-Rated Wellness Travel</span>
             </div>
             <div className="border-t border-cream-50/10 pt-4 pb-6">
-              <p className="text-[10px] uppercase tracking-[0.15em] text-cream-200/60 mb-2">Also by Chad Waldman</p>
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-cream-200/60">
-                <a href="https://bestdosage.com" target="_blank" rel="noopener" className="hover:text-cream-50 transition-colors">BestDosage — Find wellness practitioners</a>
-                <a href="https://oktodive.com" target="_blank" rel="noopener" className="hover:text-cream-50 transition-colors">OkToDive — Compare dive sites</a>
-                <a href="https://sourchad.com" target="_blank" rel="noopener" className="hover:text-cream-50 transition-colors">SourChad — Fermentation science</a>
-                <a href="https://dumpstercomparison.com" target="_blank" rel="noopener" className="hover:text-cream-50 transition-colors">DumpsterComparison — Compare dumpster rental</a>
+              <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-[11px] text-cream-200/60 sm:justify-start">
+                <a href="/for-retreats" className="hover:text-cream-50 transition-colors">For Retreat Owners →</a>
+                <a href="/about" className="hover:text-cream-50 transition-colors">About</a>
               </div>
             </div>
           </div>
