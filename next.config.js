@@ -1,20 +1,41 @@
+const fs = require("fs");
+const path = require("path");
+
+// next.config.js is evaluated AFTER the `prebuild` step (npm runs prebuild →
+// build, and next reads this config when `next build` starts). So we can check
+// whether scripts/build-snapshot.mjs actually wrote the data snapshot and pick
+// build concurrency accordingly:
+//   • snapshot present  → static generation reads the file, no per-page DB load,
+//                         so run FULLY PARALLEL — builds take a few minutes.
+//   • snapshot missing  → fall back to the live Supabase query; force a single
+//                         worker so the cold-read "thundering herd" that timed
+//                         builds out can't recur. Slower, but never fails.
+// Either way the deploy is reliable; the fast path is taken whenever the
+// snapshot exists (which it will on Vercel, in-region with Supabase).
+const hasSnapshot = (() => {
+  try {
+    const p = path.join(__dirname, "src/data/retreats-snapshot.json");
+    return fs.existsSync(p) && fs.statSync(p).size > 2;
+  } catch {
+    return false;
+  }
+})();
+
+if (!hasSnapshot) {
+  console.warn("[next.config] no build snapshot found — using single-worker fallback build");
+} else {
+  console.log("[next.config] build snapshot present — parallel static generation");
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Give data-heavy pages (homepage, guides) more room to finish their Supabase
-  // queries during static generation. Default is 60s; cold Supabase reads
-  // occasionally exceed it and fail the whole build. 180s absorbs that flake.
+  // Safety margin for the live-query fallback path only; with the snapshot in
+  // place static generation does not touch Supabase per page.
   staticPageGenerationTimeout: 240,
-  // Serialize static generation to a single worker. Many routes (city/country/
-  // region/type/guides) call getAllRetreats() — the ~9,400-row bulk query —
-  // inside generateStaticParams/generateMetadata. On a cold parallel build the
-  // default multi-worker fan-out has them all cold-call Supabase at once before
-  // the unstable_cache is warm (thundering herd), tripping the anon statement
-  // timeout → SIGTERM → build failure. With one worker the query runs once,
-  // caches, and every subsequent page reuses it. Slower build, reliable deploy.
   experimental: {
-    workerThreads: false,
-    cpus: 1,
     optimizePackageImports: ["framer-motion", "lenis"],
+    // Single worker only when we're on the live-query fallback (no snapshot).
+    ...(hasSnapshot ? {} : { workerThreads: false, cpus: 1 }),
   },
   async redirects() {
     return [
@@ -31,9 +52,6 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   productionBrowserSourceMaps: false,
-  experimental: {
-    optimizePackageImports: ["framer-motion", "lenis"],
-  },
 };
 
 module.exports = nextConfig;

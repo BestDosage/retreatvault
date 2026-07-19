@@ -70,6 +70,35 @@ let _retreatsBySlugCache: Map<string, WellnessRetreat> = new Map();
 let _retreatsPromise: Promise<WellnessRetreat[]> | null = null;
 
 async function _fetchAllRetreats(): Promise<WellnessRetreat[]> {
+  // ── Build-time fast path ──────────────────────────────────────────────────
+  // During `next build`, read the prebuilt snapshot (written by
+  // scripts/build-snapshot.mjs in the `prebuild` step) instead of hitting
+  // Supabase from every static page. This removes the entire build-time DB load
+  // — the cold-read "thundering herd" that was timing builds out — so static
+  // generation runs fully parallel and fast. Runtime (ISR / on-demand) still
+  // queries Supabase below for freshness. If the snapshot is missing/unreadable,
+  // fall straight through to the live query, so this can never make builds worse.
+  if (process.env.NEXT_PHASE === "phase-production-build") {
+    try {
+      const fs = await import("node:fs");
+      const path = await import("node:path");
+      const snap = path.join(process.cwd(), "src/data/retreats-snapshot.json");
+      if (fs.existsSync(snap)) {
+        const rows = JSON.parse(fs.readFileSync(snap, "utf8"));
+        if (Array.isArray(rows) && rows.length > 0) {
+          console.log(`[data] using build snapshot: ${rows.length} retreats (no DB read)`);
+          const mapped = rows.map(mapRow);
+          _retreatsCache = mapped;
+          _retreatsBySlugCache = new Map(mapped.map((r) => [r.slug, r]));
+          return mapped;
+        }
+      }
+      console.warn("[data] build snapshot missing/empty — falling back to live query");
+    } catch (e) {
+      console.error("[data] snapshot read failed, falling back to live query:", e);
+    }
+  }
+
   // Single-query bulk fetch, enabled by the composite index
   // `retreats_wrd_slug_idx ON retreats (wrd_score DESC, slug ASC)
   //  WHERE wrd_score > 0 AND slug <> 'test'` (applied via Supabase
