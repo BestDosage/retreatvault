@@ -49,6 +49,7 @@ async function getDistinctCountries(): Promise<string[]> {
       .select("country")
       .neq("slug", "test")
       .neq("slug", "cape-kalevala")
+      .neq("slug", "4-day-womens-intuitive-wisdom-empowerment-retreat-in-the-uk")
       .gt("wrd_score", 0)
       .range(offset, offset + PAGE - 1);
     if (!data || data.length === 0) break;
@@ -66,6 +67,7 @@ async function getRetreatCount(): Promise<number> {
     .select("id", { count: "exact", head: true })
     .neq("slug", "test")
     .neq("slug", "cape-kalevala")
+    .neq("slug", "4-day-womens-intuitive-wisdom-empowerment-retreat-in-the-uk")
     .gt("wrd_score", 0);
   return count ?? 0;
 }
@@ -77,6 +79,7 @@ async function getRetreatSlugsPage(offset: number, limit: number): Promise<{ slu
     .select("slug, updated_at")
     .neq("slug", "test")
     .neq("slug", "cape-kalevala")
+    .neq("slug", "4-day-womens-intuitive-wisdom-empowerment-retreat-in-the-uk")
     .gt("wrd_score", 0)
     .order("slug")
     .range(offset, offset + limit - 1);
@@ -95,6 +98,7 @@ async function getDistinctRegions(): Promise<string[]> {
       .select("region")
       .neq("slug", "test")
       .neq("slug", "cape-kalevala")
+      .neq("slug", "4-day-womens-intuitive-wisdom-empowerment-retreat-in-the-uk")
       .gt("wrd_score", 0)
       .range(offset, offset + PAGE - 1);
     if (!data || data.length === 0) break;
@@ -124,6 +128,7 @@ async function getCitySlugsWith3Plus(): Promise<string[]> {
     .select("city, country, region")
     .neq("slug", "test")
     .neq("slug", "cape-kalevala")
+    .neq("slug", "4-day-womens-intuitive-wisdom-empowerment-retreat-in-the-uk")
     .gt("wrd_score", 0)
     .order("wrd_score", { ascending: false })
     .order("slug", { ascending: true })

@@ -56,6 +56,7 @@ while (true) {
         .select(LIST_COLUMNS)
         .neq("slug", "test")
         .neq("slug", "cape-kalevala")
+        .neq("slug", "4-day-womens-intuitive-wisdom-empowerment-retreat-in-the-uk")
         .gt("wrd_score", 0)
         .order("wrd_score", { ascending: false })
         .order("slug", { ascending: true })

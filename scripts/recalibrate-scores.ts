@@ -180,6 +180,7 @@ async function fetchAll() {
       .select("id,slug,name,wrd_score,score_tier,scores")
       .neq("slug", "test")
       .neq("slug", "cape-kalevala")
+      .neq("slug", "4-day-womens-intuitive-wisdom-empowerment-retreat-in-the-uk")
       .gt("wrd_score", 0)
       .order("slug", { ascending: true })
       .range(offset, offset + PAGE - 1);

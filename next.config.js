@@ -44,6 +44,11 @@ const nextConfig = {
         destination: "/",
         permanent: true,
       },
+      {
+        source: "/retreats/4-day-womens-intuitive-wisdom-empowerment-retreat-in-the-uk",
+        destination: "/",
+        permanent: true,
+      },
     ];
   },
   images: {
