@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { blogPosts as basePosts } from "@/data/blog-posts";
 import { retreatBlogPosts } from "@/data/retreat-blog-posts";
 
-const blogPosts = [...retreatBlogPosts, ...basePosts];
+const blogPosts = [...retreatBlogPosts, ...basePosts].sort((a, b) => b.published_date.localeCompare(a.published_date));
 import { getAllRetreats } from "@/lib/data";
 import BlogPostClient from "./BlogPostClient";
 

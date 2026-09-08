@@ -4,11 +4,11 @@ import { BlogPost } from "@/lib/types";
 import AnimateIn from "@/components/AnimateIn";
 
 const categoryColors: Record<string, string> = {
-  trust: "text-amber-400",
-  budget: "text-emerald-400",
-  condition: "text-rose-400",
-  decision: "text-sky-400",
-  science: "text-violet-400",
+  trust: "text-sage-700",
+  budget: "text-sage-700",
+  condition: "text-sage-700",
+  decision: "text-sage-700",
+  science: "text-sage-700",
 };
 
 type RetreatImageMap = Record<string, { name: string; image: string; slug: string }>;
@@ -42,8 +42,8 @@ function RetreatImage({
           />
         </div>
         <figcaption className="mt-2 flex items-center justify-between">
-          <span className="text-[11px] text-dark-400">{retreat.name}</span>
-          <span className="text-[10px] text-gold-600 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          <span className="text-[11px] text-ink-500">{retreat.name}</span>
+          <span className="text-[10px] text-sage-700 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
             View full rating &rarr;
           </span>
         </figcaption>
@@ -85,7 +85,7 @@ function renderContent(content: string, retreatImages: RetreatImageMap) {
       elements.push(
         <h2
           key={i}
-          className="mt-14 mb-6 font-serif text-3xl font-light text-white"
+          className="mt-14 mb-6 font-serif text-3xl font-light text-ink-900"
         >
           {line.slice(3)}
         </h2>
@@ -99,7 +99,7 @@ function renderContent(content: string, retreatImages: RetreatImageMap) {
       elements.push(
         <h3
           key={i}
-          className="mt-10 mb-4 font-serif text-xl font-light text-white"
+          className="mt-10 mb-4 font-serif text-xl font-light text-ink-900"
         >
           {line.slice(4)}
         </h3>
@@ -120,7 +120,7 @@ function renderContent(content: string, retreatImages: RetreatImageMap) {
           {items.map((item, idx) => (
             <li
               key={idx}
-              className="text-[15px] leading-relaxed text-dark-200 before:mr-3 before:inline-block before:text-gold-500 before:content-['—']"
+              className="text-[15px] leading-relaxed text-ink-700 before:mr-3 before:inline-block before:text-sage-700 before:content-['—']"
             >
               <InlineMarkdown text={item} />
             </li>
@@ -140,8 +140,8 @@ function renderContent(content: string, retreatImages: RetreatImageMap) {
       elements.push(
         <ol key={`ol-${i}`} className="my-4 ml-4 flex flex-col gap-2">
           {items.map((item, idx) => (
-            <li key={idx} className="text-[15px] leading-relaxed text-dark-200">
-              <span className="mr-3 font-semibold text-gold-500">{idx + 1}.</span>
+            <li key={idx} className="text-[15px] leading-relaxed text-ink-700">
+              <span className="mr-3 font-semibold text-sage-700">{idx + 1}.</span>
               <InlineMarkdown text={item} />
             </li>
           ))}
@@ -152,7 +152,7 @@ function renderContent(content: string, retreatImages: RetreatImageMap) {
 
     // Regular paragraph
     elements.push(
-      <p key={i} className="my-4 text-[15px] leading-[1.85] text-dark-200">
+      <p key={i} className="my-4 text-[15px] leading-[1.85] text-ink-700">
         <InlineMarkdown text={line} />
       </p>
     );
@@ -191,7 +191,7 @@ function InlineMarkdown({ text }: { text: string }) {
 
     if (first.type === "bold") {
       parts.push(
-        <strong key={key++} className="font-semibold text-white">
+        <strong key={key++} className="font-semibold text-ink-900">
           {first.match![1]}
         </strong>
       );
@@ -201,7 +201,7 @@ function InlineMarkdown({ text }: { text: string }) {
         <a
           key={key++}
           href={first.match![2]}
-          className="text-gold-400 underline decoration-gold-700/40 underline-offset-2 transition-colors duration-300 hover:text-gold-300"
+          className="text-sage-700 underline decoration-sage-700/40 underline-offset-2 transition-colors duration-300 hover:text-sage-600"
         >
           {first.match![1]}
         </a>
@@ -239,11 +239,11 @@ export default function BlogPostClient({
         {/* Breadcrumb */}
         <AnimateIn>
           <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.3em]">
-            <a href="/blog" className="text-dark-400 transition-colors duration-300 hover:text-gold-400">
+            <a href="/blog" className="text-ink-500 transition-colors duration-300 hover:text-sage-600">
               Journal
             </a>
-            <span className="text-dark-600">/</span>
-            <span className={categoryColors[post.category] || "text-gold-500"}>
+            <span className="text-ink-500">/</span>
+            <span className={categoryColors[post.category] || "text-sage-700"}>
               {post.category_label}
             </span>
           </div>
@@ -251,13 +251,13 @@ export default function BlogPostClient({
 
         {/* Title */}
         <AnimateIn delay={0.1}>
-          <h1 className="mt-6 max-w-4xl font-serif text-4xl font-light leading-tight text-white sm:text-5xl">
+          <h1 className="mt-6 max-w-4xl font-serif text-4xl font-light leading-tight text-ink-900 sm:text-5xl">
             {post.title}
           </h1>
         </AnimateIn>
 
         <AnimateIn delay={0.15}>
-          <p className="mt-4 max-w-3xl text-[15px] leading-relaxed text-dark-300">
+          <p className="mt-4 max-w-3xl text-[15px] leading-relaxed text-ink-700">
             {post.subtitle}
           </p>
         </AnimateIn>
@@ -266,18 +266,18 @@ export default function BlogPostClient({
         <AnimateIn delay={0.2}>
           <div className="mt-8 flex flex-wrap items-center gap-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-gold-700/30 bg-dark-800">
-                <span className="text-[11px] font-semibold text-gold-400">CW</span>
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-sage-700/30 bg-cream-200">
+                <span className="text-[11px] font-semibold text-sage-700">CW</span>
               </div>
               <div>
-                <p className="text-[13px] font-medium text-white">{post.author}</p>
-                <p className="text-[11px] text-dark-400">{post.author_title}</p>
+                <p className="text-[13px] font-medium text-ink-900">{post.author}</p>
+                <p className="text-[11px] text-ink-500">{post.author_title}</p>
               </div>
             </div>
-            <div className="h-4 w-px bg-dark-700" />
-            <span className="text-[12px] text-dark-400">{publishedDate}</span>
-            <div className="h-4 w-px bg-dark-700" />
-            <span className="text-[12px] text-dark-400">{post.read_time_minutes} min read</span>
+            <div className="h-4 w-px bg-cream-200" />
+            <span className="text-[12px] text-ink-500">{publishedDate}</span>
+            <div className="h-4 w-px bg-cream-200" />
+            <span className="text-[12px] text-ink-500">{post.read_time_minutes} min read</span>
           </div>
         </AnimateIn>
 
@@ -296,7 +296,7 @@ export default function BlogPostClient({
                 <figcaption className="mt-2">
                   <a
                     href={`/retreats/${heroRetreatSlug}`}
-                    className="text-[11px] text-dark-500 transition-colors duration-300 hover:text-gold-400"
+                    className="text-[11px] text-ink-500 transition-colors duration-300 hover:text-sage-600"
                   >
                     {heroRetreatName}
                   </a>
@@ -322,7 +322,7 @@ export default function BlogPostClient({
             {post.tags.map((tag) => (
               <span
                 key={tag}
-                className="rounded-full border border-white/[0.06] bg-dark-800 px-3 py-1 text-[10px] uppercase tracking-[0.15em] text-dark-300"
+                className="rounded-full border border-cream-200 bg-cream-200 px-3 py-1 text-[10px] uppercase tracking-[0.15em] text-ink-700"
               >
                 {tag}
               </span>
@@ -333,23 +333,23 @@ export default function BlogPostClient({
         {/* Related Posts */}
         {relatedPosts.length > 0 && (
           <div className="mx-auto max-w-3xl pb-24">
-            <h3 className="font-serif text-2xl font-light text-white">Keep Reading</h3>
+            <h3 className="font-serif text-2xl font-light text-ink-900">Keep Reading</h3>
             <div className="mt-6 grid gap-6 sm:grid-cols-2">
               {relatedPosts.map((rp) => (
                 <a
                   key={rp.slug}
                   href={`/blog/${rp.slug}`}
-                  className="group rounded-lg border border-white/[0.04] bg-dark-900 p-6 transition-all duration-500 hover:border-gold-700/30 hover:bg-dark-800"
+                  className="group rounded-lg border border-cream-200 bg-cream-100 p-6 transition-all duration-500 hover:border-sage-700/40 hover:bg-cream-200"
                 >
                   <span
-                    className={`text-[9px] font-semibold uppercase tracking-[0.3em] ${categoryColors[rp.category] || "text-gold-500"}`}
+                    className={`text-[9px] font-semibold uppercase tracking-[0.3em] ${categoryColors[rp.category] || "text-sage-700"}`}
                   >
                     {rp.category_label}
                   </span>
-                  <h4 className="mt-2 font-serif text-lg font-light text-white transition-colors duration-500 group-hover:text-gold-400">
+                  <h4 className="mt-2 font-serif text-lg font-light text-ink-900 transition-colors duration-500 group-hover:text-sage-600">
                     {rp.title}
                   </h4>
-                  <p className="mt-2 text-[12px] text-dark-400">{rp.read_time_minutes} min read</p>
+                  <p className="mt-2 text-[12px] text-ink-500">{rp.read_time_minutes} min read</p>
                 </a>
               ))}
             </div>

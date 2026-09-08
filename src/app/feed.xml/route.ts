@@ -2,7 +2,7 @@ import { blogPosts as basePosts } from "@/data/blog-posts";
 import { retreatBlogPosts } from "@/data/retreat-blog-posts";
 import { GUIDES } from "@/data/guides";
 
-const blogPosts = [...retreatBlogPosts, ...basePosts];
+const blogPosts = [...retreatBlogPosts, ...basePosts].sort((a, b) => b.published_date.localeCompare(a.published_date));
 
 export async function GET() {
   const baseUrl = "https://www.retreatvault.com";
