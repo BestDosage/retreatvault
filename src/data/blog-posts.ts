@@ -2,6 +2,91 @@ import { BlogPost } from "@/lib/types";
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: "barcelona-reset-four-day-wellness-plan",
+    title: "The Barcelona Reset: Four Days of CrossFit, Cold Plunges, and Coffee, Planned Like a Chemist",
+    subtitle: "No retreat, no hotel, no chains. A city wellness trip built around walking distance, with every venue verified and the full directory free to download.",
+    author: "Chad Waldman",
+    author_title: "Founder, RetreatVault",
+    published_date: "2026-09-08",
+    updated_date: "2026-09-08",
+    read_time_minutes: 7,
+    hero_image_url: "",
+    hero_image_alt: "",
+    category: "decision",
+    category_label: "Field Notes",
+    tags: ["barcelona", "city wellness", "cold plunge", "crossfit", "diy retreat", "spain"],
+    meta_description: "A four-day Barcelona wellness trip with no retreat and no hotel: four independent CrossFit boxes, daily sauna and cold plunge, verified restaurants and coffee, under 200 euros a day. Directory of 45 venues included.",
+    related_retreat_slugs: [],
+    content: `I score wellness retreats for a living. This is what I do when there is no retreat.
+
+Most of the year, staying healthy is easy for me in Santa Monica. It gets hard on the road, which is where most people's habits go to die. So I built a four-day Barcelona trip where the healthy version is the default, not the exception, and I am publishing the plan before I go. If it works, you get a template you can copy for any city. If it does not, you get the honest version of why.
+
+## The base
+
+Passeig de Sant Joan 4, at the foot of the boulevard by Arc de Triomf. I picked it by walking time, not by neighbourhood name. From the door: a CrossFit box in 3 minutes, Ciutadella park in 2, specialty coffee in 3, the ice bath in 9.
+
+When the good choice is closer than the bad one, you make it half-asleep. That is the whole trick, and it is the same reason the best retreats put the yoga deck between your room and breakfast.
+
+## The morning protocol, every day
+
+- **06:45.** Wake, ginger-turmeric shot. Bottled from Veritas the night before, fresh from BeBo Cold Press when I pass it.
+- **07:00.** CrossFit. A different independent box each morning, chosen by how far I have to walk.
+- **08:30.** ILO Studios, sauna and cold plunge. Bailen 56.
+- **09:45.** Breakfast and the day's coffee.
+
+**CrossFit first, ice bath after. Never the other way round.** Cold before training blunts the work you are about to do. Cold after it is the point.
+
+## The four boxes
+
+- **Day 1.** CrossFit Eixample, Passeig de Lluis Companys 12. 3 minutes on foot. 18 euros.
+- **Day 2.** The Hall, Roger de Flor 87. 7 minutes. Price on request.
+- **Day 3.** KOR CrossFit, Ribes 23. 6 minutes. 18 euros.
+- **Day 4.** Studio CrossFit, Provenca 529. 3 minutes by bike. 18 euros.
+
+No chains. Four owner-run boxes, four different coaching styles, and I meet the owner at each one. Backups if a class is full: Condal Gracia (20 euros) and Alpha Link on Roger de Flor.
+
+## Coffee, ranked by distance
+
+Satan's Coffee Corner inside Casa Bonay is the only specialty place open before the box, 07:00 daily. Three Marks on Ausias Marc opens 08:30 on weekdays, which lands exactly after the plunge. Nomad on Passatge Sert is the weekday afternoon stop and is closed at weekends. El Magnifico in El Born is the one I will walk 15 minutes for.
+
+## Food
+
+Everything independent. Granja Petitbo and Faire for breakfast. La Pubilla in Gracia for a proper Catalan fork breakfast on day 3, Tuesday to Saturday only. Dinners: Bar Mut, Can Sole (open since 1903, closed Mondays), Berbena (reserve), and Xavier Pellicer for the finale, Wednesday to Saturday, reserve.
+
+I checked every one of these against current hours. Two places I found in guides do not exist any more, and one has closed. Guides lie. Phone calls do not.
+
+## Afternoons
+
+- **Day 1.** Bike through Ciutadella to Bogatell beach. Swim, beach volleyball.
+- **Day 2.** Padel at CEM Nova Icaria.
+- **Day 3.** The Rokka Studio ritual, sauna and plunge again, then a slow walk through Gracia.
+- **Day 4.** Paddleboard at Barceloneta, AIRE Ancient Baths in El Born, then the Bunkers del Carmel hike for golden hour.
+
+## What it costs
+
+- Boxes, four sessions: about 72 euros
+- ILO Studios, three-session pack: 45 euros
+- Rokka ritual: 42 euros
+- AIRE baths: about 50 euros
+- Padel and paddleboard: about 30 euros
+- Coffee, shots, groceries: about 80 euros
+- Breakfasts and dinners: about 430 euros
+- Accommodation: 0 euros
+- **Total, per person: about 750 euros**
+
+Four days, no chains, no hotel. Under 200 euros a day for the healthiest week of the year. For comparison, the median mid-range retreat in our database runs 200 to 600 euros a night before you have eaten anything.
+
+## The directory
+
+Forty-five places: every box, bath, cafe, restaurant, shop, and beach on this plan, with address, walking time from the base, hours, and cost. It is the spreadsheet I built to plan the trip. Take it.
+
+[Download the Barcelona wellness directory (CSV, 45 venues)](/downloads/barcelona-wellness-directory.csv)
+
+## What happens next
+
+I will post the days as they happen, with what I ate, what I lifted, and what I would change. If I skip the plunge on day 3 you will read about it. That is the deal.`,
+  },
+  {
     slug: "how-much-does-a-wellness-retreat-cost",
     title: "How Much Does a Wellness Retreat Actually Cost? A Real Breakdown",
     subtitle: "Forget the glossy brochures. Here's what you'll really pay — from budget ashrams to $10K medical spas — and how to figure out if it's worth it.",
